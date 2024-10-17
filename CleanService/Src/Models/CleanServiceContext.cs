@@ -1,3 +1,4 @@
+using EntityFramework.Exceptions.MySQL.Pomelo;
 using Microsoft.EntityFrameworkCore;
 
 namespace CleanService.Src.Models;
@@ -55,5 +56,10 @@ public class CleanServiceContext : DbContext
         modelBuilder.Entity<Contracts>()
             .Property(c => c.CreatedAt)
             .HasDefaultValue(DateTime.Now);
+    }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseExceptionProcessor();
     }
 }

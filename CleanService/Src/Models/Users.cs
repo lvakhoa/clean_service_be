@@ -20,11 +20,6 @@ public class Users
 
     [Required] [MaxLength(255)] public string Email { get; set; } = null!;
 
-    [Required]
-    [MaxLength(255)]
-    [Comment("Store hashed passwords")]
-    public string Password { get; set; } = null!;
-
     public DateTime CreatedAt { get; set; }
 
     public UserStatus Status { get; set; }
