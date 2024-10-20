@@ -42,6 +42,7 @@ public class GlobalExceptionHandler : IExceptionHandler
                     ExceptionConvention.NotFound),
                 UnauthorizedAccessException _ => new ExceptionResponse(HttpStatusCode.Unauthorized, "Unauthorized.",
                     ExceptionConvention.Unauthorized),
+                
                 _ => new ExceptionResponse(HttpStatusCode.InternalServerError,
                     "Internal server error. Please retry later.", ExceptionConvention.InternalServerError)
             };

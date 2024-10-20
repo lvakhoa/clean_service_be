@@ -1,4 +1,5 @@
 using System.Net;
+using System.Security.Claims;
 using CleanService.Src.Constant;
 using CleanService.Src.Helpers;
 using CleanService.Src.Middlewares;
@@ -37,6 +38,18 @@ builder.Services.AddRouting(options => options.LowercaseUrls = true);
 builder.Services.AddProblemDetails();
 
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy(AuthPolicy.IsAdmin,
+        policy => { policy.RequireClaim(ClaimTypes.Role, UserType.Admin.ToString()); });
+
+    options.AddPolicy(AuthPolicy.IsHelper,
+        policy => { policy.RequireClaim(ClaimTypes.Role, UserType.Helper.ToString()); });
+
+    options.AddPolicy(AuthPolicy.IsCustomer,
+        policy => { policy.RequireClaim(ClaimTypes.Role, UserType.Customer.ToString()); });
+});
 
 builder.Services
     .AddAppDependency(builder.Configuration);

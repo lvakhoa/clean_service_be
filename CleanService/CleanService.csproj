@@ -23,4 +23,9 @@
       <PackageReference Include="Pomelo.EntityFrameworkCore.MySql.Design" Version="1.1.2" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Src\Filters\" />
+      <Folder Include="Src\Modules\Auth\Validations\" />
+    </ItemGroup>
+
 </Project>

@@ -18,10 +18,7 @@ public class ClaimsTransformation : IClaimsTransformation
     {
         var claimsIdentity = new ClaimsIdentity();
 
-        var userId =
-            Guid.TryParse(principal.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var id)
-                ? id
-                : Guid.Empty;
+        var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         var claimRoleValue = await _dbContext.Users.FirstOrDefaultAsync(u => u.Id == userId);
         if (!principal.HasClaim(claim => claim.Type == ClaimTypes.Role))
         {

@@ -24,7 +24,7 @@ namespace CleanService.Migrations
 
             modelBuilder.Entity("CleanService.Src.Models.Bookings", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(255)
                         .HasColumnType("char(255)");
@@ -32,7 +32,8 @@ namespace CleanService.Migrations
                     b.Property<string>("CancellationReason")
                         .HasColumnType("longtext");
 
-                    b.Property<Guid>("CustomerId")
+                    b.Property<string>("CustomerId")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("char(255)");
 
@@ -42,7 +43,7 @@ namespace CleanService.Migrations
                     b.Property<string>("Feedback")
                         .HasColumnType("longtext");
 
-                    b.Property<Guid?>("HelperId")
+                    b.Property<string>("HelperId")
                         .HasMaxLength(255)
                         .HasColumnType("char(255)")
                         .HasComment("Can be NULL if not assigned yet");
@@ -62,7 +63,8 @@ namespace CleanService.Migrations
                     b.Property<int?>("Rating")
                         .HasColumnType("int");
 
-                    b.Property<Guid>("ServiceId")
+                    b.Property<string>("ServiceId")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("char(255)");
 
@@ -82,7 +84,7 @@ namespace CleanService.Migrations
 
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("Bookings");
+                    b.ToTable("Bookings", (string)null);
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.Contracts", b =>
@@ -91,7 +93,8 @@ namespace CleanService.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
-                    b.Property<Guid>("BookingId")
+                    b.Property<string>("BookingId")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("char(255)");
 
@@ -108,12 +111,12 @@ namespace CleanService.Migrations
                     b.HasIndex("BookingId")
                         .IsUnique();
 
-                    b.ToTable("Contracts");
+                    b.ToTable("Contracts", (string)null);
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.Helpers", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<string>("Id")
                         .HasMaxLength(255)
                         .HasColumnType("char(255)");
 
@@ -146,7 +149,7 @@ namespace CleanService.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Helpers", t =>
+                    b.ToTable("Helpers", null, t =>
                         {
                             t.HasComment("Additional information for users' type is helper");
                         });
@@ -154,16 +157,18 @@ namespace CleanService.Migrations
 
             modelBuilder.Entity("CleanService.Src.Models.RestrictedList", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(255)
                         .HasColumnType("char(255)");
 
-                    b.Property<Guid>("CustomerId")
+                    b.Property<string>("CustomerId")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("char(255)");
 
-                    b.Property<Guid>("HelperId")
+                    b.Property<string>("HelperId")
+                        .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("char(255)");
 
@@ -173,7 +178,7 @@ namespace CleanService.Migrations
 
                     b.HasIndex("HelperId");
 
-                    b.ToTable("RestrictedList");
+                    b.ToTable("RestrictedList", (string)null);
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.Services", b =>
@@ -193,12 +198,12 @@ namespace CleanService.Migrations
 
                     b.HasIndex("ServiceName");
 
-                    b.ToTable("Services");
+                    b.ToTable("Services", (string)null);
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.Users", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<string>("Id")
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(255)
                         .HasColumnType("char(255)");
@@ -241,7 +246,7 @@ namespace CleanService.Migrations
 
                     b.HasIndex("FullName");
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.Bookings", b =>

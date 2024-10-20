@@ -11,12 +11,12 @@ public class Bookings
     [ForeignKey(nameof(Users))]
     [Required]
     [MaxLength(255)]
-    public Guid CustomerId { get; set; }
+    public string CustomerId { get; set; } = null!;
 
     [ForeignKey(nameof(Users))]
     [MaxLength(255)]
     [Comment("Can be NULL if not assigned yet")]
-    public Guid? HelperId { get; set; }
+    public string? HelperId { get; set; }
 
     [ForeignKey(nameof(Services))]
     [Required]
@@ -34,6 +34,7 @@ public class Bookings
     public string? CancellationReason { get; set; }
 
     [Precision(10, 2)]
+    [Range(1000, double.MaxValue)]
     public decimal? Price { get; set; }
 
     [MaxLength(50)] public string? PaymentMethod { get; set; }

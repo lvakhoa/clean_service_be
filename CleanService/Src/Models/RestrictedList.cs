@@ -11,12 +11,12 @@ public class RestrictedList
     [ForeignKey(nameof(Users))]
     [Required]
     [MaxLength(255)]
-    public Guid CustomerId { get; set; }
+    public string CustomerId { get; set; } = null!;
     
     [ForeignKey(nameof(Users))]
     [Required]
     [MaxLength(255)]
-    public Guid HelperId { get; set; }
+    public string HelperId { get; set; } = null!;
     
     public virtual Users Customer { get; set; } = null!;
     
