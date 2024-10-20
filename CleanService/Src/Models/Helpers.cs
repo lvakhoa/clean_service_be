@@ -10,7 +10,7 @@ public class Helpers
     [Key]
     [ForeignKey(nameof(Users))]
     [MaxLength(255)]
-    public Guid Id { get; set; }
+    public string Id { get; set; } = null!;
     
     public string? ExperienceDescription { get; set; }
     
@@ -18,9 +18,11 @@ public class Helpers
     public string? ServicesOffered { get; set; }
     
     [Precision(10, 2)]
+    [Range(1000, double.MaxValue)]
     public decimal? ProposedPrice { get; set; }
 
     [Precision(3, 2)]
+    [Range(0, 100)]
     public decimal AverageRating { get; set; } 
     
     public int CompletedJobs { get; set; } 

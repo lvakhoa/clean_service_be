@@ -8,7 +8,7 @@ namespace CleanService.Src.Models;
 [Index(nameof(Email), IsUnique = true)]
 public class Users
 {
-    [Key] [MaxLength(255)] public Guid Id { get; set; }
+    [Key] [MaxLength(255)] public string Id { get; set; } = null!;
 
     [Required] public UserType UserType { get; set; }
 
@@ -16,14 +16,14 @@ public class Users
 
     [MaxLength(255)] public string? Address { get; set; }
 
-    [MaxLength(20)] public string? PhoneNumber { get; set; }
-
-    [Required] [MaxLength(255)] public string Email { get; set; } = null!;
+    [MaxLength(20)]
+    [RegularExpression("/(84|0[3|5|7|8|9])+([0-9]{8})\\b/g")]
+    public string? PhoneNumber { get; set; }
 
     [Required]
     [MaxLength(255)]
-    [Comment("Store hashed passwords")]
-    public string Password { get; set; } = null!;
+    [EmailAddress]
+    public string Email { get; set; } = null!;
 
     public DateTime CreatedAt { get; set; }
 
