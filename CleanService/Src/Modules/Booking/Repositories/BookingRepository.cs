@@ -1,8 +1,8 @@
 using CleanService.Src.Models;
-using CleanService.Src.Modules.Auth.DTOs;
+using CleanService.Src.Modules.Booking.DTOs;
 using Microsoft.EntityFrameworkCore;
 
-namespace CleanService.Src.Modules.Auth.Repositories;
+namespace CleanService.Src.Modules.Booking.Repositories;
 
 public class BookingRepository : IBookingRepository 
 {
@@ -13,19 +13,26 @@ public class BookingRepository : IBookingRepository
         _dbContext = dbContext;
     }
 
-    public async Task<BookingReturnDto?> GetBookingById(string id)
+    public async Task<BookingReturnDto?> GetBookingById(Guid id)
     {
         var booking = await _dbContext.Bookings.FirstOrDefaultAsync(x => x.Id == id);
-
+    
         return booking is not null
             ? new BookingReturnDto
             {
                 Id = booking.Id,
-                UserId = booking.UserId,
+                CustomerId = booking.CustomerId,
                 HelperId = booking.HelperId,
-                BookingDate = booking.BookingDate,
-                BookingTime = booking.BookingTime,
-                BookingStatus = booking.BookingStatus
+                ServiceId = booking.ServiceId,
+                Location = booking.Location,
+                StartTime = booking.StartTime,
+                EndTime = booking.EndTime,
+                Status = booking.Status,
+                CancellationReason = booking.CancellationReason,
+                Price = booking.Price,
+                PaymentMethod = booking.PaymentMethod,
+                Rating = booking.Rating,
+                Feedback = booking.Feedback,
             }
             : null;
     }
@@ -34,65 +41,94 @@ public class BookingRepository : IBookingRepository
     {
         var bookingEntity = await _dbContext.Bookings.AddAsync(new Bookings
         {
-            Id = createBooking.Id,
-            UserId = createBooking.UserId,
+            CustomerId = createBooking.CustomerId,
             HelperId = createBooking.HelperId,
-            BookingDate = createBooking.BookingDate,
-            BookingTime = createBooking.BookingTime,
-            BookingStatus = createBooking.BookingStatus
+            ServiceId = createBooking.ServiceId,
+            Location = createBooking.Location,
+            StartTime = createBooking.StartTime,
+            EndTime = createBooking.EndTime,
+            Price = createBooking.Price,
+            PaymentMethod = createBooking.PaymentMethod,
         });
-
+    
         await _dbContext.SaveChangesAsync();
-
+    
         return new BookingReturnDto
         {
             Id = bookingEntity.Entity.Id,
-            UserId = bookingEntity.Entity.UserId,
+            CustomerId = bookingEntity.Entity.CustomerId,
             HelperId = bookingEntity.Entity.HelperId,
-            BookingDate = bookingEntity.Entity.BookingDate,
-            BookingTime = bookingEntity.Entity.BookingTime,
-            BookingStatus = bookingEntity.Entity.BookingStatus
+            ServiceId = bookingEntity.Entity.ServiceId,
+            Location = bookingEntity.Entity.Location,
+            StartTime = bookingEntity.Entity.StartTime,
+            EndTime = bookingEntity.Entity.EndTime,
+            Status = bookingEntity.Entity.Status,
+            CancellationReason = bookingEntity.Entity.CancellationReason,
+            Price = bookingEntity.Entity.Price,
+            PaymentMethod = bookingEntity.Entity.PaymentMethod,
+            Rating = bookingEntity.Entity.Rating,
+            Feedback = bookingEntity.Entity.Feedback,
         };
     }
-
-    public async Task<BookingReturnDto?> UpdateBooking(string id, UpdateBookingDto updateBooking)
+    
+    public async Task<BookingReturnDto?> UpdateBooking(Guid id, UpdateBookingDto updateBooking)
     {
         var booking = await _dbContext.Bookings.FirstOrDefaultAsync(x => x.Id == id);
-
+    
         if (booking is null)
         {
             return null;
         }
-
-        booking.BookingDate = updateBooking.BookingDate;
-        booking.BookingTime = updateBooking.BookingTime;
-        booking.BookingStatus = updateBooking.BookingStatus;
-
+    
+        booking.HelperId = updateBooking.HelperId;
+        booking.Location = updateBooking.Location;
+        booking.EndTime = updateBooking.EndTime;
+        booking.Status = (BookingStatus)updateBooking.Status;
+        booking.CancellationReason = updateBooking.CancellationReason;
+        booking.Price = updateBooking.Price;
+        booking.PaymentMethod = updateBooking.PaymentMethod;
+        booking.Feedback = updateBooking.Feedback;
+        booking.Rating = updateBooking.Rating;
+    
         await _dbContext.SaveChangesAsync();
-
+    
         return new BookingReturnDto
         {
             Id = booking.Id,
-            UserId = booking.UserId,
+            CustomerId = booking.CustomerId,
             HelperId = booking.HelperId,
-            BookingDate = booking.BookingDate,
-            BookingTime = booking.BookingTime,
-            BookingStatus = booking.BookingStatus
+            ServiceId = booking.ServiceId,
+            Location = booking.Location,
+            StartTime = booking.StartTime,
+            EndTime = booking.EndTime,
+            Status = booking.Status,
+            CancellationReason = booking.CancellationReason,
+            Price = booking.Price,
+            PaymentMethod = booking.PaymentMethod,
+            Rating = booking.Rating,
+            Feedback = booking.Feedback,
         };
     }
-
+    
     public async Task<BookingReturnDto[]> GetAllBookings()
     {
         var bookings = await _dbContext.Bookings.ToArrayAsync();
-
+    
         return bookings.Select(booking => new BookingReturnDto
         {
             Id = booking.Id,
-            UserId = booking.UserId,
+            CustomerId = booking.CustomerId,
             HelperId = booking.HelperId,
-            BookingDate = booking.BookingDate,
-            BookingTime = booking.BookingTime,
-            BookingStatus = booking.BookingStatus
+            ServiceId = booking.ServiceId,
+            Location = booking.Location,
+            StartTime = booking.StartTime,
+            EndTime = booking.EndTime,
+            Status = booking.Status,
+            CancellationReason = booking.CancellationReason,
+            Price = booking.Price,
+            PaymentMethod = booking.PaymentMethod,
+            Rating = booking.Rating,
+            Feedback = booking.Feedback,
         }).ToArray();
     }
 }

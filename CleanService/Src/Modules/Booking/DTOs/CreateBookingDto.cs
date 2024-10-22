@@ -6,26 +6,22 @@ namespace CleanService.Src.Modules.Booking.DTOs;
 public class CreateBookingDto
 {
     [Required]
-    public string Id { get; set; }
-    
+    public string CustomerId { get; set; } = null!;
+
+    public string? HelperId { get; set; }
+
     [Required]
-    public string UserId { get; set; }
-    
+    public Guid ServiceId { get; set; }
+
+    public string? Location { get; set; }
+
     [Required]
-    public string HelperId { get; set; }
-    
-    [Required]
-    public DateTime BookingDate { get; set; }
-    
-    [Required]
-    public string BookingTime { get; set; }
-    
-    [Required]
-    public string BookingAddress { get; set; }
-    
-    [Required]
-    public string BookingDescription { get; set; }
-    
-    [Required]
-    public BookingStatus BookingStatus { get; set; }
+    public DateTime StartTime { get; set; }
+
+    public DateTime? EndTime { get; set; }
+
+    [Range(1000, double.MaxValue)]
+    public decimal? Price { get; set; }
+
+    public string? PaymentMethod { get; set; }
 }
