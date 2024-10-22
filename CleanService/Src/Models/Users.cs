@@ -28,6 +28,8 @@ public class Users
     public DateTime CreatedAt { get; set; }
 
     public UserStatus Status { get; set; }
+    
+    public string? NotificationToken { get; set; }
 
     public virtual Helpers? Helper { get; set; }
 
@@ -42,6 +44,8 @@ public class Users
 
     [InverseProperty("Helper")]
     public virtual ICollection<RestrictedList> HelperRestrictedList { get; set; } = new List<RestrictedList>();
+    
+    public virtual ICollection<Notifications> Notifications { get; set; } = new List<Notifications>();
 }
 
 public enum UserType

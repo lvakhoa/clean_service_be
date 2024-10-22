@@ -38,7 +38,7 @@ public class GlobalExceptionHandler : IExceptionHandler
                     "Unique constraint exception occurred.", ExceptionConvention.UniqueConstraintViolation),
                 MaxLengthExceededException _ => new ExceptionResponse(HttpStatusCode.BadRequest,
                     "Maximum length exceeded.", ExceptionConvention.MaxLengthViolation),
-                KeyNotFoundException _ => new ExceptionResponse(HttpStatusCode.NotFound, "The request key not found.",
+                KeyNotFoundException _ => new ExceptionResponse(HttpStatusCode.NotFound, exception.Message,
                     ExceptionConvention.NotFound),
                 UnauthorizedAccessException _ => new ExceptionResponse(HttpStatusCode.Unauthorized, "Unauthorized.",
                     ExceptionConvention.Unauthorized),

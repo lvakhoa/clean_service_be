@@ -20,6 +20,8 @@ public class CleanServiceContext : DbContext
     public virtual DbSet<Contracts> Contracts { get; set; } = null!;
 
     public virtual DbSet<RestrictedList> RestrictedList { get; set; } = null!;
+    
+    public virtual DbSet<Notifications> Notifications { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -56,6 +58,14 @@ public class CleanServiceContext : DbContext
         modelBuilder.Entity<Contracts>()
             .Property(c => c.CreatedAt)
             .HasDefaultValue(DateTime.Now);
+
+        // Notifications entity config
+        modelBuilder.Entity<Notifications>()
+            .Property(c => c.CreatedAt)
+            .HasDefaultValue(DateTime.Now);
+        modelBuilder.Entity<Notifications>()
+            .Property(c => c.IsRead)
+            .HasDefaultValue(false);
     }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

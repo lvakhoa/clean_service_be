@@ -15,7 +15,7 @@ public class AuthRepository : IAuthRepository
 
     public async Task<UserReturnDto?> GetUserById(string id)
     {
-        var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Email == id);
+        var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == id);
 
         return user is not null
             ? new UserReturnDto
@@ -25,7 +25,9 @@ public class AuthRepository : IAuthRepository
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
                 Address = user.Address,
-                UserType = user.UserType
+                UserType = user.UserType,
+                NotificationToken = user.NotificationToken,
+                CreatedAt = user.CreatedAt
             }
             : null;
     }
@@ -56,7 +58,9 @@ public class AuthRepository : IAuthRepository
             Email = userEntity.Entity.Email,
             PhoneNumber = userEntity.Entity.PhoneNumber,
             Address = userEntity.Entity.Address,
-            UserType = userEntity.Entity.UserType
+            UserType = userEntity.Entity.UserType,
+            NotificationToken = userEntity.Entity.NotificationToken,
+            CreatedAt = userEntity.Entity.CreatedAt
         };
     }
 
@@ -83,7 +87,9 @@ public class AuthRepository : IAuthRepository
             Email = user.Email,
             PhoneNumber = user.PhoneNumber,
             Address = user.Address,
-            UserType = user.UserType
+            UserType = user.UserType,
+            NotificationToken = user.NotificationToken,
+            CreatedAt = user.CreatedAt
         };
     }
 
@@ -120,7 +126,7 @@ public class AuthRepository : IAuthRepository
         var users = await _dbContext.Users
             .Where(x => (userType == null || x.UserType == userType) && x.Status == status)
             .ToArrayAsync();
-        
+
         return users.Select(x => new UserReturnDto
         {
             Id = x.Id,
@@ -128,7 +134,22 @@ public class AuthRepository : IAuthRepository
             Email = x.Email,
             PhoneNumber = x.PhoneNumber,
             Address = x.Address,
-            UserType = x.UserType
+            UserType = x.UserType,
+            NotificationToken = x.NotificationToken,
+            CreatedAt = x.CreatedAt
         }).ToArray();
+    }
+
+    public Task<string?[]> GetUserNotificationTokens(List<string>? userIds)
+    {
+        if(userIds is null)
+            return _dbContext.Users
+                .Select(x => x.NotificationToken)
+                .ToArrayAsync();
+        
+        return _dbContext.Users
+            .Where(x => userIds.Contains(x.Id))
+            .Select(x => x.NotificationToken)
+            .ToArrayAsync();
     }
 }

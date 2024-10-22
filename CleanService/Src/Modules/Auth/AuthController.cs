@@ -5,6 +5,7 @@ using CleanService.Src.Helpers;
 using CleanService.Src.Models;
 using CleanService.Src.Modules.Auth.DTOs;
 using CleanService.Src.Modules.Auth.Services;
+using CleanService.Src.Modules.Mail.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -16,7 +17,7 @@ namespace CleanService.Src.Modules.Auth;
 public class AuthController : Controller
 {
     private readonly IAuthService _authService;
-
+    
     public AuthController(IAuthService authService)
     {
         _authService = authService;
