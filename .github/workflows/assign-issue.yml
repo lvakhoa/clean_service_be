@@ -3,7 +3,7 @@ on:
   issues:
     types: [assigned]
 env:
-  GITHUB_TOKEN: ${{ secrets.ADD_TO_PROJECT_TOKEN }}
+  MY_GITHUB_TOKEN: ${{ secrets.ADD_TO_PROJECT_TOKEN }}
   
 jobs:
   move-assigned-card:
