@@ -10,5 +10,5 @@ jobs:
       - uses: alex-page/github-project-automation-plus@v0.8.3
         with:
           project: Clean Service
-          column: In Progress
+          column: In progress
           repo-token: ${{ secrets.ADD_TO_PROJECT_TOKEN }}
