@@ -13,4 +13,4 @@ jobs:
         if: github.event.action == 'assigned'
         with:
           project: 'https://github.com/users/lvakhoa/projects/5'
-          column_name: In progress
+          column_name: 'In progress'
