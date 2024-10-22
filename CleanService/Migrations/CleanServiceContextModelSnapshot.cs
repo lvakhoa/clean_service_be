@@ -24,7 +24,7 @@ namespace CleanService.Migrations
 
             modelBuilder.Entity("CleanService.Src.Models.Bookings", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(255)
                         .HasColumnType("char(255)");
@@ -35,7 +35,7 @@ namespace CleanService.Migrations
                     b.Property<string>("CustomerId")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("char(255)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<DateTime?>("EndTime")
                         .HasColumnType("datetime(6)");
@@ -45,7 +45,7 @@ namespace CleanService.Migrations
 
                     b.Property<string>("HelperId")
                         .HasMaxLength(255)
-                        .HasColumnType("char(255)")
+                        .HasColumnType("varchar(255)")
                         .HasComment("Can be NULL if not assigned yet");
 
                     b.Property<string>("Location")
@@ -63,8 +63,7 @@ namespace CleanService.Migrations
                     b.Property<int?>("Rating")
                         .HasColumnType("int");
 
-                    b.Property<string>("ServiceId")
-                        .IsRequired()
+                    b.Property<Guid>("ServiceId")
                         .HasMaxLength(255)
                         .HasColumnType("char(255)");
 
@@ -84,7 +83,7 @@ namespace CleanService.Migrations
 
                     b.HasIndex("ServiceId");
 
-                    b.ToTable("Bookings", (string)null);
+                    b.ToTable("Bookings");
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.Contracts", b =>
@@ -93,8 +92,7 @@ namespace CleanService.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
-                    b.Property<string>("BookingId")
-                        .IsRequired()
+                    b.Property<Guid>("BookingId")
                         .HasMaxLength(255)
                         .HasColumnType("char(255)");
 
@@ -104,21 +102,21 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 10, 11, 23, 19, 38, 762, DateTimeKind.Local).AddTicks(6088));
+                        .HasDefaultValue(new DateTime(2024, 10, 22, 21, 58, 48, 524, DateTimeKind.Local).AddTicks(5084));
 
                     b.HasKey("Id");
 
                     b.HasIndex("BookingId")
                         .IsUnique();
 
-                    b.ToTable("Contracts", (string)null);
+                    b.ToTable("Contracts");
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.Helpers", b =>
                 {
                     b.Property<string>("Id")
                         .HasMaxLength(255)
-                        .HasColumnType("char(255)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<decimal>("AverageRating")
                         .ValueGeneratedOnAdd()
@@ -149,15 +147,56 @@ namespace CleanService.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Helpers", null, t =>
+                    b.ToTable("Helpers", t =>
                         {
                             t.HasComment("Additional information for users' type is helper");
                         });
                 });
 
+            modelBuilder.Entity("CleanService.Src.Models.Notifications", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasDefaultValue(new DateTime(2024, 10, 22, 21, 58, 48, 524, DateTimeKind.Local).AddTicks(7451));
+
+                    b.Property<bool>("IsRead")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false);
+
+                    b.Property<Guid?>("ReferenceId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("CleanService.Src.Models.RestrictedList", b =>
                 {
-                    b.Property<string>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasMaxLength(255)
                         .HasColumnType("char(255)");
@@ -165,12 +204,12 @@ namespace CleanService.Migrations
                     b.Property<string>("CustomerId")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("char(255)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("HelperId")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("char(255)");
+                        .HasColumnType("varchar(255)");
 
                     b.HasKey("Id");
 
@@ -178,7 +217,7 @@ namespace CleanService.Migrations
 
                     b.HasIndex("HelperId");
 
-                    b.ToTable("RestrictedList", (string)null);
+                    b.ToTable("RestrictedList");
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.Services", b =>
@@ -198,15 +237,14 @@ namespace CleanService.Migrations
 
                     b.HasIndex("ServiceName");
 
-                    b.ToTable("Services", (string)null);
+                    b.ToTable("Services");
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.Users", b =>
                 {
                     b.Property<string>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasMaxLength(255)
-                        .HasColumnType("char(255)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Address")
                         .HasMaxLength(255)
@@ -215,7 +253,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 10, 11, 23, 19, 38, 761, DateTimeKind.Local).AddTicks(8220));
+                        .HasDefaultValue(new DateTime(2024, 10, 22, 21, 58, 48, 520, DateTimeKind.Local).AddTicks(8926));
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -226,6 +264,9 @@ namespace CleanService.Migrations
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
+
+                    b.Property<string>("NotificationToken")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("PhoneNumber")
                         .HasMaxLength(20)
@@ -246,7 +287,7 @@ namespace CleanService.Migrations
 
                     b.HasIndex("FullName");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.Bookings", b =>
@@ -296,6 +337,17 @@ namespace CleanService.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("CleanService.Src.Models.Notifications", b =>
+                {
+                    b.HasOne("CleanService.Src.Models.Users", "User")
+                        .WithMany("Notifications")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("CleanService.Src.Models.RestrictedList", b =>
                 {
                     b.HasOne("CleanService.Src.Models.Users", "Customer")
@@ -332,6 +384,8 @@ namespace CleanService.Migrations
                     b.Navigation("HelperBookings");
 
                     b.Navigation("HelperRestrictedList");
+
+                    b.Navigation("Notifications");
                 });
 #pragma warning restore 612, 618
         }
