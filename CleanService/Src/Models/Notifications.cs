@@ -19,6 +19,7 @@ public class Notifications
     public string Content { get; set; } = null!;
     
     [Required]
+    [Column(TypeName = "varchar(24)")]
     public NotificationType Type { get; set; }
     
     public DateTime CreatedAt { get; set; }

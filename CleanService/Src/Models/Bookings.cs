@@ -29,6 +29,7 @@ public class Bookings
 
     public DateTime? EndTime { get; set; }
 
+    [Column(TypeName = "varchar(24)")]
     public BookingStatus Status { get; set; }
 
     public string? CancellationReason { get; set; }
