@@ -1,3 +1,4 @@
+using CleanService.Src.Models;
 using CleanService.Src.Modules.Booking.DTOs;
 using CleanService.Src.Modules.Booking.Repositories;
 
@@ -12,9 +13,10 @@ namespace CleanService.Src.Modules.Booking.Services
             _bookingRepository = bookingRepository;
         }
 
-        public async Task<List<BookingReturnDto>> GetAllBooking()
+        public async Task<List<BookingReturnDto>> GetAllBooking(bool? isProcessed = null)
         {
-            var bookingList = await _bookingRepository.GetAllBookings();
+            
+            var bookingList = await _bookingRepository.GetAllBookings(isProcessed);
             return bookingList.ToList();
         }
     }

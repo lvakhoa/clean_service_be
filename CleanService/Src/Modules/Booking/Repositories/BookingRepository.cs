@@ -1,6 +1,7 @@
 using CleanService.Src.Models;
 using CleanService.Src.Modules.Booking.DTOs;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace CleanService.Src.Modules.Booking.Repositories;
 
@@ -110,10 +111,17 @@ public class BookingRepository : IBookingRepository
         };
     }
     
-    public async Task<BookingReturnDto[]> GetAllBookings()
+    public async Task<BookingReturnDto[]> GetAllBookings(bool? isProcessed = null)
     {
         var bookings = await _dbContext.Bookings.ToArrayAsync();
-    
+
+        if (isProcessed.HasValue)
+        {
+            bookings = isProcessed.Value
+                ? bookings.Where(b => b.Status == BookingStatus.Pending).ToArray()  
+                : bookings.Where(b => b.Status == BookingStatus.Confirmed).ToArray(); 
+        }
+
         return bookings.Select(booking => new BookingReturnDto
         {
             Id = booking.Id,
