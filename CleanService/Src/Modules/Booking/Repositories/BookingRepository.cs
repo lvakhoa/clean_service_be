@@ -41,6 +41,7 @@ public class BookingRepository : IBookingRepository
     {
         var bookingEntity = await _dbContext.Bookings.AddAsync(new Bookings
         {
+            Id = Guid.NewGuid(),
             CustomerId = createBooking.CustomerId,
             HelperId = createBooking.HelperId,
             ServiceId = createBooking.ServiceId,
@@ -49,10 +50,13 @@ public class BookingRepository : IBookingRepository
             EndTime = createBooking.EndTime,
             Price = createBooking.Price,
             PaymentMethod = createBooking.PaymentMethod,
+            Rating = null,
+            Feedback = null,
+            CancellationReason = null,
         });
-    
+
         await _dbContext.SaveChangesAsync();
-    
+        
         return new BookingReturnDto
         {
             Id = bookingEntity.Entity.Id,
@@ -70,6 +74,44 @@ public class BookingRepository : IBookingRepository
             Feedback = bookingEntity.Entity.Feedback,
         };
     }
+    
+    // public async Task<BookingReturnDto> CreateBooking(CreateBookingDto createBooking)
+    // {
+    //     var bookingEntity = await _dbContext.Bookings.AddAsync(new Bookings
+    //     {
+    //         Id = Guid.NewGuid(),
+    //         CustomerId = createBooking.CustomerId,
+    //         HelperId = createBooking.HelperId,
+    //         ServiceId = createBooking.ServiceId,
+    //         Location = createBooking.Location,
+    //         StartTime = createBooking.StartTime,
+    //         EndTime = createBooking.EndTime,
+    //         Price = createBooking.Price,
+    //         PaymentMethod = createBooking.PaymentMethod,
+    //         Rating = null,
+    //         Feedback = null,
+    //         CancellationReason = null,
+    //     });
+    //     
+    //     await _dbContext.SaveChangesAsync();
+    //
+    //     return new BookingReturnDto
+    //     {
+    //         Id = bookingEntity.Entity.Id,
+    //         CustomerId = bookingEntity.Entity.CustomerId,
+    //         HelperId = bookingEntity.Entity.HelperId,
+    //         ServiceId = bookingEntity.Entity.ServiceId,
+    //         Location = bookingEntity.Entity.Location,
+    //         StartTime = bookingEntity.Entity.StartTime,
+    //         EndTime = bookingEntity.Entity.EndTime,
+    //         Status = bookingEntity.Entity.Status,
+    //         CancellationReason = bookingEntity.Entity.CancellationReason,
+    //         Price = bookingEntity.Entity.Price,
+    //         PaymentMethod = bookingEntity.Entity.PaymentMethod,
+    //         Rating = bookingEntity.Entity.Rating,
+    //         Feedback = bookingEntity.Entity.Feedback,
+    //     };
+    // }
     
     public async Task<BookingReturnDto?> UpdateBooking(Guid id, UpdateBookingDto updateBooking)
     {
