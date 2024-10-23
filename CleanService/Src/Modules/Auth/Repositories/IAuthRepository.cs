@@ -14,4 +14,6 @@ public interface IAuthRepository
     public Task<HelperReturnDto?> UpdateHelperInfo(string id, UpdateHelperDto updateHelperDto);
     
     public Task<UserReturnDto[]> GetAllUsers(UserType? userType, UserStatus? status = UserStatus.Active);
+    
+    public Task<string?[]> GetUserNotificationTokens(List<string>? userIds);
 }

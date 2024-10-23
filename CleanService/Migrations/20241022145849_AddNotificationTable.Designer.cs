@@ -12,15 +12,15 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanService.Migrations
 {
     [DbContext(typeof(CleanServiceContext))]
-    [Migration("20241006060133_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20241022145849_AddNotificationTable")]
+    partial class AddNotificationTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.8")
+                .HasAnnotation("ProductVersion", "8.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
@@ -35,9 +35,10 @@ namespace CleanService.Migrations
                     b.Property<string>("CancellationReason")
                         .HasColumnType("longtext");
 
-                    b.Property<Guid>("CustomerId")
+                    b.Property<string>("CustomerId")
+                        .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("char(255)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<DateTime?>("EndTime")
                         .HasColumnType("datetime(6)");
@@ -45,9 +46,9 @@ namespace CleanService.Migrations
                     b.Property<string>("Feedback")
                         .HasColumnType("longtext");
 
-                    b.Property<Guid?>("HelperId")
+                    b.Property<string>("HelperId")
                         .HasMaxLength(255)
-                        .HasColumnType("char(255)")
+                        .HasColumnType("varchar(255)")
                         .HasComment("Can be NULL if not assigned yet");
 
                     b.Property<string>("Location")
@@ -104,7 +105,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 10, 6, 13, 1, 30, 87, DateTimeKind.Local).AddTicks(8504));
+                        .HasDefaultValue(new DateTime(2024, 10, 22, 21, 58, 48, 524, DateTimeKind.Local).AddTicks(5084));
 
                     b.HasKey("Id");
 
@@ -116,9 +117,9 @@ namespace CleanService.Migrations
 
             modelBuilder.Entity("CleanService.Src.Models.Helpers", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<string>("Id")
                         .HasMaxLength(255)
-                        .HasColumnType("char(255)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<decimal>("AverageRating")
                         .ValueGeneratedOnAdd()
@@ -155,6 +156,47 @@ namespace CleanService.Migrations
                         });
                 });
 
+            modelBuilder.Entity("CleanService.Src.Models.Notifications", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasDefaultValue(new DateTime(2024, 10, 22, 21, 58, 48, 524, DateTimeKind.Local).AddTicks(7451));
+
+                    b.Property<bool>("IsRead")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("tinyint(1)")
+                        .HasDefaultValue(false);
+
+                    b.Property<Guid?>("ReferenceId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("int");
+
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Notifications");
+                });
+
             modelBuilder.Entity("CleanService.Src.Models.RestrictedList", b =>
                 {
                     b.Property<Guid>("Id")
@@ -162,13 +204,15 @@ namespace CleanService.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("char(255)");
 
-                    b.Property<Guid>("CustomerId")
+                    b.Property<string>("CustomerId")
+                        .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("char(255)");
+                        .HasColumnType("varchar(255)");
 
-                    b.Property<Guid>("HelperId")
+                    b.Property<string>("HelperId")
+                        .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("char(255)");
+                        .HasColumnType("varchar(255)");
 
                     b.HasKey("Id");
 
@@ -201,10 +245,9 @@ namespace CleanService.Migrations
 
             modelBuilder.Entity("CleanService.Src.Models.Users", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<string>("Id")
                         .HasMaxLength(255)
-                        .HasColumnType("char(255)");
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("Address")
                         .HasMaxLength(255)
@@ -213,7 +256,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 10, 6, 13, 1, 30, 86, DateTimeKind.Local).AddTicks(4323));
+                        .HasDefaultValue(new DateTime(2024, 10, 22, 21, 58, 48, 520, DateTimeKind.Local).AddTicks(8926));
 
                     b.Property<string>("Email")
                         .IsRequired()
@@ -225,11 +268,8 @@ namespace CleanService.Migrations
                         .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
 
-                    b.Property<string>("Password")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)")
-                        .HasComment("Store hashed passwords");
+                    b.Property<string>("NotificationToken")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("PhoneNumber")
                         .HasMaxLength(20)
@@ -300,6 +340,17 @@ namespace CleanService.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("CleanService.Src.Models.Notifications", b =>
+                {
+                    b.HasOne("CleanService.Src.Models.Users", "User")
+                        .WithMany("Notifications")
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("CleanService.Src.Models.RestrictedList", b =>
                 {
                     b.HasOne("CleanService.Src.Models.Users", "Customer")
@@ -336,6 +387,8 @@ namespace CleanService.Migrations
                     b.Navigation("HelperBookings");
 
                     b.Navigation("HelperRestrictedList");
+
+                    b.Navigation("Notifications");
                 });
 #pragma warning restore 612, 618
         }
