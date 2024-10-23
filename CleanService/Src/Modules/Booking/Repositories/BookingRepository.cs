@@ -111,15 +111,14 @@ public class BookingRepository : IBookingRepository
         };
     }
     
-    public async Task<BookingReturnDto[]> GetAllBookings(bool? isProcessed = null)
+    public async Task<BookingReturnDto[]> GetAllBookings(BookingStatus? status = null)
     {
         var bookings = await _dbContext.Bookings.ToArrayAsync();
 
-        if (isProcessed.HasValue)
+        if (status.HasValue)
         {
-            bookings = isProcessed.Value
-                ? bookings.Where(b => b.Status == BookingStatus.Pending).ToArray()  
-                : bookings.Where(b => b.Status == BookingStatus.Confirmed).ToArray(); 
+            bookings = bookings.Where(b => b.Status == status).ToArray();  
+           
         }
 
         return bookings.Select(booking => new BookingReturnDto

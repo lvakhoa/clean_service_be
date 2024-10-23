@@ -11,6 +11,6 @@ namespace CleanService.Src.Modules.Booking.Repositories
         
         public Task<BookingReturnDto?> UpdateBooking(Guid id, UpdateBookingDto updateBooking);
         
-        public Task<BookingReturnDto[]> GetAllBookings(bool? isProcessed = null);
+        public Task<BookingReturnDto[]> GetAllBookings(BookingStatus? status = null);
     }
 }

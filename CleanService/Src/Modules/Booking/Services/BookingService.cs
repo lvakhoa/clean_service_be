@@ -13,10 +13,10 @@ namespace CleanService.Src.Modules.Booking.Services
             _bookingRepository = bookingRepository;
         }
 
-        public async Task<List<BookingReturnDto>> GetAllBooking(bool? isProcessed = null)
+        public async Task<List<BookingReturnDto>> GetAllBooking(BookingStatus? status = null)
         {
             
-            var bookingList = await _bookingRepository.GetAllBookings(isProcessed);
+            var bookingList = await _bookingRepository.GetAllBookings(status);
             return bookingList.ToList();
         }
     }
