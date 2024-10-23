@@ -4,6 +4,6 @@ namespace CleanService.Src.Modules.Booking.Services
 {
     public interface IBookingService
     {
-        Task<List<BookingReturnDto>> GetAllClasss();
+        Task<List<BookingReturnDto>> GetAllBooking();
     }
 }

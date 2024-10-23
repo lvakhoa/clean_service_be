@@ -12,7 +12,7 @@ namespace CleanService.Src.Modules.Booking.Services
             _bookingRepository = bookingRepository;
         }
 
-        public async Task<List<BookingReturnDto>> GetAllClasss()
+        public async Task<List<BookingReturnDto>> GetAllBooking()
         {
             var bookingList = await _bookingRepository.GetAllBookings();
             return bookingList.ToList();
