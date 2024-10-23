@@ -10,6 +10,7 @@ public class Users
 {
     [Key] [MaxLength(255)] public string Id { get; set; } = null!;
 
+    [Column(TypeName = "varchar(24)")]
     [Required] public UserType UserType { get; set; }
 
     [Required] [MaxLength(255)] public string FullName { get; set; } = null!;
@@ -27,6 +28,7 @@ public class Users
 
     public DateTime CreatedAt { get; set; }
 
+    [Column(TypeName = "varchar(24)")]
     public UserStatus Status { get; set; }
     
     public string? NotificationToken { get; set; }
