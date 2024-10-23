@@ -21,7 +21,8 @@ public class BookingController : Controller
     [HttpPost]
     public async Task<ActionResult<BookingReturnDto>> CreateBooking([FromBody] CreateBookingDto booking)
     {
-        return Ok(await _bookingService.CreateBooking(booking));
+        var test = await _bookingService.CreateBooking(booking);
+        return test;
     }
 
     [HttpGet]

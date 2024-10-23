@@ -19,7 +19,7 @@ public class BookingReturnDto
     
     public DateTime? EndTime { get; set; }
     
-    public BookingStatus Status { get; set; }
+    public string Status { get; set; }
     
     public string? CancellationReason { get; set; }
     
