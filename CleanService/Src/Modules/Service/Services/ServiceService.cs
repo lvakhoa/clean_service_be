@@ -21,4 +21,10 @@ public class ServiceService : IServiceService
     {
         return await _serviceRepository.GetServiceById(id);
     }
+
+    public decimal GetPriceById(Guid serviceId)
+    {
+        var service = _serviceRepository.GetServiceById(serviceId);
+        return 1;
+    }
 }

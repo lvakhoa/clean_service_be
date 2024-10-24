@@ -25,9 +25,21 @@ public class BookingController : Controller
         return test;
     }
 
+    [HttpPatch("{id}")]
+    public async Task<ActionResult<BookingReturnDto>> UpdateBooking(Guid id,[FromBody] UpdateBookingDto booking)
+    {
+        return await _bookingService.UpdateBooking(id, booking);
+    }
+    
     [HttpGet]
     public async Task<ActionResult<BookingReturnDto[]>> GetAllBookings()
     {
         return await _bookingService.GetAllBookings();
+    }
+
+    [HttpGet("{id}")]
+    public async Task<ActionResult<BookingReturnDto?>> GetBookingById(Guid id)
+    {
+        return await _bookingService.GetBookingById(id);
     }
 }

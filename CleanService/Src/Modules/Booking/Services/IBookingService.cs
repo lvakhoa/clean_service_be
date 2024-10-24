@@ -7,6 +7,10 @@ public interface IBookingService
 {
     Task<BookingReturnDto> CreateBooking(CreateBookingDto createBookingDto);
     
+    Task<BookingReturnDto> UpdateBooking(Guid id, UpdateBookingDto updateBookingDto);
+    
     Task<BookingReturnDto[]> GetAllBookings();
+
+    Task<BookingReturnDto?> GetBookingById(Guid id);
 }
 

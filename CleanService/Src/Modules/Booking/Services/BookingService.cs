@@ -19,9 +19,22 @@ public class BookingService : IBookingService
         return await _bookingRepository.CreateBooking(createBookingDto);;
     }
 
+    public async Task<BookingReturnDto> UpdateBooking(Guid id, UpdateBookingDto updateBookingDto)
+    {
+        var booking = await _bookingRepository.GetBookingById(id);
+        if(booking == null)
+            throw new KeyNotFoundException("Booking not found");
+        return await _bookingRepository.UpdateBooking(id, updateBookingDto);
+    }
+
     public Task<BookingReturnDto[]> GetAllBookings()
     {
         return _bookingRepository.GetAllBookings();
+    }
+
+    public Task<BookingReturnDto?> GetBookingById(Guid id)
+    {
+        return _bookingRepository.GetBookingById(id);
     }
 }
 

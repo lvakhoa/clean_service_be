@@ -15,8 +15,8 @@ namespace CleanService.Src.Modules.Booking.DTOs
 
         public string? CancellationReason { get; set; }
 
-        [Range(1000, double.MaxValue)]
-        public decimal? Price { get; set; }
+        // [Range(1000, double.MaxValue)]
+        // public decimal? Price { get; set; }
 
         public string? PaymentMethod { get; set; }
 

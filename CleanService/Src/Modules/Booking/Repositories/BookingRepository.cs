@@ -1,5 +1,6 @@
 using CleanService.Src.Models;
 using CleanService.Src.Modules.Booking.DTOs;
+using CleanService.Src.Modules.Service.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace CleanService.Src.Modules.Booking.Repositories;
@@ -7,10 +8,12 @@ namespace CleanService.Src.Modules.Booking.Repositories;
 public class BookingRepository : IBookingRepository 
 {
     private readonly CleanServiceContext _dbContext;
+    private readonly IServiceService _serviceService;
 
-    public BookingRepository(CleanServiceContext dbContext)
+    public BookingRepository(CleanServiceContext dbContext, IServiceService serviceService)
     {
         _dbContext = dbContext;
+        _serviceService = serviceService;
     }
 
     public async Task<BookingReturnDto?> GetBookingById(Guid id)
@@ -40,6 +43,8 @@ public class BookingRepository : IBookingRepository
 
     public async Task<BookingReturnDto> CreateBooking(CreateBookingDto createBooking)
     {
+        var price = _serviceService.GetPriceById(createBooking.ServiceId);
+        
         var bookingEntity = await _dbContext.Bookings.AddAsync(new Bookings
         {
             Id = Guid.NewGuid(),
@@ -49,7 +54,7 @@ public class BookingRepository : IBookingRepository
             Location = createBooking.Location,
             StartTime = createBooking.StartTime,
             EndTime = createBooking.EndTime,
-            Price = createBooking.Price,
+            Price = price,
             PaymentMethod = createBooking.PaymentMethod,
             Rating = null,
             Feedback = null,
@@ -85,16 +90,23 @@ public class BookingRepository : IBookingRepository
         {
             return null;
         }
-    
-        booking.HelperId = updateBooking.HelperId;
-        booking.Location = updateBooking.Location;
-        booking.EndTime = updateBooking.EndTime;
-        booking.Status = (BookingStatus)updateBooking.Status;
-        booking.CancellationReason = updateBooking.CancellationReason;
-        booking.Price = updateBooking.Price;
-        booking.PaymentMethod = updateBooking.PaymentMethod;
-        booking.Feedback = updateBooking.Feedback;
-        booking.Rating = updateBooking.Rating;
+        
+        if(updateBooking.HelperId is not null)
+            booking.HelperId = updateBooking.HelperId;
+        if(updateBooking.Location is not null)
+            booking.Location = updateBooking.Location;
+        if(updateBooking.EndTime is not null)
+            booking.EndTime = updateBooking.EndTime;
+        if(updateBooking.Status is not null)
+            booking.Status = (BookingStatus)updateBooking.Status;
+        if(updateBooking.CancellationReason is not null)
+            booking.CancellationReason = updateBooking.CancellationReason;
+        if(updateBooking.PaymentMethod is not null)
+            booking.PaymentMethod = updateBooking.PaymentMethod;
+        if(updateBooking.Rating is not null)
+            booking.Feedback = updateBooking.Feedback;
+        if(updateBooking.CancellationReason is not null)
+            booking.Rating = updateBooking.Rating;
     
         await _dbContext.SaveChangesAsync();
     

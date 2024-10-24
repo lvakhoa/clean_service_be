@@ -20,8 +20,8 @@ public class CreateBookingDto
 
     public DateTime? EndTime { get; set; }
 
-    [Range(1000, double.MaxValue)]
-    public decimal? Price { get; set; }
+    // [Range(1000, double.MaxValue)]
+    // public decimal? Price { get; set; }
 
     public string? PaymentMethod { get; set; }
 }

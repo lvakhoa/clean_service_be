@@ -7,4 +7,6 @@ public interface IServiceService
     Task<ServiceReturnDto> CreateService(CreateServiceDto createServiceDto);
     
     Task<ServiceReturnDto?> GetServiceById(Guid id);
+
+    decimal GetPriceById(Guid serviceId);
 }
