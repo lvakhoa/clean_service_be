@@ -19,6 +19,9 @@ public class ContractService : IContractService
 
     public async Task<ContractReturnDto?> UpdateContract(Guid id, UpdateContractDto updateContractDto)
     {
+        var contract = await _contractRepository.GetContractById(id);
+        if(contract == null)
+            throw new KeyNotFoundException("Contract not found");
         return await _contractRepository.UpdateContract(id, updateContractDto);
     }
 

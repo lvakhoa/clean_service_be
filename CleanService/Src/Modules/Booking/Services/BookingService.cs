@@ -15,7 +15,6 @@ public class BookingService : IBookingService
 
     public async Task<BookingReturnDto> CreateBooking(CreateBookingDto createBookingDto)
     {
-        //return await _bookingRepository.CreateBooking(createBookingDto);
         return await _bookingRepository.CreateBooking(createBookingDto);;
     }
 
