@@ -37,7 +37,7 @@ public class BookingService : IBookingService
         return await _bookingRepository.CreateBooking(booking);;
     }
 
-    public async Task<BookingReturnDto> UpdateBooking(Guid id, UpdateBookingDto updateBookingDto)
+    public async Task<BookingReturnDto?> UpdateBooking(Guid id, UpdateBookingDto updateBookingDto)
     {
         var booking = await _bookingRepository.GetBookingById(id);
         if(booking == null)

@@ -38,10 +38,14 @@ public class ContractRepository : IContractRepository
         if (contract is null)
             return null;
 
-        if (updateContractDto.BookingId.HasValue)
-            contract.BookingId = updateContractDto.BookingId.Value;
-        if(updateContractDto.Content is not null)
-            contract.Content = updateContractDto.Content;
+        // if (updateContractDto.BookingId.HasValue)
+        //     contract.BookingId = updateContractDto.BookingId.Value;
+        // if(updateContractDto.Content is not null)
+        //     contract.Content = updateContractDto.Content;
+        
+        contract.BookingId = updateContractDto.BookingId ?? contract.BookingId;
+        contract.Content = updateContractDto.Content ?? contract.Content;
+
         
         _dbContext.SaveChanges();
 

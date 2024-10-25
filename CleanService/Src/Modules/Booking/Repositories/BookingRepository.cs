@@ -78,22 +78,32 @@ public class BookingRepository : IBookingRepository
             return null;
         }
         
-        if(updateBooking.HelperId is not null)
-            booking.HelperId = updateBooking.HelperId;
-        if(updateBooking.Location is not null)
-            booking.Location = updateBooking.Location;
-        if(updateBooking.EndTime is not null)
-            booking.EndTime = updateBooking.EndTime;
-        if(updateBooking.Status is not null)
-            booking.Status = (BookingStatus)updateBooking.Status;
-        if(updateBooking.CancellationReason is not null)
-            booking.CancellationReason = updateBooking.CancellationReason;
-        if(updateBooking.PaymentMethod is not null)
-            booking.PaymentMethod = updateBooking.PaymentMethod;
-        if(updateBooking.Rating is not null)
-            booking.Feedback = updateBooking.Feedback;
-        if(updateBooking.CancellationReason is not null)
-            booking.Rating = updateBooking.Rating;
+        // if(updateBooking.HelperId is not null)
+        //     booking.HelperId = updateBooking.HelperId;
+        // if(updateBooking.Location is not null)
+        //     booking.Location = updateBooking.Location;
+        // if(updateBooking.EndTime is not null)
+        //     booking.EndTime = updateBooking.EndTime;
+        // if(updateBooking.Status is not null)
+        //     booking.Status = (BookingStatus)updateBooking.Status;
+        // if(updateBooking.CancellationReason is not null)
+        //     booking.CancellationReason = updateBooking.CancellationReason;
+        // if(updateBooking.PaymentMethod is not null)
+        //     booking.PaymentMethod = updateBooking.PaymentMethod;
+        // if(updateBooking.Rating is not null)
+        //     booking.Feedback = updateBooking.Feedback;
+        // if(updateBooking.CancellationReason is not null)
+        //     booking.Rating = updateBooking.Rating;
+        
+        booking.HelperId = updateBooking.HelperId ?? booking.HelperId;
+        booking.Location = updateBooking.Location ?? booking.Location;
+        booking.EndTime = updateBooking.EndTime ?? booking.EndTime;
+        booking.Status = updateBooking.Status ?? booking.Status;
+        booking.CancellationReason = updateBooking.CancellationReason ?? booking.CancellationReason;
+        booking.PaymentMethod = updateBooking.PaymentMethod ?? booking.PaymentMethod;
+        booking.Feedback = updateBooking.Feedback ?? booking.Feedback;
+        booking.Rating = updateBooking.Rating ?? booking.Rating;
+
     
         await _dbContext.SaveChangesAsync();
     
@@ -106,7 +116,7 @@ public class BookingRepository : IBookingRepository
             Location = booking.Location,
             StartTime = booking.StartTime,
             EndTime = booking.EndTime,
-            Status = nameof(booking.Status),
+            Status = booking.Status.ToString(),
             CancellationReason = booking.CancellationReason,
             Price = booking.Price,
             PaymentMethod = booking.PaymentMethod,
