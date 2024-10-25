@@ -8,18 +8,15 @@ namespace CleanService.Src.Modules.Booking.Repositories;
 public class BookingRepository : IBookingRepository 
 {
     private readonly CleanServiceContext _dbContext;
-    private readonly IServiceService _serviceService;
 
     public BookingRepository(CleanServiceContext dbContext, IServiceService serviceService)
     {
         _dbContext = dbContext;
-        _serviceService = serviceService;
     }
 
     public async Task<BookingReturnDto?> GetBookingById(Guid id)
     {
         var booking = await _dbContext.Bookings.FirstOrDefaultAsync(x => x.Id == id);
-        
         
         return booking is not null
             ? new BookingReturnDto
@@ -41,27 +38,9 @@ public class BookingRepository : IBookingRepository
             : null;
     }
 
-    public async Task<BookingReturnDto> CreateBooking(CreateBookingDto createBooking)
+    public async Task<BookingReturnDto> CreateBooking(Bookings createBooking)
     {
-        var price = _serviceService.GetPriceById(createBooking.ServiceId);
-        
-        var bookingEntity = await _dbContext.Bookings.AddAsync(new Bookings
-        {
-            Id = Guid.NewGuid(),
-            CustomerId = createBooking.CustomerId,
-            HelperId = createBooking.HelperId,
-            ServiceId = createBooking.ServiceId,
-            Location = createBooking.Location,
-            StartTime = createBooking.StartTime,
-            EndTime = createBooking.EndTime,
-            Price = price,
-            PaymentMethod = createBooking.PaymentMethod,
-            Rating = null,
-            Feedback = null,
-            CancellationReason = null,
-        });
-
-        await _dbContext.SaveChangesAsync();
+        var bookingEntity = await _dbContext.Bookings.AddAsync(createBooking);
 
         var contractEntity = await _dbContext.Contracts.AddAsync(new Contracts
         {

@@ -1,21 +1,40 @@
 using CleanService.Src.Models;
 using CleanService.Src.Modules.Booking.DTOs;
 using CleanService.Src.Modules.Booking.Repositories;
+using CleanService.Src.Modules.Service.Services;
 
 namespace CleanService.Src.Modules.Booking.Services;
 
 public class BookingService : IBookingService
 {
     private readonly IBookingRepository _bookingRepository;
+    private readonly IServiceService _serviceService;
 
-    public BookingService(IBookingRepository bookingRepository)
+    public BookingService(IBookingRepository bookingRepository, IServiceService serviceService)
     {
         _bookingRepository = bookingRepository;
+        _serviceService = serviceService;
     }
 
     public async Task<BookingReturnDto> CreateBooking(CreateBookingDto createBookingDto)
     {
-        return await _bookingRepository.CreateBooking(createBookingDto);;
+        var price = _serviceService.GetPriceById(createBookingDto.ServiceId);
+        var booking = new Bookings
+        {
+            Id = Guid.NewGuid(),
+            CustomerId = createBookingDto.CustomerId,
+            HelperId = createBookingDto.HelperId,
+            ServiceId = createBookingDto.ServiceId,
+            Location = createBookingDto.Location,
+            StartTime = createBookingDto.StartTime,
+            EndTime = createBookingDto.EndTime,
+            Price = price,
+            PaymentMethod = createBookingDto.PaymentMethod,
+            Rating = null,
+            Feedback = null,
+            CancellationReason = null,
+        };
+        return await _bookingRepository.CreateBooking(booking);;
     }
 
     public async Task<BookingReturnDto> UpdateBooking(Guid id, UpdateBookingDto updateBookingDto)

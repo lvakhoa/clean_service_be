@@ -7,7 +7,7 @@ namespace CleanService.Src.Modules.Booking.Repositories
     {
         public Task<BookingReturnDto?> GetBookingById(Guid id);
         
-        public Task<BookingReturnDto> CreateBooking(CreateBookingDto createBooking);
+        public Task<BookingReturnDto> CreateBooking(Bookings createBooking);
         
         public Task<BookingReturnDto?> UpdateBooking(Guid id, UpdateBookingDto updateBooking);
         
