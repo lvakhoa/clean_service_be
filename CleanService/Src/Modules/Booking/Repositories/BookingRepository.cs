@@ -42,11 +42,11 @@ public class BookingRepository : IBookingRepository
     {
         var bookingEntity = await _dbContext.Bookings.AddAsync(createBooking);
 
-        var contractEntity = await _dbContext.Contracts.AddAsync(new Contracts
-        {
-            BookingId = bookingEntity.Entity.Id,
-            Content = "Clean at " + bookingEntity.Entity.Location
-        }); 
+        // var contractEntity = await _dbContext.Contracts.AddAsync(new Contracts
+        // {
+        //     BookingId = bookingEntity.Entity.Id,
+        //     Content = "Clean at " + bookingEntity.Entity.Location
+        // }); 
 
         await _dbContext.SaveChangesAsync();
         
