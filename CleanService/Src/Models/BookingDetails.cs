@@ -1,20 +1,28 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace CleanService.Src.Models;
 
-public class Contracts
+public class BookingDetails
 {
     [Key]
     public Guid Id { get; set; }
     
-    [ForeignKey(nameof(Booking))]
     [Required]
+    [ForeignKey(nameof(Booking))]
     public Guid BookingId { get; set; }
     
-    public string? Content { get; set; }
+    public int BedroomCount { get; set; }
     
+    public int BathroomCount { get; set; }
+    
+    public int KitchenCount { get; set; }
+    
+    public int LivingRoomCount { get; set; }
+    
+    public string? SpecialRequirements { get; set; }
+    
+    [Required]
     public DateTime CreatedAt { get; set; }
     
     public virtual Bookings Booking { get; set; } = null!;

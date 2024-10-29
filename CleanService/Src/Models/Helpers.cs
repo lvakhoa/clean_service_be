@@ -8,26 +8,32 @@ namespace CleanService.Src.Models;
 public class Helpers
 {
     [Key]
-    [ForeignKey(nameof(Users))]
-    [MaxLength(255)]
+    [ForeignKey(nameof(User))]
     public string Id { get; set; } = null!;
     
     public string? ExperienceDescription { get; set; }
     
-    [MaxLength(255)]
-    public string? ServicesOffered { get; set; }
+    public string? ResumeUploaded { get; set; }
     
+    [Comment("Array of service_type_ids")]
+    public Guid[]? ServicesOffered { get; set; }
+    
+    [Required]
     [Precision(10, 2)]
-    [Range(1000, double.MaxValue)]
-    public decimal? ProposedPrice { get; set; }
-
-    [Precision(3, 2)]
-    [Range(0, 100)]
+    public decimal HourlyRate { get; set; }
+    
+    [Precision(2, 1)]
     public decimal AverageRating { get; set; } 
     
     public int CompletedJobs { get; set; } 
     
     public int CancelledJobs { get; set; } 
+    
+    [Required]
+    public DateTime CreatedAt { get; set; }
+    
+    [Required]
+    public DateTime UpdatedAt { get; set; }
     
     public virtual Users User { get; set; } = null!;
 }
