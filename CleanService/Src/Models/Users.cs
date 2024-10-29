@@ -4,22 +4,38 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CleanService.Src.Models;
 
-[Index(nameof(FullName))]
 [Index(nameof(Email), IsUnique = true)]
 public class Users
 {
-    [Key] [MaxLength(255)] public string Id { get; set; } = null!;
+    [Key]
+    [MaxLength(255)] 
+    public string Id { get; set; } = null!;
 
     [Column(TypeName = "varchar(24)")]
-    [Required] public UserType UserType { get; set; }
+    [Required]
+    public UserType UserType { get; set; }
+    
+    [Column(TypeName = "varchar(24)")]
+    public Gender? Gender { get; set; }
 
-    [Required] [MaxLength(255)] public string FullName { get; set; } = null!;
+    public string? ProfilePicture { get; set; }
+    
+    [Required] 
+    [MaxLength(150)] 
+    public string FullName { get; set; } = null!;
+    
+    [Required]
+    public DateTime DateOfBirth { get; set; }
+    
+    public string? IdentityCard { get; set; }
 
-    [MaxLength(255)] public string? Address { get; set; }
+    [MaxLength(255)]
+    public string? Address { get; set; }
 
     [MaxLength(20)]
+    [Required]
     [RegularExpression("/(84|0[3|5|7|8|9])+([0-9]{8})\\b/g")]
-    public string? PhoneNumber { get; set; }
+    public string PhoneNumber { get; set; } = null!;
 
     [Required]
     [MaxLength(255)]
@@ -27,7 +43,10 @@ public class Users
     public string Email { get; set; } = null!;
 
     public DateTime CreatedAt { get; set; }
+    
+    public DateTime UpdatedAt { get; set; }
 
+    [Required]
     [Column(TypeName = "varchar(24)")]
     public UserStatus Status { get; set; }
     
@@ -41,13 +60,19 @@ public class Users
     [InverseProperty("Helper")]
     public virtual ICollection<Bookings> HelperBookings { get; set; } = new List<Bookings>();
 
-    [InverseProperty("Customer")]
-    public virtual ICollection<RestrictedList> CustomerRestrictedList { get; set; } = new List<RestrictedList>();
-
-    [InverseProperty("Helper")]
-    public virtual ICollection<RestrictedList> HelperRestrictedList { get; set; } = new List<RestrictedList>();
-    
     public virtual ICollection<Notifications> Notifications { get; set; } = new List<Notifications>();
+    
+    [InverseProperty("ReportedBy")]
+    public virtual ICollection<Complaints> CreatedComplaints { get; set; } = new List<Complaints>();
+    
+    [InverseProperty("ReportedUser")]
+    public virtual ICollection<Complaints> ReceivedComplaints { get; set; } = new List<Complaints>();
+    
+    [InverseProperty("User")]
+    public virtual ICollection<BlacklistedUsers> BlacklistedUsers { get; set; } = new List<BlacklistedUsers>();
+    
+    [InverseProperty("BlacklistedByUser")]
+    public virtual ICollection<BlacklistedUsers> BlacklistedByUsers { get; set; } = new List<BlacklistedUsers>();
 }
 
 public enum UserType
@@ -60,5 +85,13 @@ public enum UserType
 public enum UserStatus
 {
     Active,
+    Inactive,
     Blocked
+}
+
+public enum Gender
+{
+    Male,
+    Female,
+    Other
 }

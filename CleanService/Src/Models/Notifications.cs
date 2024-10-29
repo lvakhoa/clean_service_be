@@ -8,7 +8,7 @@ public class Notifications
     [Key]
     public Guid Id { get; set; }
     
-    [ForeignKey(nameof(Users))]
+    [ForeignKey(nameof(User))]
     [Required]
     public string UserId { get; set; } = null!;
     

@@ -25,7 +25,7 @@ public class AuthRepository : IAuthRepository
                 Email = user.Email,
                 PhoneNumber = user.PhoneNumber,
                 Address = user.Address,
-                UserType = user.UserType,
+                UserType = user.UserType.ToString(),
                 NotificationToken = user.NotificationToken,
                 CreatedAt = user.CreatedAt
             }
@@ -58,7 +58,7 @@ public class AuthRepository : IAuthRepository
             Email = userEntity.Entity.Email,
             PhoneNumber = userEntity.Entity.PhoneNumber,
             Address = userEntity.Entity.Address,
-            UserType = userEntity.Entity.UserType,
+            UserType = userEntity.Entity.UserType.ToString(),
             NotificationToken = userEntity.Entity.NotificationToken,
             CreatedAt = userEntity.Entity.CreatedAt
         };
@@ -87,7 +87,7 @@ public class AuthRepository : IAuthRepository
             Email = user.Email,
             PhoneNumber = user.PhoneNumber,
             Address = user.Address,
-            UserType = user.UserType,
+            UserType = user.UserType.ToString(),
             NotificationToken = user.NotificationToken,
             CreatedAt = user.CreatedAt
         };
@@ -102,10 +102,8 @@ public class AuthRepository : IAuthRepository
 
         if (updateHelperDto.ExperienceDescription is not null)
             helper.ExperienceDescription = updateHelperDto.ExperienceDescription;
-        if (updateHelperDto.ServicesOffered is not null)
-            helper.ServicesOffered = updateHelperDto.ServicesOffered;
-        if (updateHelperDto.ProposedPrice is not null)
-            helper.ProposedPrice = updateHelperDto.ProposedPrice;
+        // if (updateHelperDto.ServicesOffered is not null)
+        //     helper.ServicesOffered = updateHelperDto.ServicesOffered;
 
         await _dbContext.SaveChangesAsync();
 
@@ -113,8 +111,6 @@ public class AuthRepository : IAuthRepository
         {
             Id = helper.Id,
             ExperienceDescription = helper.ExperienceDescription,
-            ServicesOffered = helper.ServicesOffered,
-            ProposedPrice = helper.ProposedPrice,
             AverageRating = helper.AverageRating,
             CompletedJobs = helper.CompletedJobs,
             CancelledJobs = helper.CancelledJobs
@@ -134,7 +130,7 @@ public class AuthRepository : IAuthRepository
             Email = x.Email,
             PhoneNumber = x.PhoneNumber,
             Address = x.Address,
-            UserType = x.UserType,
+            UserType = x.UserType.ToString(),
             NotificationToken = x.NotificationToken,
             CreatedAt = x.CreatedAt
         }).ToArray();

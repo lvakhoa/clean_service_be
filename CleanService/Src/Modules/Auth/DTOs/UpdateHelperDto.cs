@@ -7,8 +7,7 @@ public class UpdateHelperDto
 {
     public string? ExperienceDescription { get; set; }
 
-    [MaxLength(255)]
-    public string? ServicesOffered { get; set; }
+    public string[]? ServicesOffered { get; set; }
     
     [Precision(10, 2)]
     [Range(1000, double.MaxValue)]
