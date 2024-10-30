@@ -37,3 +37,28 @@ public class Helpers
     
     public virtual Users User { get; set; } = null!;
 }
+
+public class PartialHelper
+{
+    public string? Id { get; set; }
+    
+    public string? ExperienceDescription { get; set; }
+    
+    public string? ResumeUploaded { get; set; }
+    
+    public Guid[]? ServicesOffered { get; set; }
+    
+    [Precision(10, 2)]
+    public decimal? HourlyRate { get; set; }
+    
+    [Precision(2, 1)]
+    public decimal? AverageRating { get; set; } 
+    
+    public int? CompletedJobs { get; set; } 
+    
+    public int? CancelledJobs { get; set; } 
+    
+    public DateTime? CreatedAt { get; set; }
+    
+    public DateTime? UpdatedAt { get; set; }
+}

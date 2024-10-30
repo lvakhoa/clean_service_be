@@ -1,5 +1,6 @@
 using CleanService.Src.Models;
-using CleanService.Src.Modules.Auth.DTOs;
+using CleanService.Src.Modules.Auth.Mapping.DTOs;
+
 using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Modules.Auth.Services;

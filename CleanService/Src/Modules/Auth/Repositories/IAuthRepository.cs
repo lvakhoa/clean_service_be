@@ -1,22 +1,22 @@
 using CleanService.Src.Models;
-using CleanService.Src.Modules.Auth.DTOs;
+using CleanService.Src.Modules.Auth.Mapping.DTOs;
 using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Modules.Auth.Repositories;
 
 public interface IAuthRepository
 {
-    public Task<UserReturnDto?> GetUserById(string id);
+    public Task<Users?> GetUserById(string id);
     
-    public Task<UserReturnDto> CreateUser(RegistrationDto registration);
+    public Task<Users> CreateUser(Users user);
     
-    public Task<UserReturnDto?> UpdateInfo(string id, UpdateInfoDto updateInfoDto);
+    public Task<Users?> UpdateInfo(string id, PartialUsers updateInfoUser);
     
-    public Task<HelperReturnDto?> UpdateHelperInfo(string id, UpdateHelperDto updateHelperDto);
+    public Task<Helpers?> UpdateHelperInfo(string id, PartialHelper updateInfoHelper);
     
-    public Task<UserReturnDto[]> GetAllUsers(UserType? userType, UserStatus? status = UserStatus.Active);
-
-    public Task<Pagination<UserReturnDto>> GetPagedUsersAsync(UserType? userType, UserStatus? status = UserStatus.Active, int page = 1, int limit = 1);
-
+    public Task<Users[]> GetAllUsers(UserType? userType, UserStatus? status = UserStatus.Active);
+   
+    public Task<Pagination<Users>> GetPagedUsersAsync(UserType? userType, UserStatus? status = UserStatus.Active, int page = 1, int limit = 1);
+    
     public Task<string?[]> GetUserNotificationTokens(List<string>? userIds);
 }

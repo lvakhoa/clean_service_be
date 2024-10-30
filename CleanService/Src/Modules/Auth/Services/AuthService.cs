@@ -1,5 +1,6 @@
+using AutoMapper;
 using CleanService.Src.Models;
-using CleanService.Src.Modules.Auth.DTOs;
+using CleanService.Src.Modules.Auth.Mapping.DTOs;
 using CleanService.Src.Modules.Auth.Repositories;
 using Pagination.EntityFrameworkCore.Extensions;
 
@@ -9,16 +10,24 @@ public class AuthService : IAuthService
 {
     private readonly IAuthRepository _authRepository;
     
-    public AuthService(IAuthRepository authRepository)
+    private readonly IMapper _mapper;
+
+    public AuthService(IAuthRepository authRepository, IMapper mapper)
     {
         _authRepository = authRepository;
+        _mapper = mapper;
     }
     
     public async Task<UserReturnDto?> RegisterUser(RegistrationDto registrationDto)
     {
         var user = await _authRepository.GetUserById(registrationDto.Id);
-        if(user == null)
-            return await _authRepository.CreateUser(registrationDto);
+        if (user == null)
+        {
+            var userEntity = _mapper.Map<Users>(registrationDto);
+            var createdUser = await _authRepository.CreateUser(userEntity);
+            var userDto = _mapper.Map<UserReturnDto>(createdUser);
+            return userDto;
+        }
         return null;
     }
 
@@ -27,7 +36,10 @@ public class AuthService : IAuthService
         var user = await _authRepository.GetUserById(id);
         if(user == null)
             throw new KeyNotFoundException("User not found");
-        return user;
+        
+        var userDto = _mapper.Map<UserReturnDto>(user);
+        
+        return userDto;
     }
     
     public async Task<UserReturnDto?> UpdateInfo(string id, UpdateInfoDto updateInfoDto)
@@ -35,40 +47,57 @@ public class AuthService : IAuthService
         var user = await _authRepository.GetUserById(id);
         if(user == null)
             throw new KeyNotFoundException("User not found");
-        return await _authRepository.UpdateInfo(id, updateInfoDto);
+        
+        var userEntity = _mapper.Map<PartialUsers>(updateInfoDto);
+        var updatedUser = await _authRepository.UpdateInfo(id, userEntity);
+        
+        var userDto = _mapper.Map<UserReturnDto>(updatedUser);
+        return userDto;
     }
 
-    public Task<HelperReturnDto?> UpdateHelperInfo(string id, UpdateHelperDto updateHelperDto)
+    public async Task<HelperReturnDto?> UpdateHelperInfo(string id, UpdateHelperDto updateHelperDto)
     {
-        var helper = _authRepository.UpdateHelperInfo(id, updateHelperDto);
+        var helperEntity = _mapper.Map<PartialHelper>(updateHelperDto);
+        var helper = await _authRepository.UpdateHelperInfo(id, helperEntity);
         if(helper == null)
             throw new KeyNotFoundException("Helper not found");
-        return helper;
+        var helperDto = _mapper.Map<HelperReturnDto>(helper);
+        return helperDto;
     }
 
-    public Task<UserReturnDto[]> GetAllUsers(UserType? userType, UserStatus? status = UserStatus.Active)
+    public async Task<UserReturnDto[]> GetAllUsers(UserType? userType, UserStatus? status = UserStatus.Active)
     {
-        return _authRepository.GetAllUsers(userType, status);
+        var users = await _authRepository.GetAllUsers(userType, status);
+        var listUserDto = _mapper.Map<UserReturnDto[]>(users);
+        return listUserDto;
     }
 
-    public Task<Pagination<UserReturnDto>> GetPagedUsersAsync(UserType? userType, UserStatus? status = UserStatus.Active, int page = 1, int limit = 1)
+    public async Task<Pagination<UserReturnDto>> GetPagedUsersAsync(UserType? userType, UserStatus? status = UserStatus.Active, int page = 1, int limit = 1)
     {
-        return _authRepository.GetPagedUsersAsync(userType, status, page, limit);
+        var users = await _authRepository.GetPagedUsersAsync(userType, status, page, limit);
+        var response = _mapper.Map<UserReturnDto[]>(users.Results);
+        return new Pagination<UserReturnDto>(response, users.TotalItems, page, limit);
     }
-
-    public Task<UserReturnDto?> ActivateUser(string id)
+    
+    public async Task<UserReturnDto?> ActivateUser(string id)
     {
-        return _authRepository.UpdateInfo(id, new UpdateInfoDto
+        var user = await _authRepository.UpdateInfo(id, new PartialUsers()
         {
             Status = UserStatus.Active
         });
+        
+        var userDto = _mapper.Map<UserReturnDto>(user);
+        return userDto;
     }
 
-    public Task<UserReturnDto?> BlockUser(string id)
+    public async Task<UserReturnDto?> BlockUser(string id)
     {
-        return _authRepository.UpdateInfo(id, new UpdateInfoDto
+        var user = await _authRepository.UpdateInfo(id, new PartialUsers
         {
             Status = UserStatus.Blocked
         });
+        
+        var userDto = _mapper.Map<UserReturnDto>(user);
+        return userDto;
     }
 }

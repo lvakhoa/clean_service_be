@@ -40,3 +40,20 @@ public enum RoomType
     LivingRoom,
     Other
 }
+
+public class PartialRoomPricing
+{
+    public Guid? Id { get; set; }
+
+    public Guid? ServiceTypeId { get; set; }
+
+    public RoomType? RoomType { get; set; }
+
+    [Range(0, 5)]
+    public int? RoomCount { get; set; }
+
+    [Precision(10, 2)]
+    public decimal? AdditionalPrice { get; set; }
+
+    public DateTime? CreatedAt { get; set; }
+}

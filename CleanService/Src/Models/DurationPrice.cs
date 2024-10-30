@@ -25,3 +25,17 @@ public class DurationPrice
     
     public virtual ServiceTypes ServiceType { get; set; } = null!;
 }
+
+public class PartialDurationPrice
+{
+    public Guid? Id { get; set; }
+    
+    public Guid? ServiceTypeId { get; set; }
+    
+    public int? DurationHours { get; set; }
+    
+    [Precision(3, 2)]
+    public decimal? PriceMultiplier { get; set; }
+    
+    public DateTime? CreatedAt { get; set; }
+}

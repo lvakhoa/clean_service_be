@@ -1,11 +1,11 @@
 using System.Net;
 using System.Security.Claims;
 using CleanService.Src.Constant;
-using CleanService.Src.Helpers;
+using CleanService.Src.Filters;
 using CleanService.Src.Models;
-using CleanService.Src.Modules.Auth.DTOs;
+using CleanService.Src.Modules.Auth.Mapping.DTOs;
 using CleanService.Src.Modules.Auth.Services;
-using CleanService.Src.Modules.Mail.Services;
+using CleanService.Src.Utils;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,11 +14,12 @@ using Pagination.EntityFrameworkCore.Extensions;
 namespace CleanService.Src.Modules.Auth;
 
 [Authorize]
+[ApiController]
 [Route("[controller]")]
-public class AuthController : Controller
+public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
-    
+
     public AuthController(IAuthService authService)
     {
         _authService = authService;
@@ -76,22 +77,35 @@ public class AuthController : Controller
     public async Task<IActionResult> GetUserById(string id)
     {
         var user = await _authService.GetUserById(id);
-        return Ok(user);
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Get user successfully",
+            Data = user
+        });
     }
-
+    
+    [ModelValidation]
     [HttpPatch("user/{id}")]
     public async Task<IActionResult> UpdateInfo(string id, [FromBody] UpdateInfoDto updateInfoDto)
     {
+        var modelstate = ModelState;
         var currentUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
         if (currentUserId != id && !User.IsInRole(UserType.Admin.ToString()))
         {
             throw new ExceptionResponse(HttpStatusCode.Forbidden, "Forbidden", ExceptionConvention.Forbidden);
         }
         var user = await _authService.UpdateInfo(id, updateInfoDto);
-        return Ok(user);
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Update user's information successfully",
+            Data = user
+        });
     }
 
     [HttpPatch("helper/{id}")]
+    [ModelValidation]
     public async Task<IActionResult> UpdateHelperInfo(string id, [FromBody] UpdateHelperDto updateHelperDto)
     {
         var currentUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
@@ -100,7 +114,12 @@ public class AuthController : Controller
             throw new ExceptionResponse(HttpStatusCode.Forbidden, "Forbidden", ExceptionConvention.Forbidden);
         }
         var user = await _authService.UpdateHelperInfo(id, updateHelperDto);
-        return Ok(user);
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Update helper's information successfully",
+            Data = user
+        });
     }
 
     [HttpGet("users")]
@@ -108,7 +127,12 @@ public class AuthController : Controller
     public async Task<IActionResult> GetAllUsers(UserType? userType, UserStatus? status = UserStatus.Active)
     {
         var users = await _authService.GetAllUsers(userType, status);
-        return Ok(users);
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Get all users successfully",
+            Data = users
+        });
     }
 
     [HttpGet("paged_users")]
@@ -124,7 +148,12 @@ public class AuthController : Controller
     {
         var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
         var user = await _authService.GetUserById(userId);
-        return Ok(user);
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Get personal information successfully",
+            Data = user
+        });
     }
 
     [HttpPatch("user/{id}/block")]
@@ -132,7 +161,12 @@ public class AuthController : Controller
     public async Task<IActionResult> BlockUser(string id)
     {
         var user = await _authService.BlockUser(id);
-        return Ok(user);
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Block user successfully",
+            Data = user
+        });
     }
 
     [HttpPatch("user/{id}/activate")]
@@ -140,6 +174,11 @@ public class AuthController : Controller
     public async Task<IActionResult> ActivateUser(string id)
     {
         var user = await _authService.ActivateUser(id);
-        return Ok(user);
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Activate user successfully",
+            Data = user
+        });
     }
 }

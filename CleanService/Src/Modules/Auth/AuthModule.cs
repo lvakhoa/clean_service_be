@@ -3,9 +3,11 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
 using CleanService.Src.Constant;
-using CleanService.Src.Helpers;
+using CleanService.Src.Modules.Auth.Mapping.DTOs;
+using CleanService.Src.Modules.Auth.Mapping.Profiles;
 using CleanService.Src.Modules.Auth.Repositories;
 using CleanService.Src.Modules.Auth.Services;
+using CleanService.Src.Utils;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
@@ -27,9 +29,12 @@ public static class AuthModule
             {
                 context.Response.ContentType = "application/json";
                 context.Response.StatusCode = StatusCodes.Status403Forbidden;
-                var exceptionResponse =
-                    new ExceptionResponse(HttpStatusCode.Forbidden, "Forbidden", ExceptionConvention.Forbidden);
-                context.Response.WriteAsJsonAsync(exceptionResponse);
+                context.Response.WriteAsJsonAsync(new
+                {
+                    StatusCode = HttpStatusCode.Forbidden,
+                    Message = "Forbidden",
+                    ExceptionCode = ExceptionConvention.Forbidden
+                });
                 return context.Response.CompleteAsync();
             };
         }).AddOAuth(AuthProvider.Provider, options =>
@@ -80,6 +85,18 @@ public static class AuthModule
     {
         services.AddScoped<IAuthService, AuthService>();
         services.AddScoped<IAuthRepository, AuthRepository>();
+
+        return services;
+    }
+
+    public static IServiceCollection AddAuthMapping(this IServiceCollection services)
+    {
+        services
+            .AddAutoMapper(typeof(UserResponseProfile))
+            .AddAutoMapper(typeof(RegistrationRequestProfile))
+            .AddAutoMapper(typeof(UpdateUserRequestProfile))
+            .AddAutoMapper(typeof(UpdateHelperRequestProfile))
+            .AddAutoMapper(typeof(HelperResponseProfile));
 
         return services;
     }
