@@ -1,6 +1,9 @@
 using CleanService.Src.Models;
 using CleanService.Src.Modules.Auth.DTOs;
 using Microsoft.EntityFrameworkCore;
+using Pagination.EntityFrameworkCore.Extensions;
+using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 
 namespace CleanService.Src.Modules.Auth.Repositories;
 
@@ -136,13 +139,37 @@ public class AuthRepository : IAuthRepository
         }).ToArray();
     }
 
+    public async Task<Pagination<UserReturnDto>> GetPagedUsersAsync(UserType? userType, UserStatus? status = UserStatus.Active, int page = 1, int limit = 1)
+    {
+
+        var list = await _dbContext.Users
+            .Where(x => (userType == null || x.UserType == userType) && x.Status == status).OrderBy(x => x.FullName).Skip((page - 1) * limit).Take(limit)
+            .ToListAsync();
+
+        var totalItems = await _dbContext.Users.Where(x => (userType == null || x.UserType == userType) && x.Status == status).CountAsync();
+
+        var users = list.Select(x => new UserReturnDto
+        {
+            Id = x.Id,
+            FullName = x.FullName,
+            Email = x.Email,
+            PhoneNumber = x.PhoneNumber,
+            Address = x.Address,
+            UserType = x.UserType.ToString(),
+            NotificationToken = x.NotificationToken,
+            CreatedAt = x.CreatedAt
+        });
+
+        return new Pagination<UserReturnDto>(users, totalItems, page, limit);
+    }
+
     public Task<string?[]> GetUserNotificationTokens(List<string>? userIds)
     {
-        if(userIds is null)
+        if (userIds is null)
             return _dbContext.Users
                 .Select(x => x.NotificationToken)
                 .ToArrayAsync();
-        
+
         return _dbContext.Users
             .Where(x => userIds.Contains(x.Id))
             .Select(x => x.NotificationToken)

@@ -1,6 +1,7 @@
 using CleanService.Src.Models;
 using CleanService.Src.Modules.Auth.DTOs;
 using CleanService.Src.Modules.Auth.Repositories;
+using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Modules.Auth.Services;
 
@@ -49,7 +50,12 @@ public class AuthService : IAuthService
     {
         return _authRepository.GetAllUsers(userType, status);
     }
-    
+
+    public Task<Pagination<UserReturnDto>> GetPagedUsersAsync(UserType? userType, UserStatus? status = UserStatus.Active, int page = 1, int limit = 1)
+    {
+        return _authRepository.GetPagedUsersAsync(userType, status, page, limit);
+    }
+
     public Task<UserReturnDto?> ActivateUser(string id)
     {
         return _authRepository.UpdateInfo(id, new UpdateInfoDto

@@ -9,6 +9,7 @@ using CleanService.Src.Modules.Mail.Services;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Modules.Auth;
 
@@ -103,10 +104,18 @@ public class AuthController : Controller
     }
 
     [HttpGet("users")]
-    [Authorize(Policy = AuthPolicy.IsAdmin)]
+    //[Authorize(Policy = AuthPolicy.IsAdmin)]
     public async Task<IActionResult> GetAllUsers(UserType? userType, UserStatus? status = UserStatus.Active)
     {
         var users = await _authService.GetAllUsers(userType, status);
+        return Ok(users);
+    }
+
+    [HttpGet("paged_users")]
+    //[Authorize(Policy = AuthPolicy.IsAdmin)]
+    public async Task<IActionResult> GetPagedUsersAsync(UserType? userType, UserStatus? status = UserStatus.Active, int page = 1, int limit = 1)
+    { 
+        var users = await _authService.GetPagedUsersAsync(userType, status, page, limit);
         return Ok(users);
     }
 
