@@ -1,6 +1,6 @@
 using System.Net;
 using CleanService.Src.Constant;
-using CleanService.Src.Helpers;
+using CleanService.Src.Utils;
 using EntityFramework.Exceptions.Common;
 using Microsoft.AspNetCore.Diagnostics;
 
@@ -28,7 +28,13 @@ public class GlobalExceptionHandler : IExceptionHandler
         {
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)exceptionResponse.StatusCode;
-            await context.Response.WriteAsJsonAsync(exceptionResponse, cancellationToken);
+            await context.Response.WriteAsJsonAsync(new
+            {
+                exceptionResponse.StatusCode,
+                exceptionResponse.Message,
+                exceptionResponse.ExceptionCode,
+                exceptionResponse.Errors
+            }, cancellationToken);
         }
         else
         {
@@ -52,7 +58,13 @@ public class GlobalExceptionHandler : IExceptionHandler
 
             context.Response.ContentType = "application/json";
             context.Response.StatusCode = (int)response.StatusCode;
-            await context.Response.WriteAsJsonAsync(response, cancellationToken);
+            await context.Response.WriteAsJsonAsync(new
+            {
+                response.StatusCode,
+                response.Message,
+                response.ExceptionCode,
+                response.Errors
+            }, cancellationToken);
         }
     }
 }

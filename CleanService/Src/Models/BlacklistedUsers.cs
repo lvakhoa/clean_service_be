@@ -33,3 +33,20 @@ public class BlacklistedUsers
     
     public virtual Users BlacklistedByUser { get; set; } = null!;
 }
+
+public class PartialBlacklistedUsers
+{
+    public Guid? Id { get; set; }
+    
+    public string? UserId { get; set; } = null!;
+    
+    public string? Reason { get; set; } = null!;
+    
+    public DateTime? BlacklistedAt { get; set; }
+    
+    public string? BlacklistedBy { get; set; } = null!;
+    
+    public bool? IsPermanent { get; set; }
+    
+    public DateTime? ExpiryDate { get; set; }
+}

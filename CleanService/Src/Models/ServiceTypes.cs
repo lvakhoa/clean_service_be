@@ -38,3 +38,21 @@ public class ServiceTypes
     
     public virtual ICollection<Bookings> Bookings { get; set; } = new List<Bookings>();
 }
+
+public class PartialServiceTypes
+{
+    public Guid? Id { get; set; }
+    
+    public Guid? CategoryId { get; set; }
+    
+    [MaxLength(100)]
+    public string? Name { get; set; } = null!;
+    
+    public string? Description { get; set; }
+    
+    public decimal? BasePrice { get; set; }
+    
+    public DateTime? CreatedAt { get; set; }
+    
+    public bool? IsActive { get; set; }
+}

@@ -3,7 +3,7 @@ using CleanService.Src.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.EntityFrameworkCore;
 
-namespace CleanService.Src.Helpers;
+namespace CleanService.Src.Utils;
 
 public class ClaimsTransformation : IClaimsTransformation
 {

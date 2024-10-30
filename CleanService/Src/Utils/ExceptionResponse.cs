@@ -1,6 +1,6 @@
 using System.Net;
 
-namespace CleanService.Src.Helpers;
+namespace CleanService.Src.Utils;
 
 public class ExceptionResponse : Exception
 {
@@ -8,9 +8,12 @@ public class ExceptionResponse : Exception
     
     public string ExceptionCode { get; set; }
     
-    public ExceptionResponse(HttpStatusCode statusCode, string message, string exceptionCode) : base(message)
+    public string[]? Errors { get; set; }
+    
+    public ExceptionResponse(HttpStatusCode statusCode, string message, string exceptionCode, string[]? errors = null) : base(message)
     {
         StatusCode = statusCode;
         ExceptionCode = exceptionCode;
+        Errors = errors;
     }
 }

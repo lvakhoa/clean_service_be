@@ -19,3 +19,14 @@ public class Contracts
     
     public virtual Bookings Booking { get; set; } = null!;
 }
+
+public class PartialContracts
+{
+    public Guid? Id { get; set; }
+    
+    public Guid? BookingId { get; set; }
+    
+    public string? Content { get; set; }
+    
+    public DateTime? CreatedAt { get; set; }
+}

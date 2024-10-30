@@ -23,3 +23,17 @@ public class ServiceCategories
     
     public virtual ICollection<ServiceTypes> ServiceTypes { get; set; } = new List<ServiceTypes>();
 }
+
+public class PartialServiceCategories
+{
+    public Guid? Id { get; set; }
+    
+    [MaxLength(50)]
+    public string? Name { get; set; } = null!;
+    
+    public string? Description { get; set; }
+    
+    public DateTime? CreatedAt { get; set; }
+    
+    public bool? IsActive { get; set; }
+}

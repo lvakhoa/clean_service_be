@@ -27,3 +27,22 @@ public class BookingDetails
     
     public virtual Bookings Booking { get; set; } = null!;
 }
+
+public class PartialBookingDetails
+{
+    public Guid? Id { get; set; }
+    
+    public Guid? BookingId { get; set; }
+    
+    public int?BedroomCount { get; set; }
+    
+    public int?BathroomCount { get; set; }
+    
+    public int?KitchenCount { get; set; }
+    
+    public int? LivingRoomCount { get; set; }
+    
+    public string? SpecialRequirements { get; set; }
+    
+    public DateTime? CreatedAt { get; set; }
+}
