@@ -86,7 +86,7 @@ public class AuthRepository : IAuthRepository
         return helper;
     }
 
-    public async Task<Users[]> GetAllUsers(UserType? userType, UserStatus? status = UserStatus.Active)
+    public async Task<Users[]> GetAllUsers(UserType? userType = null, UserStatus? status = UserStatus.Active)
     {
         return await _dbContext.Users
             .Where(x => (userType == null || x.UserType == userType) && x.Status == status)

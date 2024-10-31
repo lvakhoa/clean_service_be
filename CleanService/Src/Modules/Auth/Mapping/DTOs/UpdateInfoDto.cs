@@ -8,6 +8,7 @@ public class UpdateInfoDto
 {
     public string? ProfilePicture { get; set; }
     
+    [EnumDataType(typeof(Gender), ErrorMessage = "Gender type must be Male, Female, or Other")]
     public string? Gender { get; set; }
     
     public string? FullName { get; set; }
@@ -18,6 +19,6 @@ public class UpdateInfoDto
     
     public string? Address { get; set; }
     
-    [RegularExpression("/(84|0[3|5|7|8|9])+([0-9]{8})\b/g", ErrorMessage = "Invalid phone number")]
+    // [RegularExpression("/(84|0[3|5|7|8|9])+([0-9]{8})\b/g", ErrorMessage = "Invalid phone number")]
     public string? PhoneNumber { get; set; }
 }

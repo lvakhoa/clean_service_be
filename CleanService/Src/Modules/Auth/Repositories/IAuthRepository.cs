@@ -13,7 +13,7 @@ public interface IAuthRepository
     
     public Task<Helpers?> UpdateHelperInfo(string id, PartialHelper updateInfoHelper);
     
-    public Task<Users[]> GetAllUsers(UserType? userType, UserStatus? status = UserStatus.Active);
+    public Task<Users[]> GetAllUsers(UserType? userType = null, UserStatus? status = UserStatus.Active);
     
     public Task<string?[]> GetUserNotificationTokens(List<string>? userIds);
 }

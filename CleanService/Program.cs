@@ -5,8 +5,10 @@ using CleanService.Src.Filters;
 using CleanService.Src.Middlewares;
 using CleanService.Src.Models;
 using CleanService.Src.Modules;
+using CleanService.Src.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -59,7 +61,7 @@ builder.Services
     .AddAppDependency(builder.Configuration);
 
 builder.Services
-    .AddControllers(options => options.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true);
+    .AddControllers();
 builder.Services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });
 
 var app = builder.Build();

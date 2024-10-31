@@ -84,11 +84,10 @@ public class AuthController : ControllerBase
         });
     }
     
-    [ModelValidation]
     [HttpPatch("user/{id}")]
+    [ModelValidation]
     public async Task<IActionResult> UpdateInfo(string id, [FromBody] UpdateInfoDto updateInfoDto)
     {
-        var modelstate = ModelState;
         var currentUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
         if (currentUserId != id && !User.IsInRole(UserType.Admin.ToString()))
         {

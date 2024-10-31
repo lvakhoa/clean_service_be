@@ -3,6 +3,7 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
 using CleanService.Src.Constant;
+using CleanService.Src.Models;
 using CleanService.Src.Modules.Auth.Mapping.DTOs;
 using CleanService.Src.Modules.Auth.Mapping.Profiles;
 using CleanService.Src.Modules.Auth.Repositories;
@@ -63,6 +64,9 @@ public static class AuthModule
             {
                 OnCreatingTicket = async context =>
                 {
+                    // var authRepository = context.HttpContext.RequestServices.GetRequiredService<IAuthRepository>();
+                    // var role = context.Principal?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+                    
                     var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
                     request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                     request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);
@@ -73,6 +77,8 @@ public static class AuthModule
                     var user = await response.Content.ReadFromJsonAsync<JsonElement>();
 
                     context.RunClaimActions(user);
+                    
+                    // var claim = context.Principal?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
                 }
             };
         });
