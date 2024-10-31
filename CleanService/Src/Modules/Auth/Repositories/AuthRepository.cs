@@ -1,5 +1,5 @@
 using CleanService.Src.Models;
-using CleanService.Src.Modules.Auth.DTOs;
+using CleanService.Src.Modules.Auth.Mapping.DTOs;
 using Microsoft.EntityFrameworkCore;
 
 namespace CleanService.Src.Modules.Auth.Repositories;
@@ -13,35 +13,15 @@ public class AuthRepository : IAuthRepository
         _dbContext = dbContext;
     }
 
-    public async Task<UserReturnDto?> GetUserById(string id)
+    public async Task<Users?> GetUserById(string id)
     {
-        var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == id);
-
-        return user is not null
-            ? new UserReturnDto
-            {
-                Id = user.Id,
-                FullName = user.FullName,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
-                Address = user.Address,
-                UserType = user.UserType.ToString(),
-                NotificationToken = user.NotificationToken,
-                CreatedAt = user.CreatedAt
-            }
-            : null;
+        return await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == id);
     }
 
-    public async Task<UserReturnDto> CreateUser(RegistrationDto registration)
+    public async Task<Users> CreateUser(Users user)
     {
-        var userEntity = await _dbContext.Users.AddAsync(new Users
-        {
-            Id = registration.Id,
-            FullName = registration.Fullname,
-            Email = registration.Email,
-            UserType = registration.UserType
-        });
-        if (registration.UserType == UserType.Helper)
+        var userEntity = await _dbContext.Users.AddAsync(user);
+        if (user.UserType == UserType.Helper)
         {
             await _dbContext.Helpers.AddAsync(new Models.Helpers
             {
@@ -51,98 +31,75 @@ public class AuthRepository : IAuthRepository
 
         await _dbContext.SaveChangesAsync();
 
-        return new UserReturnDto
-        {
-            Id = userEntity.Entity.Id,
-            FullName = userEntity.Entity.FullName,
-            Email = userEntity.Entity.Email,
-            PhoneNumber = userEntity.Entity.PhoneNumber,
-            Address = userEntity.Entity.Address,
-            UserType = userEntity.Entity.UserType.ToString(),
-            NotificationToken = userEntity.Entity.NotificationToken,
-            CreatedAt = userEntity.Entity.CreatedAt
-        };
+        return userEntity.Entity;
     }
 
-    public async Task<UserReturnDto?> UpdateInfo(string id, UpdateInfoDto updateInfoDto)
+    public async Task<Users?> UpdateInfo(string id, PartialUsers updateInfoUser)
     {
         var user = await _dbContext.Users.FirstOrDefaultAsync(x => x.Id == id);
         if (user is null)
             return null;
 
-        if (updateInfoDto.FullName is not null)
-            user.FullName = updateInfoDto.FullName;
-        if (updateInfoDto.Address is not null)
-            user.Address = updateInfoDto.Address;
-        if (updateInfoDto.PhoneNumber is not null)
-            user.PhoneNumber = updateInfoDto.PhoneNumber;
-        if (updateInfoDto.Status is not null)
-            user.Status = updateInfoDto.Status.Value;
+        if (updateInfoUser.UserType is not null)
+            user.UserType = updateInfoUser.UserType.Value;
+        if (updateInfoUser.Gender is not null)
+            user.Gender = updateInfoUser.Gender;
+        if (updateInfoUser.ProfilePicture is not null)
+            user.ProfilePicture = updateInfoUser.ProfilePicture;
+        if (updateInfoUser.FullName is not null)
+            user.FullName = updateInfoUser.FullName;
+        if (updateInfoUser.DateOfBirth is not null)
+            user.DateOfBirth = updateInfoUser.DateOfBirth;
+        if (updateInfoUser.IdentityCard is not null)
+            user.IdentityCard = updateInfoUser.IdentityCard;
+        if (updateInfoUser.Address is not null)
+            user.Address = updateInfoUser.Address;
+        if (updateInfoUser.PhoneNumber is not null)
+            user.PhoneNumber = updateInfoUser.PhoneNumber;
+        if (updateInfoUser.Email is not null)
+            user.Email = updateInfoUser.Email;
+        if (updateInfoUser.Status is not null)
+            user.Status = updateInfoUser.Status.Value;
+        if (updateInfoUser.NotificationToken is not null)
+            user.NotificationToken = updateInfoUser.NotificationToken;
 
         await _dbContext.SaveChangesAsync();
-        return new UserReturnDto
-        {
-            Id = user.Id,
-            FullName = user.FullName,
-            Email = user.Email,
-            PhoneNumber = user.PhoneNumber,
-            Address = user.Address,
-            UserType = user.UserType.ToString(),
-            NotificationToken = user.NotificationToken,
-            CreatedAt = user.CreatedAt
-        };
+        return user;
     }
 
-    public async Task<HelperReturnDto?> UpdateHelperInfo(string id, UpdateHelperDto updateHelperDto)
+    public async Task<Helpers?> UpdateHelperInfo(string id, PartialHelper updateInfoHelper)
     {
         var helper = await _dbContext.Helpers.FirstOrDefaultAsync(x => x.Id == id);
 
         if (helper is null)
             return null;
 
-        if (updateHelperDto.ExperienceDescription is not null)
-            helper.ExperienceDescription = updateHelperDto.ExperienceDescription;
-        // if (updateHelperDto.ServicesOffered is not null)
-        //     helper.ServicesOffered = updateHelperDto.ServicesOffered;
+        if (updateInfoHelper.ExperienceDescription is not null)
+            helper.ExperienceDescription = updateInfoHelper.ExperienceDescription;
+        if (updateInfoHelper.ResumeUploaded is not null)
+            helper.ResumeUploaded = updateInfoHelper.ResumeUploaded;
+        if (updateInfoHelper.ServicesOffered is not null)
+            helper.ServicesOffered = updateInfoHelper.ServicesOffered;
 
         await _dbContext.SaveChangesAsync();
 
-        return new HelperReturnDto
-        {
-            Id = helper.Id,
-            ExperienceDescription = helper.ExperienceDescription,
-            AverageRating = helper.AverageRating,
-            CompletedJobs = helper.CompletedJobs,
-            CancelledJobs = helper.CancelledJobs
-        };
+        return helper;
     }
 
-    public async Task<UserReturnDto[]> GetAllUsers(UserType? userType, UserStatus? status = UserStatus.Active)
+    public async Task<Users[]> GetAllUsers(UserType? userType = null, UserStatus? status = UserStatus.Active)
     {
-        var users = await _dbContext.Users
+        return await _dbContext.Users
             .Where(x => (userType == null || x.UserType == userType) && x.Status == status)
             .ToArrayAsync();
-
-        return users.Select(x => new UserReturnDto
-        {
-            Id = x.Id,
-            FullName = x.FullName,
-            Email = x.Email,
-            PhoneNumber = x.PhoneNumber,
-            Address = x.Address,
-            UserType = x.UserType.ToString(),
-            NotificationToken = x.NotificationToken,
-            CreatedAt = x.CreatedAt
-        }).ToArray();
     }
 
     public Task<string?[]> GetUserNotificationTokens(List<string>? userIds)
     {
-        if(userIds is null)
+        if (userIds is null)
             return _dbContext.Users
                 .Select(x => x.NotificationToken)
                 .ToArrayAsync();
-        
+
         return _dbContext.Users
             .Where(x => userIds.Contains(x.Id))
             .Select(x => x.NotificationToken)

@@ -1,11 +1,14 @@
 using System.Net;
 using System.Security.Claims;
 using CleanService.Src.Constant;
-using CleanService.Src.Helpers;
+using CleanService.Src.Filters;
 using CleanService.Src.Middlewares;
 using CleanService.Src.Models;
 using CleanService.Src.Modules;
+using CleanService.Src.Utils;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,14 +22,17 @@ builder.Services
 
 var origins = Environment.GetEnvironmentVariable("ORIGINS")?.Split(",")
               ?? new[] { "http://localhost:3000" };
-const string allowPolicy = "AllowOriginsAndCredentials";
+const string allowPolicy = "AllowCors";
 builder.Services
     .AddCors(options =>
     {
         options.AddPolicy(allowPolicy, policy =>
         {
-            policy.WithOrigins(origins);
-            policy.AllowCredentials();
+            policy
+                .WithOrigins(origins)
+                .AllowCredentials()
+                .AllowAnyHeader()
+                .AllowAnyMethod();
         });
     });
 
@@ -56,6 +62,7 @@ builder.Services
 
 builder.Services
     .AddControllers();
+builder.Services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });
 
 var app = builder.Build();
 
@@ -81,8 +88,12 @@ app.Use(async (context, next) =>
     }
     else
     {
-        await context.Response.WriteAsJsonAsync(new ExceptionResponse(HttpStatusCode.NotFound,
-            "Route not found", ExceptionConvention.NotFound));
+        await context.Response.WriteAsJsonAsync(new
+        {
+            StatusCode = HttpStatusCode.NotFound,
+            Message = "Route not found",
+            ExceptionCode = ExceptionConvention.NotFound,
+        });
     }
 });
 
@@ -95,8 +106,12 @@ app.UseStatusCodePages(new StatusCodePagesOptions()
     {
         if (ctx.HttpContext.Response.StatusCode == 404)
         {
-            await ctx.HttpContext.Response.WriteAsJsonAsync(new ExceptionResponse(HttpStatusCode.NotFound,
-                "Route not found", ExceptionConvention.NotFound));
+            await ctx.HttpContext.Response.WriteAsJsonAsync(new
+            {
+                StatusCode = HttpStatusCode.NotFound,
+                Message = "Route not found",
+                ExceptionCode = ExceptionConvention.NotFound,
+            });
         }
     }
 });

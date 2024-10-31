@@ -85,3 +85,43 @@ public enum PaymentStatus
     Paid,
     Refunded
 }
+
+public class PartialBookings
+{
+    public Guid? Id { get; set; }
+
+    public string? CustomerId { get; set; } = null!;
+
+    public string? HelperId { get; set; }
+
+    public Guid? ServiceTypeId { get; set; }
+
+    public string? Location { get; set; }
+
+    public DateTime? ScheduledStartTime { get; set; }
+
+    public DateTime? ScheduledEndTime { get; set; }
+
+    public BookingStatus? Status { get; set; }
+
+    public string? CancellationReason { get; set; }
+
+    [Precision(10, 2)]
+    public decimal? TotalPrice { get; set; }
+    
+    public PaymentStatus? PaymentStatus { get; set; }
+
+    [MaxLength(50)]
+    public string? PaymentMethod { get; set; }
+
+    [Precision(2, 1)]
+    public decimal? HelperRating { get; set; }
+
+    public string? CustomerFeedback { get; set; }
+
+    public string? HelperFeedback { get; set; }
+    
+    public DateTime? CreatedAt { get; set; }
+    
+    public DateTime? UpdatedAt { get; set; }
+}
