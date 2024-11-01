@@ -65,18 +65,17 @@ public class AuthService : IAuthService
         return helperDto;
     }
 
-    public async Task<UserReturnDto[]> GetAllUsers(UserType? userType, UserStatus? status = UserStatus.Active)
+    public async Task<Pagination<UserReturnDto>> GetPagedUsersAsync(UserType? userType, int? page, int? limit, UserStatus? status = UserStatus.Active)
     {
-        var users = await _authRepository.GetAllUsers(userType, status);
-        var listUserDto = _mapper.Map<UserReturnDto[]>(users);
-        return listUserDto;
-    }
-
-    public async Task<Pagination<UserReturnDto>> GetPagedUsersAsync(UserType? userType, UserStatus? status = UserStatus.Active, int page = 1, int limit = 1)
-    {
-        var users = await _authRepository.GetPagedUsersAsync(userType, status, page, limit);
+        var users = await _authRepository.GetPagedUsersAsync(userType, page, limit, status);
         var response = _mapper.Map<UserReturnDto[]>(users.Results);
-        return new Pagination<UserReturnDto>(response, users.TotalItems, page, limit);
+
+        var currentPage = page ?? 1;
+        var currentLimit = (int)(limit ?? users.TotalItems);
+
+        return new Pagination<UserReturnDto>(response, users.TotalItems,
+            currentPage,
+            currentLimit);
     }
     
     public async Task<UserReturnDto?> ActivateUser(string id)

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Pagination.EntityFrameworkCore.Extensions;
 using System.Collections.Generic;
 using System.Diagnostics.Metrics;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace CleanService.Src.Modules.Auth.Repositories;
 
@@ -89,34 +90,28 @@ public class AuthRepository : IAuthRepository
         return helper;
     }
 
-    public async Task<Users[]> GetAllUsers(UserType? userType, UserStatus? status = UserStatus.Active)
+    public async Task<Pagination<Users>> GetPagedUsersAsync(UserType? userType, int? page, int? limit, UserStatus? status = UserStatus.Active)
     {
-        return await _dbContext.Users
-            .Where(x => (userType == null || x.UserType == userType) && x.Status == status)
-            .ToArrayAsync();
-    }
-
-    public async Task<Pagination<Users>> GetPagedUsersAsync(UserType? userType, UserStatus? status = UserStatus.Active, int page = 1, int limit = 1)
-    {
+        if (page == null || limit == null)
+        {
+            var allUsers = await _dbContext.Users
+                .Where(x => (userType == null || x.UserType == userType) && x.Status == status)
+                .OrderBy(x => x.FullName)
+                .ToListAsync();
+            return new Pagination<Users>(allUsers, allUsers.Count, 1, allUsers.Count);
+        }
 
         var list = await _dbContext.Users
-            .Where(x => (userType == null || x.UserType == userType) && x.Status == status).OrderBy(x => x.FullName).Skip((page - 1) * limit).Take(limit)
+            .Where(x => (userType == null || x.UserType == userType) && x.Status == status)
+            .OrderBy(x => x.FullName).Skip((page.Value - 1) * limit.Value)
+            .Take(limit.Value)
             .ToListAsync();
 
-        var totalItems = await _dbContext.Users.Where(x => (userType == null || x.UserType == userType) && x.Status == status).CountAsync();
+        var totalItems = await _dbContext.Users
+            .Where(x => (userType == null || x.UserType == userType) && x.Status == status)
+            .CountAsync();
 
-        //var users = list.Select(x => new UserReturnDto
-        //{
-        //    Id = x.Id,
-        //    FullName = x.FullName,
-        //    Email = x.Email,
-        //    PhoneNumber = x.PhoneNumber,
-        //    Address = x.Address,
-        //    UserType = x.UserType.ToString(),
-        //    CreatedAt = x.CreatedAt
-        //});
-
-        return new Pagination<Users>(list, totalItems, page, limit);
+        return new Pagination<Users>(list, totalItems, page.Value, limit.Value);
     }
 
     public Task<string?[]> GetUserNotificationTokens(List<string>? userIds)

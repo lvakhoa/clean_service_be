@@ -57,9 +57,9 @@ public class AuthController : ControllerBase
     public IActionResult LoginCustomer()
     {
         return Challenge(new AuthenticationProperties()
-            {
-                RedirectUri = "http://localhost:5011/api/v1/auth/create-customer"
-            },
+        {
+            RedirectUri = "http://localhost:5011/api/v1/auth/create-customer"
+        },
             authenticationSchemes: new[] { AuthProvider.Provider });
     }
 
@@ -67,9 +67,9 @@ public class AuthController : ControllerBase
     public IActionResult LoginHelper()
     {
         return Challenge(new AuthenticationProperties()
-            {
-                RedirectUri = "http://localhost:5011/api/v1/auth/create-helper"
-            },
+        {
+            RedirectUri = "http://localhost:5011/api/v1/auth/create-helper"
+        },
             authenticationSchemes: new[] { AuthProvider.Provider });
     }
 
@@ -84,7 +84,7 @@ public class AuthController : ControllerBase
             Data = user
         });
     }
-    
+
     [ModelValidation]
     [HttpPatch("user/{id}")]
     public async Task<IActionResult> UpdateInfo(string id, [FromBody] UpdateInfoDto updateInfoDto)
@@ -124,22 +124,13 @@ public class AuthController : ControllerBase
 
     [HttpGet("users")]
     //[Authorize(Policy = AuthPolicy.IsAdmin)]
-    public async Task<IActionResult> GetAllUsers(UserType? userType, UserStatus? status = UserStatus.Active)
+    public async Task<IActionResult> GetPagedUsersAsync(UserType? userType, int? page, int? limit, UserStatus? status = UserStatus.Active)
     {
-        var users = await _authService.GetAllUsers(userType, status);
-        return Ok(new SuccessResponse
+        if (page < 1 || limit < 1)
         {
-            StatusCode = HttpStatusCode.OK,
-            Message = "Get all users successfully",
-            Data = users
-        });
-    }
-
-    [HttpGet("paged_users")]
-    //[Authorize(Policy = AuthPolicy.IsAdmin)]
-    public async Task<IActionResult> GetPagedUsersAsync(UserType? userType, UserStatus? status = UserStatus.Active, int page = 1, int limit = 1)
-    { 
-        var users = await _authService.GetPagedUsersAsync(userType, status, page, limit);
+            throw new ExceptionResponse(HttpStatusCode.BadRequest, "BadRequest", ExceptionConvention.BadRequest);
+        }
+        var users = await _authService.GetPagedUsersAsync(userType, page, limit, status);
         return Ok(users);
     }
 
