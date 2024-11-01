@@ -127,7 +127,7 @@ public class AuthController : ControllerBase
     {
         if (page < 1 || limit < 1)
         {
-            throw new ExceptionResponse(HttpStatusCode.BadRequest, "BadRequest", ExceptionConvention.BadRequest);
+            throw new ExceptionResponse(HttpStatusCode.BadRequest, "Page Or Limit Param is Negative", ExceptionConvention.ValidationFailed);
         }
         var users = await _authService.GetPagedUsersAsync(userType, page, limit, status);
         return Ok(users);
