@@ -66,7 +66,7 @@ public static class AuthModule
                 {
                     // var authRepository = context.HttpContext.RequestServices.GetRequiredService<IAuthRepository>();
                     // var role = context.Principal?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-                    
+
                     var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
                     request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                     request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);
@@ -77,7 +77,7 @@ public static class AuthModule
                     var user = await response.Content.ReadFromJsonAsync<JsonElement>();
 
                     context.RunClaimActions(user);
-                    
+
                     // var claim = context.Principal?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
                 }
             };
@@ -103,6 +103,17 @@ public static class AuthModule
             .AddAutoMapper(typeof(UpdateUserRequestProfile))
             .AddAutoMapper(typeof(UpdateHelperRequestProfile))
             .AddAutoMapper(typeof(HelperResponseProfile));
+
+        return services;
+    }
+
+    public static IServiceCollection AddAuthModule(this IServiceCollection services, IConfiguration config)
+    {
+        services
+            .AddTransient<IClaimsTransformation, ClaimsTransformation>()
+            .AddAuthScheme(config)
+            .AddAuthDependency()
+            .AddAuthMapping();
 
         return services;
     }

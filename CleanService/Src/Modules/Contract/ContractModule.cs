@@ -12,4 +12,11 @@ public static class ContractModule
 
         return services;
     }
+    
+    public static IServiceCollection AddContractModule(this IServiceCollection services)
+    {
+        services.AddContractDependency();
+
+        return services;
+    }
 }

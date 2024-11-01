@@ -1,5 +1,5 @@
 using CleanService.Src.Models;
-using CleanService.Src.Modules.Booking.DTOs;
+using CleanService.Src.Modules.Booking.Mapping.DTOs;
 
 namespace  CleanService.Src.Modules.Booking.Services;
 

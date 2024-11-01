@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace CleanService.Src.Models;
 
 public class BookingDetails
-{
+{ 
     [Key]
     public Guid Id { get; set; }
     

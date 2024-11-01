@@ -1,16 +1,16 @@
 using CleanService.Src.Models;
-using CleanService.Src.Modules.Booking.DTOs;
+using CleanService.Src.Modules.Booking.Mapping.DTOs;
 
 namespace CleanService.Src.Modules.Booking.Repositories
 {
     public interface IBookingRepository
     {
-        public Task<BookingReturnDto?> GetBookingById(Guid id);
+        public Task<Bookings?> GetBookingById(Guid id);
         
-        public Task<BookingReturnDto> CreateBooking(Bookings createBooking);
+        public Task<Bookings> CreateBooking(Bookings createBooking);
         
-        public Task<BookingReturnDto?> UpdateBooking(Guid id, UpdateBookingDto updateBooking);
+        public Task<Bookings?> UpdateBooking(Guid id, PartialBookings updateBooking);
         
-        public Task<BookingReturnDto[]> GetAllBookings();
+        public Task<Bookings[]> GetAllBookings();
     }
 }

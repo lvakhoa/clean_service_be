@@ -1,6 +1,9 @@
 using CleanService.Src.Modules.Auth;
+using CleanService.Src.Modules.Booking;
+using CleanService.Src.Modules.Contract;
 using CleanService.Src.Modules.Mail;
 using CleanService.Src.Modules.Notification;
+using CleanService.Src.Modules.Service;
 using CleanService.Src.Utils;
 using Microsoft.AspNetCore.Authentication;
 
@@ -14,20 +17,29 @@ public static class AppModule
         services
             .AddSingleton<IConfiguration>(config);
         
-        // Inject Auth Services
+        // Inject Auth Module
         services
-            .AddTransient<IClaimsTransformation, ClaimsTransformation>()
-            .AddAuthScheme(config)
-            .AddAuthDependency()
-            .AddAuthMapping();
+            .AddAuthModule(config);
             
-        // Inject Notification Services
+        // Inject Notification Module
         services
             .AddNotificationModule(config);
         
-        // Inject Mail Services
+        // Inject Mail Module
         services
             .AddMailModule(config);
+        
+        // Inject Booking Module
+        services
+            .AddBookingModule();
+        
+        // Inject Service Module
+        services
+            .AddServiceModule();
+        
+        // Inject Contract Module
+        services
+            .AddContractModule();
 
         return services;
     }

@@ -1,5 +1,5 @@
 using CleanService.Src.Models;
-using CleanService.Src.Modules.Booking.DTOs;
+using CleanService.Src.Modules.Booking.Mapping.DTOs;
 using CleanService.Src.Modules.Service.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,38 +9,19 @@ public class BookingRepository : IBookingRepository
 {
     private readonly CleanServiceContext _dbContext;
 
-    public BookingRepository(CleanServiceContext dbContext, IServiceService serviceService)
+    public BookingRepository(CleanServiceContext dbContext, IServiceTypeService serviceTypeService)
     {
         _dbContext = dbContext;
     }
 
-    public async Task<BookingReturnDto?> GetBookingById(Guid id)
+    public async Task<Bookings?> GetBookingById(Guid id)
     {
-        var booking = await _dbContext.Bookings.FirstOrDefaultAsync(x => x.Id == id);
-        
-        return booking is not null
-            ? new BookingReturnDto
-            {
-                Id = booking.Id,
-                CustomerId = booking.CustomerId,
-                HelperId = booking.HelperId,
-                ServiceId = booking.ServiceId,
-                Location = booking.Location,
-                StartTime = booking.StartTime,
-                EndTime = booking.EndTime,
-                Status = nameof(booking.Status),
-                CancellationReason = booking.CancellationReason,
-                Price = booking.Price,
-                PaymentMethod = booking.PaymentMethod,
-                Rating = booking.Rating,
-                Feedback = booking.Feedback,
-            }
-            : null;
+        return await _dbContext.Bookings.FirstOrDefaultAsync(x => x.Id == id);
     }
 
-    public async Task<BookingReturnDto> CreateBooking(Bookings createBooking)
+    public async Task<Bookings> CreateBooking(Bookings createBooking)
     {
-        var bookingEntity = await _dbContext.Bookings.AddAsync(createBooking);
+        var booking = await _dbContext.Bookings.AddAsync(createBooking);
 
         // var contractEntity = await _dbContext.Contracts.AddAsync(new Contracts
         // {
@@ -49,27 +30,11 @@ public class BookingRepository : IBookingRepository
         // }); 
 
         await _dbContext.SaveChangesAsync();
-        
-        return new BookingReturnDto
-        {
-            Id = bookingEntity.Entity.Id,
-            CustomerId = bookingEntity.Entity.CustomerId,
-            HelperId = bookingEntity.Entity.HelperId,
-            ServiceId = bookingEntity.Entity.ServiceId,
-            Location = bookingEntity.Entity.Location,
-            StartTime = bookingEntity.Entity.StartTime,
-            EndTime = bookingEntity.Entity.EndTime,
-            //Status = Enum.GetName(typeof(BookingStatus),bookingEntity.Entity.Status),
-            Status = bookingEntity.Entity.Status.ToString(),
-            CancellationReason = bookingEntity.Entity.CancellationReason,
-            Price = bookingEntity.Entity.Price,
-            PaymentMethod = bookingEntity.Entity.PaymentMethod,
-            Rating = bookingEntity.Entity.Rating,
-            Feedback = bookingEntity.Entity.Feedback,
-        };
+
+        return booking.Entity;
     }
     
-    public async Task<BookingReturnDto?> UpdateBooking(Guid id, UpdateBookingDto updateBooking)
+    public async Task<Bookings?> UpdateBooking(Guid id, PartialBookings updateBooking)
     {
         var booking = await _dbContext.Bookings.FirstOrDefaultAsync(x => x.Id == id);
     
@@ -94,56 +59,15 @@ public class BookingRepository : IBookingRepository
         //     booking.Feedback = updateBooking.Feedback;
         // if(updateBooking.CancellationReason is not null)
         //     booking.Rating = updateBooking.Rating;
-        
-        booking.HelperId = updateBooking.HelperId ?? booking.HelperId;
-        booking.Location = updateBooking.Location ?? booking.Location;
-        booking.EndTime = updateBooking.EndTime ?? booking.EndTime;
-        booking.Status = updateBooking.Status ?? booking.Status;
-        booking.CancellationReason = updateBooking.CancellationReason ?? booking.CancellationReason;
-        booking.PaymentMethod = updateBooking.PaymentMethod ?? booking.PaymentMethod;
-        booking.Feedback = updateBooking.Feedback ?? booking.Feedback;
-        booking.Rating = updateBooking.Rating ?? booking.Rating;
 
     
         await _dbContext.SaveChangesAsync();
     
-        return new BookingReturnDto
-        {
-            Id = booking.Id,
-            CustomerId = booking.CustomerId,
-            HelperId = booking.HelperId,
-            ServiceId = booking.ServiceId,
-            Location = booking.Location,
-            StartTime = booking.StartTime,
-            EndTime = booking.EndTime,
-            Status = booking.Status.ToString(),
-            CancellationReason = booking.CancellationReason,
-            Price = booking.Price,
-            PaymentMethod = booking.PaymentMethod,
-            Rating = booking.Rating,
-            Feedback = booking.Feedback,
-        };
+        return booking;
     }
     
-    public async Task<BookingReturnDto[]> GetAllBookings()
+    public async Task<Bookings[]> GetAllBookings()
     {
-        var bookings = await _dbContext.Bookings.ToArrayAsync();
-    
-        return bookings.Select(booking => new BookingReturnDto
-        {
-            Id = booking.Id,
-            CustomerId = booking.CustomerId,
-            HelperId = booking.HelperId,
-            ServiceId = booking.ServiceId,
-            Location = booking.Location,
-            StartTime = booking.StartTime,
-            EndTime = booking.EndTime,
-            Status = nameof(booking.Status),
-            CancellationReason = booking.CancellationReason,
-            Price = booking.Price,
-            PaymentMethod = booking.PaymentMethod,
-            Rating = booking.Rating,
-            Feedback = booking.Feedback,
-        }).ToArray();
+        return await _dbContext.Bookings.ToArrayAsync();
     }
 }

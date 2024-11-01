@@ -1,5 +1,6 @@
+using AutoMapper;
 using CleanService.Src.Models;
-using CleanService.Src.Modules.Booking.DTOs;
+using CleanService.Src.Modules.Booking.Mapping.DTOs;
 using CleanService.Src.Modules.Booking.Repositories;
 using CleanService.Src.Modules.Contract.DTOs;
 using CleanService.Src.Modules.Contract.Services;
@@ -10,74 +11,58 @@ namespace CleanService.Src.Modules.Booking.Services;
 public class BookingService : IBookingService
 {
     private readonly IBookingRepository _bookingRepository;
-    private readonly IServiceService _serviceService;
+    private readonly IServiceTypeService _serviceTypeService;
     private readonly IContractService _contractService;
+    private readonly IMapper _mapper;
 
-    public BookingService(IBookingRepository bookingRepository, IServiceService serviceService, IContractService contractService)
+    public BookingService(IBookingRepository bookingRepository, IServiceTypeService serviceTypeService,
+        IContractService contractService, IMapper mapper)
     {
         _bookingRepository = bookingRepository;
-        _serviceService = serviceService;
+        _serviceTypeService = serviceTypeService;
         _contractService = contractService;
+        _mapper = mapper;
     }
 
     public async Task<BookingReturnDto> CreateBooking(CreateBookingDto createBookingDto)
     {
-        var price = _serviceService.GetPriceById(createBookingDto.ServiceId);
-        // var booking = new Bookings
-        // {
-        //     Id = Guid.NewGuid(),
-        //     CustomerId = createBookingDto.CustomerId,
-        //     HelperId = createBookingDto.HelperId,
-        //     ServiceId = createBookingDto.ServiceId,
-        //     Location = createBookingDto.Location,
-        //     StartTime = createBookingDto.StartTime,
-        //     EndTime = createBookingDto.EndTime,
-        //     Price = price,
-        //     PaymentMethod = createBookingDto.PaymentMethod,
-        //     Rating = null,
-        //     Feedback = null,
-        //     CancellationReason = null,
-        // };
-        var booking = await _bookingRepository.CreateBooking(new Bookings
-        {
-            Id = Guid.NewGuid(),
-            CustomerId = createBookingDto.CustomerId,
-            HelperId = createBookingDto.HelperId,
-            ServiceId = createBookingDto.ServiceId,
-            Location = createBookingDto.Location,
-            StartTime = createBookingDto.StartTime,
-            EndTime = createBookingDto.EndTime,
-            Price = price,
-            PaymentMethod = createBookingDto.PaymentMethod,
-            Rating = null,
-            Feedback = null,
-            CancellationReason = null,
-        });
+        // var price = _serviceService.GetPriceById(createBookingDto.ServiceTypeId);
+        var booking = _mapper.Map<Bookings>(createBookingDto);
+        var bookingEntity = await _bookingRepository.CreateBooking(booking);
+        var bookingDto = _mapper.Map<BookingReturnDto>(bookingEntity);
 
         await _contractService.CreateContract(new CreateContractDto
         {
             BookingId = booking.Id,
             Content = "Clean at " + booking.Location
         });
-        return booking;
+        return bookingDto;
     }
 
     public async Task<BookingReturnDto?> UpdateBooking(Guid id, UpdateBookingDto updateBookingDto)
     {
         var booking = await _bookingRepository.GetBookingById(id);
-        if(booking == null)
+        if (booking == null)
             throw new KeyNotFoundException("Booking not found");
-        return await _bookingRepository.UpdateBooking(id, updateBookingDto);
+        
+        var updateBooking = _mapper.Map<PartialBookings>(updateBookingDto);
+        var bookingEntity = await _bookingRepository.UpdateBooking(id, updateBooking);
+        var bookingDto = _mapper.Map<BookingReturnDto>(bookingEntity);
+        
+        return bookingDto;
     }
 
-    public Task<BookingReturnDto[]> GetAllBookings()
+    public async Task<BookingReturnDto[]> GetAllBookings()
     {
-        return _bookingRepository.GetAllBookings();
+        var bookings = await _bookingRepository.GetAllBookings();
+        var bookingsDto = _mapper.Map<BookingReturnDto[]>(bookings);
+        return bookingsDto;
     }
 
-    public Task<BookingReturnDto?> GetBookingById(Guid id)
+    public async Task<BookingReturnDto?> GetBookingById(Guid id)
     {
-        return _bookingRepository.GetBookingById(id);
+        var booking = await _bookingRepository.GetBookingById(id);
+        var bookingDto = _mapper.Map<BookingReturnDto>(booking);
+        return bookingDto;
     }
 }
-
