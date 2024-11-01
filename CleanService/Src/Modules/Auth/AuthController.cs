@@ -9,6 +9,7 @@ using CleanService.Src.Utils;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Modules.Auth;
 
@@ -56,9 +57,9 @@ public class AuthController : ControllerBase
     public IActionResult LoginCustomer()
     {
         return Challenge(new AuthenticationProperties()
-            {
-                RedirectUri = "http://localhost:5011/api/v1/auth/create-customer"
-            },
+        {
+            RedirectUri = "http://localhost:5011/api/v1/auth/create-customer"
+        },
             authenticationSchemes: new[] { AuthProvider.Provider });
     }
 
@@ -66,9 +67,9 @@ public class AuthController : ControllerBase
     public IActionResult LoginHelper()
     {
         return Challenge(new AuthenticationProperties()
-            {
-                RedirectUri = "http://localhost:5011/api/v1/auth/create-helper"
-            },
+        {
+            RedirectUri = "http://localhost:5011/api/v1/auth/create-helper"
+        },
             authenticationSchemes: new[] { AuthProvider.Provider });
     }
 
@@ -121,16 +122,15 @@ public class AuthController : ControllerBase
     }
 
     [HttpGet("users")]
-    [Authorize(Policy = AuthPolicy.IsAdmin)]
-    public async Task<IActionResult> GetAllUsers(UserType? userType, UserStatus? status = UserStatus.Active)
+    //[Authorize(Policy = AuthPolicy.IsAdmin)]
+    public async Task<IActionResult> GetUsers(UserType? userType = null, int? page = null, int? limit = null, UserStatus? status = UserStatus.Active)
     {
-        var users = await _authService.GetAllUsers(userType, status);
-        return Ok(new SuccessResponse
+        if (page < 1 || limit < 1)
         {
-            StatusCode = HttpStatusCode.OK,
-            Message = "Get all users successfully",
-            Data = users
-        });
+            throw new ExceptionResponse(HttpStatusCode.BadRequest, "Page Or Limit Param is Negative", ExceptionConvention.ValidationFailed);
+        }
+        var users = await _authService.GetUsers(userType, page, limit, status);
+        return Ok(users);
     }
 
     [HttpGet("me")]

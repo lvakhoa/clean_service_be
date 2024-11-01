@@ -2,6 +2,7 @@ using AutoMapper;
 using CleanService.Src.Models;
 using CleanService.Src.Modules.Auth.Mapping.DTOs;
 using CleanService.Src.Modules.Auth.Repositories;
+using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Modules.Auth.Services;
 
@@ -64,11 +65,17 @@ public class AuthService : IAuthService
         return helperDto;
     }
 
-    public async Task<UserReturnDto[]> GetAllUsers(UserType? userType, UserStatus? status = UserStatus.Active)
+    public async Task<Pagination<UserReturnDto>> GetUsers(UserType? userType, int? page, int? limit, UserStatus? status = UserStatus.Active)
     {
-        var users = await _authRepository.GetAllUsers(userType, status);
-        var listUserDto = _mapper.Map<UserReturnDto[]>(users);
-        return listUserDto;
+        var users = await _authRepository.GetUsers(userType, page, limit, status);
+        var response = _mapper.Map<UserReturnDto[]>(users.Results);
+
+        var currentPage = page ?? 1;
+        var currentLimit = (int)(limit ?? users.TotalItems);
+
+        return new Pagination<UserReturnDto>(response, users.TotalItems,
+            currentPage,
+            currentLimit);
     }
     
     public async Task<UserReturnDto?> ActivateUser(string id)
