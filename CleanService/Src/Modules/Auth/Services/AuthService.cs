@@ -65,9 +65,9 @@ public class AuthService : IAuthService
         return helperDto;
     }
 
-    public async Task<Pagination<UserReturnDto>> GetPagedUsersAsync(UserType? userType, int? page, int? limit, UserStatus? status = UserStatus.Active)
+    public async Task<Pagination<UserReturnDto>> GetUsers(UserType? userType, int? page, int? limit, UserStatus? status = UserStatus.Active)
     {
-        var users = await _authRepository.GetPagedUsersAsync(userType, page, limit, status);
+        var users = await _authRepository.GetUsers(userType, page, limit, status);
         var response = _mapper.Map<UserReturnDto[]>(users.Results);
 
         var currentPage = page ?? 1;

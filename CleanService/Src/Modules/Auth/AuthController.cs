@@ -123,13 +123,13 @@ public class AuthController : ControllerBase
 
     [HttpGet("users")]
     //[Authorize(Policy = AuthPolicy.IsAdmin)]
-    public async Task<IActionResult> GetPagedUsersAsync(UserType? userType = null, int? page = null, int? limit = null, UserStatus? status = UserStatus.Active)
+    public async Task<IActionResult> GetUsers(UserType? userType = null, int? page = null, int? limit = null, UserStatus? status = UserStatus.Active)
     {
         if (page < 1 || limit < 1)
         {
             throw new ExceptionResponse(HttpStatusCode.BadRequest, "Page Or Limit Param is Negative", ExceptionConvention.ValidationFailed);
         }
-        var users = await _authService.GetPagedUsersAsync(userType, page, limit, status);
+        var users = await _authService.GetUsers(userType, page, limit, status);
         return Ok(users);
     }
 
