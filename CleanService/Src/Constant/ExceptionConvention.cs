@@ -9,5 +9,4 @@ public static class ExceptionConvention
     public const string Unauthorized = "ERR/UNAUTHORIZED";
     public const string Forbidden = "ERR/FORBIDDEN";
     public const string InternalServerError = "ERR/INTERNAL_SERVER_ERROR";
-    public const string BadRequest = "ERR/BADREQUEST";
 }
