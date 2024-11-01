@@ -15,7 +15,7 @@ public interface IAuthService
     
     public Task<HelperReturnDto?> UpdateHelperInfo(string id, UpdateHelperDto updateHelperDto);
 
-    public Task<Pagination<UserReturnDto>> GetPagedUsersAsync(UserType? userType, int? page, int? limit, UserStatus? status = UserStatus.Active);
+    public Task<Pagination<UserReturnDto>> GetPagedUsersAsync(UserType? userType = null, int? page = null, int? limit = null, UserStatus? status = UserStatus.Active);
 
     public Task<UserReturnDto?> ActivateUser(string id);
     

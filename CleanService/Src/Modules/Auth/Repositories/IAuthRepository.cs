@@ -14,7 +14,7 @@ public interface IAuthRepository
     
     public Task<Helpers?> UpdateHelperInfo(string id, PartialHelper updateInfoHelper);
    
-    public Task<Pagination<Users>> GetPagedUsersAsync(UserType? userType, int? page, int? limit, UserStatus? status = UserStatus.Active);
+    public Task<Pagination<Users>> GetPagedUsersAsync(UserType? userType = null, int? page = null, int? limit = null, UserStatus? status = UserStatus.Active);
     
     public Task<string?[]> GetUserNotificationTokens(List<string>? userIds);
 }

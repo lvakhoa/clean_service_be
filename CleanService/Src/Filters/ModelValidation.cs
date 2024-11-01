@@ -13,14 +13,15 @@ public class ModelValidation : ActionFilterAttribute
     public override void OnActionExecuting(ActionExecutingContext context)
     {
         var modelState = context.ModelState;
-        modelState.Clear();
-        var models = context.ActionArguments.Values.ToList();
-
-        // var model = context.ActionArguments["updateInfoDto"] as UpdateInfoDto;
-        var controller = context.Controller as ControllerBase;
-        var isValid = controller != null &&
-                      models.TrueForAll(model => model != null && controller.TryValidateModel(model));
-        if (!isValid)
+        // var models = context.ActionArguments.ToList();
+        //
+        // // var model = context.ActionArguments["updateInfoDto"] as UpdateInfoDto;
+        // var controller = context.Controller as ControllerBase;
+        // models.ForEach(model => modelState.SetModelValue(model.Key, model.Value));
+        // var valid = modelState.IsValid;
+        // var isValid = controller != null &&
+        //               models.TrueForAll(model => model != null && controller.TryValidateModel(model));
+        if (!modelState.IsValid)
         {
             var errors = modelState.Values
                 .SelectMany(v => v.Errors)

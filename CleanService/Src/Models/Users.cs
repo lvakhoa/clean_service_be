@@ -27,7 +27,7 @@ public class Users
 
     [MaxLength(20)]
     [RegularExpression("/(84|0[3|5|7|8|9])+([0-9]{8})\b/g", ErrorMessage = "Invalid phone number")]
-    public string? PhoneNumber { get; set; } = null!;
+    public string? PhoneNumber { get; set; }
 
     [Required]
     [MaxLength(255)]
@@ -106,10 +106,10 @@ public class PartialUsers
 
     public string? Address { get; set; }
 
-    [RegularExpression("/(84|0[3|5|7|8|9])+([0-9]{8})\b/g", ErrorMessage = "Invalid phone number")]
-    public string? PhoneNumber { get; set; } = null!;
+    // [RegularExpression("/(84|0[3|5|7|8|9])+([0-9]{8})\b/g", ErrorMessage = "Invalid phone number")]
+    public string? PhoneNumber { get; set; } 
 
-    [EmailAddress] public string? Email { get; set; } = null!;
+    [EmailAddress] public string? Email { get; set; } 
 
     public DateTime? CreatedAt { get; set; }
 

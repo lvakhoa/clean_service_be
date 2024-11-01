@@ -84,12 +84,11 @@ public class AuthController : ControllerBase
             Data = user
         });
     }
-
-    [ModelValidation]
+    
     [HttpPatch("user/{id}")]
+    [ModelValidation]
     public async Task<IActionResult> UpdateInfo(string id, [FromBody] UpdateInfoDto updateInfoDto)
     {
-        var modelstate = ModelState;
         var currentUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
         if (currentUserId != id && !User.IsInRole(UserType.Admin.ToString()))
         {
@@ -124,7 +123,7 @@ public class AuthController : ControllerBase
 
     [HttpGet("users")]
     //[Authorize(Policy = AuthPolicy.IsAdmin)]
-    public async Task<IActionResult> GetPagedUsersAsync(UserType? userType, int? page, int? limit, UserStatus? status = UserStatus.Active)
+    public async Task<IActionResult> GetPagedUsersAsync(UserType? userType = null, int? page = null, int? limit = null, UserStatus? status = UserStatus.Active)
     {
         if (page < 1 || limit < 1)
         {
