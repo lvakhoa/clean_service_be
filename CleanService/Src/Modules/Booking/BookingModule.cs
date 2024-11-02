@@ -12,10 +12,9 @@ public static class BookingModule
 {
     public static IServiceCollection AddBookingDependency(this IServiceCollection services)
     {
-        services.AddScoped<IBookingService, BookingService>();
-        services.AddScoped<IBookingRepository, BookingRepository>();
-        services.AddScoped<IServiceTypeService, ServiceTypeService>();
-        services.AddScoped<IContractService, ContractService>();
+        services
+            .AddScoped<IBookingService, BookingService>()
+            .AddScoped<IBookingRepository, BookingRepository>();
 
         return services;
     }

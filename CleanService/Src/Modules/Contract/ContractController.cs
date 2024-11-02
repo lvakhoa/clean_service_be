@@ -1,4 +1,4 @@
-using CleanService.Src.Modules.Contract.DTOs;
+using CleanService.Src.Modules.Contract.Mapping.DTOs;
 using CleanService.Src.Modules.Contract.Services;
 using Microsoft.AspNetCore.Mvc;
 

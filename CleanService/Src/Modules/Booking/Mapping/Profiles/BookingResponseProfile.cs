@@ -65,6 +65,7 @@ public class BookingResponseProfile : Profile
                     {
                         Id = user.BookingDetails.Id.ToString(),
                         BookingId = user.BookingDetails.BookingId.ToString(),
+                        DurationPriceId = user.BookingDetails.DurationPriceId.ToString(),
                         BedroomCount = user.BookingDetails.BedroomCount,
                         BathroomCount = user.BookingDetails.BathroomCount,
                         KitchenCount = user.BookingDetails.KitchenCount,

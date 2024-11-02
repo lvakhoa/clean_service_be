@@ -5,7 +5,7 @@ namespace  CleanService.Src.Modules.Booking.Services;
 
 public interface IBookingService
 {
-    Task<BookingReturnDto> CreateBooking(CreateBookingDto createBookingDto);
+    Task<string> CreateBooking(CreateBookingDto createBookingDto);
     
     Task<BookingReturnDto?> UpdateBooking(Guid id, UpdateBookingDto updateBookingDto);
     

@@ -17,6 +17,15 @@ public class CreateBookingRequestProfile : Profile
                 ScheduledStartTime = user.ScheduledStartTime,
                 ScheduledEndTime = user.ScheduledEndTime,
                 PaymentMethod = user.PaymentMethod,
+                BookingDetails = new BookingDetails
+                {
+                    DurationPriceId = Guid.Parse(user.BookingDetails.DurationPriceId),
+                    BedroomCount = user.BookingDetails.BedroomCount,
+                    BathroomCount = user.BookingDetails.BathroomCount,
+                    KitchenCount = user.BookingDetails.KitchenCount,
+                    LivingRoomCount = user.BookingDetails.LivingRoomCount,
+                    SpecialRequirements = user.BookingDetails.SpecialRequirements
+                }
             });
     }
 }

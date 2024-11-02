@@ -1,4 +1,4 @@
-namespace CleanService.Src.Modules.Contract.DTOs;
+namespace CleanService.Src.Modules.Contract.Mapping.DTOs;
 
 public class CreateContractDto
 {

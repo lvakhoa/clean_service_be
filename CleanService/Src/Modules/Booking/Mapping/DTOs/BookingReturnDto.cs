@@ -88,6 +88,8 @@ public class BookingDetailsReturn
     
     public string BookingId { get; set; } = null!;
     
+    public string DurationPriceId { get; set; } = null!;
+    
     public int BedroomCount { get; set; }
     
     public int BathroomCount { get; set; }

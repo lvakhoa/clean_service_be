@@ -19,14 +19,13 @@ public class BookingController : Controller
     } 
 
     [HttpPost]
-    public async Task<ActionResult<BookingReturnDto>> CreateBooking([FromBody] CreateBookingDto booking)
+    public async Task<ActionResult<string>> CreateBooking([FromBody] CreateBookingDto booking)
     {
-        var test = await _bookingService.CreateBooking(booking);
-        return test;
+        return await _bookingService.CreateBooking(booking);
     }
 
     [HttpPatch("{id}")]
-    public async Task<ActionResult<BookingReturnDto>> UpdateBooking(Guid id,[FromBody] UpdateBookingDto booking)
+    public async Task<ActionResult<BookingReturnDto?>> UpdateBooking(Guid id,[FromBody] UpdateBookingDto booking)
     {
         return await _bookingService.UpdateBooking(id, booking);
     }

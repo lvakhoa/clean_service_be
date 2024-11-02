@@ -25,7 +25,24 @@ public class ServiceTypeResponseProfile : Profile
                     Description = entity.Category.Description,
                     CreatedAt = entity.Category.CreatedAt,
                     IsActive = entity.Category.IsActive
-                }
+                },
+                RoomPricing = entity.RoomPricing.Select(roomPricing => new RoomPricingReturn
+                {
+                    Id = roomPricing.Id.ToString(),
+                    ServiceTypeId = roomPricing.ServiceTypeId.ToString(),
+                    RoomType = roomPricing.RoomType.ToString(),
+                    RoomCount = roomPricing.RoomCount,
+                    AdditionalPrice = roomPricing.AdditionalPrice,
+                    CreatedAt = roomPricing.CreatedAt
+                }).ToList(),
+                DurationPrice = entity.DurationPrice.Select(durationPrice => new DurationPriceReturn
+                {
+                    Id = durationPrice.Id.ToString(),
+                    ServiceTypeId = durationPrice.ServiceTypeId.ToString(),
+                    DurationHours = durationPrice.DurationHours,
+                    PriceMultiplier = durationPrice.PriceMultiplier,
+                    CreatedAt = durationPrice.CreatedAt
+                }).ToList()
             });
     }
 }

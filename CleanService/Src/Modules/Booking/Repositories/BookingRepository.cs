@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CleanService.Src.Modules.Booking.Repositories;
 
-public class BookingRepository : IBookingRepository 
+public class BookingRepository : IBookingRepository
 {
     private readonly CleanServiceContext _dbContext;
 
@@ -16,33 +16,37 @@ public class BookingRepository : IBookingRepository
 
     public async Task<Bookings?> GetBookingById(Guid id)
     {
-        return await _dbContext.Bookings.FirstOrDefaultAsync(x => x.Id == id);
+        return await _dbContext.Bookings
+            .Include(x => x.Customer)
+            .Include(x => x.Helper)
+            .Include(x => x.ServiceType)
+            .Include(x => x.ServiceType)
+            .FirstOrDefaultAsync(x => x.Id == id);
     }
 
     public async Task<Bookings> CreateBooking(Bookings createBooking)
     {
         var booking = await _dbContext.Bookings.AddAsync(createBooking);
 
-        // var contractEntity = await _dbContext.Contracts.AddAsync(new Contracts
-        // {
-        //     BookingId = bookingEntity.Entity.Id,
-        //     Content = "Clean at " + bookingEntity.Entity.Location
-        // }); 
-
         await _dbContext.SaveChangesAsync();
 
         return booking.Entity;
     }
-    
+
     public async Task<Bookings?> UpdateBooking(Guid id, PartialBookings updateBooking)
     {
-        var booking = await _dbContext.Bookings.FirstOrDefaultAsync(x => x.Id == id);
-    
+        var booking = await _dbContext.Bookings
+            .Include(x => x.Customer)
+            .Include(x => x.Helper)
+            .Include(x => x.ServiceType)
+            .Include(x => x.ServiceType)
+            .FirstOrDefaultAsync(x => x.Id == id);
+
         if (booking is null)
         {
             return null;
         }
-        
+
         // if(updateBooking.HelperId is not null)
         //     booking.HelperId = updateBooking.HelperId;
         // if(updateBooking.Location is not null)
@@ -60,14 +64,19 @@ public class BookingRepository : IBookingRepository
         // if(updateBooking.CancellationReason is not null)
         //     booking.Rating = updateBooking.Rating;
 
-    
+
         await _dbContext.SaveChangesAsync();
-    
+
         return booking;
     }
-    
+
     public async Task<Bookings[]> GetAllBookings()
     {
-        return await _dbContext.Bookings.ToArrayAsync();
+        return await _dbContext.Bookings
+            .Include(x => x.Customer)
+            .Include(x => x.Helper)
+            .Include(x => x.ServiceType)
+            .Include(x => x.ServiceType)
+            .ToArrayAsync();
     }
 }
