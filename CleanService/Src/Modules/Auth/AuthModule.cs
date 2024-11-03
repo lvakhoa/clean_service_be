@@ -92,8 +92,8 @@ public static class AuthModule
     public static IServiceCollection AddAuthDependency(this IServiceCollection services)
     {
         services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<IUserRepository, UserRepository>();
-        services.AddScoped<IAuthUnitOfWork, AuthUnitOfWork>();
+        services.AddScoped<IAuthRepository, AuthRepository>();
+        // services.AddScoped<IAuthUnitOfWork, AuthUnitOfWork>();
 
         return services;
     }

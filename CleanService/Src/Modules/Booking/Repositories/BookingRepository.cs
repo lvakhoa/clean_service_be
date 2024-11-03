@@ -53,8 +53,8 @@ public class BookingRepository : IBookingRepository
         //     booking.Location = updateBooking.Location;
         // if(updateBooking.EndTime is not null)
         //     booking.EndTime = updateBooking.EndTime;
-        // if(updateBooking.Status is not null)
-        //     booking.Status = (BookingStatus)updateBooking.Status;
+        if(updateBooking.Status is not null)
+            booking.Status = (BookingStatus)updateBooking.Status;
         // if(updateBooking.CancellationReason is not null)
         //     booking.CancellationReason = updateBooking.CancellationReason;
         // if(updateBooking.PaymentMethod is not null)

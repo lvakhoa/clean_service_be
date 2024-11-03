@@ -7,16 +7,16 @@ namespace CleanService.Src.Modules.Auth.Infrastructures;
 public class AuthUnitOfWork : IAuthUnitOfWork
 {
     private readonly CleanServiceContext _dbContext;
+    //
+    // public IUserRepository UserRepository { get; }
+    //
+    // public IHelperRepository HelperRepository { get; }
     
-    public IUserRepository UserRepository { get; }
-    
-    public IHelperRepository HelperRepository { get; }
-    
-    public AuthUnitOfWork(CleanServiceContext dbContext, IUserRepository userRepository, IHelperRepository helperRepository)
+    public AuthUnitOfWork(CleanServiceContext dbContext)
     {
         _dbContext = dbContext;
-        UserRepository = userRepository;
-        HelperRepository = helperRepository;
+        // UserRepository = userRepository;
+        // HelperRepository = helperRepository;
     }
     
     public void SaveChangesAsync()

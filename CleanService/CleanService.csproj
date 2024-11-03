@@ -35,6 +35,7 @@
 
     <ItemGroup>
       <Folder Include="Src\Modules\Contract\Mapping\Profiles\" />
+      <Folder Include="Src\Modules\Scheduler\" />
     </ItemGroup>
 
 </Project>
