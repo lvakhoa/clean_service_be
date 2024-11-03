@@ -27,7 +27,7 @@ public class AuthRepository : IAuthRepository
         var userEntity = await _dbContext.Users.AddAsync(user);
         if (user.UserType == UserType.Helper)
         {
-            await _dbContext.Helpers.AddAsync(new Models.Helpers
+            await _dbContext.Helpers.AddAsync(new Helpers
             {
                 Id = userEntity.Entity.Id
             });

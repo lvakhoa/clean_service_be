@@ -4,6 +4,7 @@ using CleanService.Src.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanService.Migrations
 {
     [DbContext(typeof(CleanServiceContext))]
-    partial class CleanServiceContextModelSnapshot : ModelSnapshot
+    [Migration("20241102121403_DurationPriceInBookingDetails")]
+    partial class DurationPriceInBookingDetails
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -31,7 +34,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("BlacklistedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 11, 2, 21, 27, 27, 596, DateTimeKind.Local).AddTicks(4491));
+                        .HasDefaultValue(new DateTime(2024, 11, 2, 19, 14, 0, 115, DateTimeKind.Local).AddTicks(4575));
 
                     b.Property<string>("BlacklistedBy")
                         .IsRequired()
@@ -85,9 +88,9 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 11, 2, 21, 27, 27, 595, DateTimeKind.Local).AddTicks(8191));
+                        .HasDefaultValue(new DateTime(2024, 11, 2, 19, 14, 0, 114, DateTimeKind.Local).AddTicks(6539));
 
-                    b.Property<Guid?>("DurationPriceId")
+                    b.Property<Guid>("DurationPriceId")
                         .HasColumnType("char(36)");
 
                     b.Property<int>("KitchenCount")
@@ -125,7 +128,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 11, 2, 21, 27, 27, 595, DateTimeKind.Local).AddTicks(3483));
+                        .HasDefaultValue(new DateTime(2024, 11, 2, 19, 14, 0, 113, DateTimeKind.Local).AddTicks(8256));
 
                     b.Property<string>("CustomerFeedback")
                         .HasColumnType("longtext");
@@ -180,7 +183,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 11, 2, 21, 27, 27, 595, DateTimeKind.Local).AddTicks(4157));
+                        .HasDefaultValue(new DateTime(2024, 11, 2, 19, 14, 0, 113, DateTimeKind.Local).AddTicks(9757));
 
                     b.HasKey("Id");
 
@@ -205,7 +208,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 11, 2, 21, 27, 27, 596, DateTimeKind.Local).AddTicks(3583));
+                        .HasDefaultValue(new DateTime(2024, 11, 2, 19, 14, 0, 115, DateTimeKind.Local).AddTicks(3126));
 
                     b.Property<string>("Reason")
                         .IsRequired()
@@ -256,7 +259,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 11, 2, 21, 27, 27, 596, DateTimeKind.Local).AddTicks(2122));
+                        .HasDefaultValue(new DateTime(2024, 11, 2, 19, 14, 0, 115, DateTimeKind.Local).AddTicks(321));
 
                     b.HasKey("Id");
 
@@ -275,7 +278,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 11, 2, 21, 27, 27, 595, DateTimeKind.Local).AddTicks(620));
+                        .HasDefaultValue(new DateTime(2024, 11, 2, 19, 14, 0, 113, DateTimeKind.Local).AddTicks(2631));
 
                     b.Property<int>("DurationHours")
                         .HasColumnType("int");
@@ -321,7 +324,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 11, 2, 21, 27, 27, 594, DateTimeKind.Local).AddTicks(3398));
+                        .HasDefaultValue(new DateTime(2024, 11, 2, 19, 14, 0, 112, DateTimeKind.Local).AddTicks(462));
 
                     b.Property<string>("ExperienceDescription")
                         .HasColumnType("longtext");
@@ -340,7 +343,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 11, 2, 21, 27, 27, 594, DateTimeKind.Local).AddTicks(4000));
+                        .HasDefaultValue(new DateTime(2024, 11, 2, 19, 14, 0, 112, DateTimeKind.Local).AddTicks(1927));
 
                     b.HasKey("Id");
 
@@ -363,7 +366,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 11, 2, 21, 27, 27, 596, DateTimeKind.Local).AddTicks(5938));
+                        .HasDefaultValue(new DateTime(2024, 11, 2, 19, 14, 0, 115, DateTimeKind.Local).AddTicks(7161));
 
                     b.Property<bool>("IsRead")
                         .ValueGeneratedOnAdd()
@@ -407,7 +410,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 11, 2, 21, 27, 27, 594, DateTimeKind.Local).AddTicks(9489));
+                        .HasDefaultValue(new DateTime(2024, 11, 2, 19, 14, 0, 113, DateTimeKind.Local).AddTicks(330));
 
                     b.Property<int>("RoomCount")
                         .HasColumnType("int")
@@ -437,7 +440,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 11, 2, 21, 27, 27, 594, DateTimeKind.Local).AddTicks(7137));
+                        .HasDefaultValue(new DateTime(2024, 11, 2, 19, 14, 0, 112, DateTimeKind.Local).AddTicks(5745));
 
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
@@ -475,7 +478,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 11, 2, 21, 27, 27, 594, DateTimeKind.Local).AddTicks(8179));
+                        .HasDefaultValue(new DateTime(2024, 11, 2, 19, 14, 0, 112, DateTimeKind.Local).AddTicks(7903));
 
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
@@ -514,7 +517,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 11, 2, 21, 27, 27, 593, DateTimeKind.Local).AddTicks(8863));
+                        .HasDefaultValue(new DateTime(2024, 11, 2, 19, 14, 0, 111, DateTimeKind.Local).AddTicks(2880));
 
                     b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("datetime(6)");
@@ -554,7 +557,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 11, 2, 21, 27, 27, 593, DateTimeKind.Local).AddTicks(9998));
+                        .HasDefaultValue(new DateTime(2024, 11, 2, 19, 14, 0, 111, DateTimeKind.Local).AddTicks(4311));
 
                     b.Property<string>("UserType")
                         .IsRequired()
@@ -597,7 +600,9 @@ namespace CleanService.Migrations
 
                     b.HasOne("CleanService.Src.Models.DurationPrice", "DurationPrice")
                         .WithMany("BookingDetails")
-                        .HasForeignKey("DurationPriceId");
+                        .HasForeignKey("DurationPriceId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Booking");
 

@@ -17,32 +17,35 @@ public class ServiceTypeResponseProfile : Profile
                 Description = entity.Description,
                 BasePrice = entity.BasePrice,
                 CreatedAt = entity.CreatedAt,
-                IsActive = entity.IsActive,
-                Category = new ServiceCategoryReturn
-                {
-                    Id = entity.Category.Id.ToString(),
-                    Name = entity.Category.Name,
-                    Description = entity.Category.Description,
-                    CreatedAt = entity.Category.CreatedAt,
-                    IsActive = entity.Category.IsActive
-                },
-                RoomPricing = entity.RoomPricing.Select(roomPricing => new RoomPricingReturn
-                {
-                    Id = roomPricing.Id.ToString(),
-                    ServiceTypeId = roomPricing.ServiceTypeId.ToString(),
-                    RoomType = roomPricing.RoomType.ToString(),
-                    RoomCount = roomPricing.RoomCount,
-                    AdditionalPrice = roomPricing.AdditionalPrice,
-                    CreatedAt = roomPricing.CreatedAt
-                }).ToList(),
-                DurationPrice = entity.DurationPrice.Select(durationPrice => new DurationPriceReturn
-                {
-                    Id = durationPrice.Id.ToString(),
-                    ServiceTypeId = durationPrice.ServiceTypeId.ToString(),
-                    DurationHours = durationPrice.DurationHours,
-                    PriceMultiplier = durationPrice.PriceMultiplier,
-                    CreatedAt = durationPrice.CreatedAt
-                }).ToList()
+                IsActive = entity.IsActive
+            });
+        CreateMap<ServiceCategories, ServiceCategoryReturn>()
+            .ConstructUsing(entity => new ServiceCategoryReturn
+            {
+                Id = entity.Id.ToString(),
+                Name = entity.Name,
+                Description = entity.Description,
+                CreatedAt = entity.CreatedAt,
+                IsActive = entity.IsActive
+            });
+        CreateMap<RoomPricing, RoomPricingReturn>()
+            .ConstructUsing(entity => new RoomPricingReturn
+            {
+                Id = entity.Id.ToString(),
+                ServiceTypeId = entity.ServiceTypeId.ToString(),
+                RoomType = entity.RoomType.ToString(),
+                RoomCount = entity.RoomCount,
+                AdditionalPrice = entity.AdditionalPrice,
+                CreatedAt = entity.CreatedAt
+            });
+        CreateMap<DurationPrice, DurationPriceReturn>()
+            .ConstructUsing(entity => new DurationPriceReturn
+            {
+                Id = entity.Id.ToString(),
+                ServiceTypeId = entity.ServiceTypeId.ToString(),
+                DurationHours = entity.DurationHours,
+                PriceMultiplier = entity.PriceMultiplier,
+                CreatedAt = entity.CreatedAt
             });
     }
 }

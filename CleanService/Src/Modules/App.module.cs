@@ -5,6 +5,7 @@ using CleanService.Src.Modules.Mail;
 using CleanService.Src.Modules.Notification;
 using CleanService.Src.Modules.Service;
 using CleanService.Src.Modules.ServicePricing;
+using CleanService.Src.Repositories;
 using CleanService.Src.Utils;
 using Microsoft.AspNetCore.Authentication;
 
@@ -17,6 +18,10 @@ public static class AppModule
         // Inject Configuration
         services
             .AddSingleton<IConfiguration>(config);
+        
+        // Inject Base Repository
+        services
+            .AddScoped(typeof(IRepository<>), typeof(Repository<>));
         
         // Inject Auth Module
         services

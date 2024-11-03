@@ -20,7 +20,7 @@ public class BookingRepository : IBookingRepository
             .Include(x => x.Customer)
             .Include(x => x.Helper)
             .Include(x => x.ServiceType)
-            .Include(x => x.ServiceType)
+            .Include(x => x.BookingDetails)
             .FirstOrDefaultAsync(x => x.Id == id);
     }
 
@@ -39,7 +39,7 @@ public class BookingRepository : IBookingRepository
             .Include(x => x.Customer)
             .Include(x => x.Helper)
             .Include(x => x.ServiceType)
-            .Include(x => x.ServiceType)
+            .Include(x => x.BookingDetails)
             .FirstOrDefaultAsync(x => x.Id == id);
 
         if (booking is null)
@@ -76,7 +76,7 @@ public class BookingRepository : IBookingRepository
             .Include(x => x.Customer)
             .Include(x => x.Helper)
             .Include(x => x.ServiceType)
-            .Include(x => x.ServiceType)
+            .Include(x => x.BookingDetails)
             .ToArrayAsync();
     }
 }

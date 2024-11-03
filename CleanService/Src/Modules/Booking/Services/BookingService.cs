@@ -51,9 +51,9 @@ public class BookingService : IBookingService
         var livingRoomPricing =
             (await _servicePricingRepository.GetUniqueRoomPricingType(RoomType.LivingRoom,
                 booking.BookingDetails.LivingRoomCount))?.AdditionalPrice ?? 0;
-        var durationPricing =
-            (await _servicePricingRepository.GetDurationPriceTypeById(booking.BookingDetails.DurationPriceId))
-            ?.PriceMultiplier ?? 1;
+        var durationPricing = (await _servicePricingRepository
+                .GetDurationPriceTypeById(booking.BookingDetails.DurationPriceId ?? Guid.Empty))
+            ?.PriceMultiplier ?? 0;
 
         var totalPrice = basePrice + bedroomPricing + bathroomPricing +
                          kitchenPricing + livingRoomPricing +
