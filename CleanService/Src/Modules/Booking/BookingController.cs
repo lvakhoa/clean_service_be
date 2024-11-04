@@ -22,13 +22,14 @@ public class BookingController : Controller
     public async Task<ActionResult> CreateBooking([FromBody] CreateBookingRequestDto createBooking)
     {
         await _bookingService.CreateBooking(createBooking);
+        
         return CreatedAtAction("CreateBooking", new SuccessResponse()
         {
             StatusCode = HttpStatusCode.Created,
             Message = "Create booking successfully"
         });
     }
-
+    
     [HttpPatch("update/{id}")]
     public async Task<ActionResult> UpdateBooking(Guid id, [FromBody] UpdateBookingRequestDto updateBooking)
     {
@@ -63,4 +64,5 @@ public class BookingController : Controller
             Data = booking
         });
     }
+    
 }

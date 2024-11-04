@@ -11,6 +11,7 @@ public class CreateBookingRequestProfile : Profile
         CreateMap<CreateBookingRequestDto, Bookings>()
             .ConstructUsing(dto => new Bookings
             {
+                Id = Guid.NewGuid(),
                 CustomerId = dto.CustomerId,
                 ServiceTypeId = Guid.Parse(dto.ServiceTypeId),
                 Location = dto.Location,
