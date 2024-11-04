@@ -12,5 +12,9 @@ namespace CleanService.Src.Modules.Booking.Repositories
         public Task<Bookings?> UpdateBooking(Guid id, PartialBookings updateBooking);
         
         public Task<Bookings[]> GetAllBookings();
+
+        public Task<Bookings[]> GetBookingByUserId(IEnumerable<BookingStatus>? statuses, string id, UserType userType);
+
+
     }
 }

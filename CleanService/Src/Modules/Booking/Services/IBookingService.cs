@@ -12,5 +12,7 @@ public interface IBookingService
     Task<BookingReturnDto[]> GetAllBookings();
 
     Task<BookingReturnDto?> GetBookingById(Guid id);
+
+    Task<string?> AssignHelperToBooking(Guid id);
 }
 

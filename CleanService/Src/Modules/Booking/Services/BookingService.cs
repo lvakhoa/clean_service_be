@@ -1,11 +1,14 @@
-using AutoMapper;
+﻿using AutoMapper;
 using CleanService.Src.Models;
+using CleanService.Src.Modules.Auth.Repositories;
 using CleanService.Src.Modules.Booking.Mapping.DTOs;
 using CleanService.Src.Modules.Booking.Repositories;
 using CleanService.Src.Modules.Contract.Mapping.DTOs;
 using CleanService.Src.Modules.Contract.Repositories;
 using CleanService.Src.Modules.ServicePricing.Repositories;
 using CleanService.Src.Modules.ServiceType.Repositories;
+using System.Collections.Generic;
+using System;
 
 namespace CleanService.Src.Modules.Booking.Services;
 
@@ -16,16 +19,18 @@ public class BookingService : IBookingService
     private readonly IServicePricingRepository _servicePricingRepository;
     private readonly IContractRepository _contractRepository;
     private readonly IMapper _mapper;
+    private readonly IAuthRepository _authRepository;
 
     public BookingService(IBookingRepository bookingRepository, IServiceTypeRepository serviceTypeRepository,
         IServicePricingRepository servicePricingRepository,
-        IContractRepository contractRepository, IMapper mapper)
+        IContractRepository contractRepository, IMapper mapper, IAuthRepository authRepository)
     {
         _bookingRepository = bookingRepository;
         _serviceTypeRepository = serviceTypeRepository;
         _servicePricingRepository = servicePricingRepository;
         _contractRepository = contractRepository;
         _mapper = mapper;
+        _authRepository = authRepository;
     }
 
     public async Task<string> CreateBooking(CreateBookingDto createBookingDto)
@@ -95,5 +100,68 @@ public class BookingService : IBookingService
         var booking = await _bookingRepository.GetBookingById(id);
         var bookingDto = _mapper.Map<BookingReturnDto>(booking);
         return bookingDto;
+    }
+
+    public async Task<string?> AssignHelperToBooking(Guid id)
+    {
+        // Lấy booking cần gán helper
+        var booking = await _bookingRepository.GetBookingById(id);
+        if (booking == null)
+            throw new KeyNotFoundException("Booking not found"); ;
+
+        // Lấy customer đặt booking
+        var customer = booking.Customer;
+
+        // Lấy danh sách helper rảnh rỗi trong khoảng thời gian
+        var helperList = await _authRepository.GetUsers(UserType.Helper);
+        var availableHelpers = new List<Users>();
+
+        foreach (var helper in helperList.Results)
+        {
+            // Lấy danh sách booking của helper hiện tại
+            var statuses = new List<BookingStatus> { BookingStatus.Pending, BookingStatus.Confirmed, BookingStatus.InProgress };
+
+            var helperBookings = await _bookingRepository.GetBookingByUserId(statuses, helper.Id, UserType.Helper);
+
+            // Kiểm tra xem helper có rảnh rỗi trong khoảng thời gian yêu cầu không
+            bool isAvailable = helperBookings.All(x =>
+                x.Status != BookingStatus.Confirmed ||
+                x.ScheduledEndTime <= booking.ScheduledStartTime ||
+                x.ScheduledStartTime >= booking.ScheduledEndTime
+            );
+
+            if (isAvailable)
+            {
+                availableHelpers.Add(helper);
+            }
+        }
+        //
+
+        //Blacklist của Customer
+        availableHelpers = availableHelpers.Where(x => !customer.BlacklistedByUsers.Any(y => y.UserId == x.Id)).ToList();
+        //
+
+        //Helper có cung cấp dịch vụ đó không
+        availableHelpers = availableHelpers
+            .Where(x => x.Helper.ServicesOffered != null && x.Helper.ServicesOffered.Contains(booking.ServiceTypeId))
+            .ToList();
+        //
+
+        //Helper có nghỉ vào ngày đó không 
+        //
+
+        // Gán ngẫu nhiên helper vào booking
+        if (availableHelpers == null) return null;
+
+        Random random = new Random();
+
+        int index = random.Next(availableHelpers.Count);
+
+        await _bookingRepository.UpdateBooking(booking.Id, new PartialBookings
+        {
+            HelperId = availableHelpers[index].Id
+        });
+
+        return availableHelpers[index].Id;
     }
 }
