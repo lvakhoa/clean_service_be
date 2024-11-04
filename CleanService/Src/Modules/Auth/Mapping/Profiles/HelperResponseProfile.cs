@@ -8,19 +8,19 @@ public class HelperResponseProfile : Profile
 {
     public HelperResponseProfile()
     {
-        CreateMap<Helpers, HelperReturnDto>()
-            .ConstructUsing(user => new HelperReturnDto
+        CreateMap<Helpers, HelperResponseDto>()
+            .ConstructUsing(entity => new HelperResponseDto
             {
-                Id = user.Id,
-                ExperienceDescription = user.ExperienceDescription,
-                ResumeUploaded = user.ResumeUploaded,
-                ServicesOffered = user.ServicesOffered != null
-                    ? user.ServicesOffered.Select(service => service.ToString()).ToArray()
+                Id = entity.Id,
+                ExperienceDescription = entity.ExperienceDescription,
+                ResumeUploaded = entity.ResumeUploaded,
+                ServicesOffered = entity.ServicesOffered != null
+                    ? entity.ServicesOffered.Select(service => service.ToString()).ToArray()
                     : null,
-                HourlyRate = user.HourlyRate,
-                AverageRating = user.AverageRating,
-                CompletedJobs = user.CompletedJobs,
-                CancelledJobs = user.CancelledJobs,
+                HourlyRate = entity.HourlyRate,
+                AverageRating = entity.AverageRating,
+                CompletedJobs = entity.CompletedJobs,
+                CancelledJobs = entity.CancelledJobs,
             });
     }
 }

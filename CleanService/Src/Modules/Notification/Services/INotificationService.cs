@@ -1,5 +1,6 @@
 using CleanService.Src.Constant;
 using CleanService.Src.Modules.Notification.DTOs;
+using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Modules.Notification.Services;
 
@@ -9,5 +10,5 @@ public interface INotificationService
     
     public Task SendMultipleUsers(List<string> userIds, NotificationData message);
 
-    public Task<NotificationReturnDto[]> GetNotifications(string userId);
+    public Task<Pagination<NotificationResponseDto>> GetNotifications(string userId, int? page, int? limit);
 }

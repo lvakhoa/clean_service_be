@@ -3,9 +3,19 @@ using CleanService.Src.Modules.Booking;
 using CleanService.Src.Modules.Contract;
 using CleanService.Src.Modules.Mail;
 using CleanService.Src.Modules.Notification;
-using CleanService.Src.Modules.Service;
-using CleanService.Src.Modules.ServicePricing;
+using CleanService.Src.Modules.ServiceType;
 using CleanService.Src.Repositories;
+using CleanService.Src.Repositories.Booking;
+using CleanService.Src.Repositories.BookingDetail;
+using CleanService.Src.Repositories.Complaint;
+using CleanService.Src.Repositories.Contract;
+using CleanService.Src.Repositories.DurationPrices;
+using CleanService.Src.Repositories.Helper;
+using CleanService.Src.Repositories.Notification;
+using CleanService.Src.Repositories.RoomPricings;
+using CleanService.Src.Repositories.ServiceCategory;
+using CleanService.Src.Repositories.ServiceType;
+using CleanService.Src.Repositories.User;
 using CleanService.Src.Utils;
 using Microsoft.AspNetCore.Authentication;
 
@@ -21,7 +31,7 @@ public static class AppModule
         
         // Inject Base Repository
         services
-            .AddScoped(typeof(IRepository<>), typeof(Repository<>));
+            .AddRepositories();
         
         // Inject Auth Module
         services
@@ -29,7 +39,7 @@ public static class AppModule
             
         // Inject Notification Module
         services
-            .AddNotificationModule(config);
+            .AddNotificationModule();
         
         // Inject Mail Module
         services
@@ -41,16 +51,31 @@ public static class AppModule
         
         // Inject Service Module
         services
-            .AddServiceModule();
+            .AddServiceTypeModule();
         
         // Inject Contract Module
         services
             .AddContractModule();
         
-        // Inject Service Pricing Module
+        return services;
+    }
+    
+    public static IServiceCollection AddRepositories(this IServiceCollection services)
+    {
         services
-            .AddServicePricingDependency();
-
+            .AddScoped(typeof(IRepository<,>), typeof(Repository<,>))
+            .AddScoped<IBookingRepository, BookingRepository>()
+            .AddScoped<IBookingDetailRepository, BookingDetailRepository>()
+            .AddScoped<IComplaintRepository, ComplaintRepository>()
+            .AddScoped<IContractRepository, ContractRepository>()
+            .AddScoped<IDurationPriceRepository, DurationPriceRepository>()
+            .AddScoped<IHelperRepository, HelperRepository>()
+            .AddScoped<INotificationRepository, NotificationRepository>()
+            .AddScoped<IRoomPricingRepository, RoomPricingRepository>()
+            .AddScoped<IServiceCategoryRepository, ServiceCategoryRepository>()
+            .AddScoped<IServiceTypeRepository, ServiceTypeRepository>()
+            .AddScoped<IUserRepository, UserRepository>();
+        
         return services;
     }
 }

@@ -40,24 +40,12 @@ public class CleanServiceContext : DbContext
             .Navigation(u => u.Helper)
             .AutoInclude();
         modelBuilder.Entity<Users>()
-            .Navigation(u => u.CustomerBookings)
-            .AutoInclude();
-        modelBuilder.Entity<Users>()
-            .Navigation(u => u.HelperBookings)
-            .AutoInclude();
-        modelBuilder.Entity<Users>()
-            .Navigation(u => u.CreatedComplaints)
-            .AutoInclude();
-        modelBuilder.Entity<Users>()
-            .Navigation(u => u.ReceivedComplaints)
-            .AutoInclude();
-        modelBuilder.Entity<Users>()
             .Navigation(u => u.BlacklistedUsers)
             .AutoInclude();
         modelBuilder.Entity<Users>()
             .Navigation(u => u.BlacklistedByUsers)
             .AutoInclude();
-        
+
         modelBuilder.Entity<Users>()
             .Property(u => u.CreatedAt)
             .HasDefaultValue(DateTime.Now);
@@ -94,7 +82,7 @@ public class CleanServiceContext : DbContext
         modelBuilder.Entity<ServiceCategories>()
             .Navigation(s => s.ServiceTypes)
             .AutoInclude();
-        
+
         modelBuilder.Entity<ServiceCategories>()
             .Property(s => s.CreatedAt)
             .HasDefaultValue(DateTime.Now);
@@ -104,15 +92,12 @@ public class CleanServiceContext : DbContext
 
         // Service Types entity config
         modelBuilder.Entity<ServiceTypes>()
-            .Navigation(s => s.Category)
-            .AutoInclude();
-        modelBuilder.Entity<ServiceTypes>()
             .Navigation(s => s.RoomPricing)
             .AutoInclude();
         modelBuilder.Entity<ServiceTypes>()
             .Navigation(s => s.DurationPrice)
             .AutoInclude();
-        
+
         modelBuilder.Entity<ServiceTypes>()
             .Property(s => s.CreatedAt)
             .HasDefaultValue(DateTime.Now);
@@ -138,6 +123,12 @@ public class CleanServiceContext : DbContext
 
         // Bookings entity config
         modelBuilder.Entity<Bookings>()
+            .Navigation(b => b.Customer)
+            .AutoInclude();
+        modelBuilder.Entity<Bookings>()
+            .Navigation(b => b.Helper)
+            .AutoInclude();
+        modelBuilder.Entity<Bookings>()
             .Navigation(b => b.ServiceType)
             .AutoInclude();
         modelBuilder.Entity<Bookings>()
@@ -146,10 +137,7 @@ public class CleanServiceContext : DbContext
         modelBuilder.Entity<Bookings>()
             .Navigation(b => b.BookingDetails)
             .AutoInclude();
-        modelBuilder.Entity<Bookings>()
-            .Navigation(b => b.Complaints)
-            .AutoInclude();
-        
+
         modelBuilder.Entity<Bookings>()
             .Property(b => b.Status)
             .HasDefaultValue(BookingStatus.Pending);
@@ -167,7 +155,7 @@ public class CleanServiceContext : DbContext
         modelBuilder.Entity<BookingDetails>()
             .Navigation(b => b.DurationPrice)
             .AutoInclude();
-        
+
         modelBuilder.Entity<BookingDetails>()
             .Property(b => b.BedroomCount)
             .HasDefaultValue(0);
@@ -183,17 +171,13 @@ public class CleanServiceContext : DbContext
         modelBuilder.Entity<BookingDetails>()
             .Property(b => b.CreatedAt)
             .HasDefaultValue(DateTime.Now);
-        
+
         modelBuilder.Entity<BookingDetails>()
             .HasOne(bd => bd.Booking)
             .WithOne(b => b.BookingDetails)
             .HasForeignKey<BookingDetails>(bd => bd.BookingId);
 
         // Contracts entity config
-        modelBuilder.Entity<Contracts>()
-            .Navigation(c => c.Booking)
-            .AutoInclude();
-        
         modelBuilder.Entity<Contracts>()
             .Property(c => c.CreatedAt)
             .HasDefaultValue(DateTime.Now);
@@ -202,13 +186,7 @@ public class CleanServiceContext : DbContext
         modelBuilder.Entity<Complaints>()
             .Navigation(c => c.Booking)
             .AutoInclude();
-        modelBuilder.Entity<Complaints>()
-            .Navigation(c => c.ReportedBy)
-            .AutoInclude();
-        modelBuilder.Entity<Complaints>()
-            .Navigation(c => c.ReportedUser)
-            .AutoInclude();
-        
+
         modelBuilder.Entity<Complaints>()
             .Property(c => c.Status)
             .HasDefaultValue(ComplaintStatus.Pending);
@@ -217,13 +195,6 @@ public class CleanServiceContext : DbContext
             .HasDefaultValue(DateTime.Now);
 
         // BlacklistedUsers entity config
-        modelBuilder.Entity<BlacklistedUsers>()
-            .Navigation(b => b.User)
-            .AutoInclude();
-        modelBuilder.Entity<BlacklistedUsers>()
-            .Navigation(b => b.BlacklistedByUser)
-            .AutoInclude();
-        
         modelBuilder.Entity<BlacklistedUsers>()
             .Property(b => b.BlacklistedAt)
             .HasDefaultValue(DateTime.Now);
@@ -247,7 +218,8 @@ public class CleanServiceContext : DbContext
 
         foreach (var entity in modifiedEntities)
         {
-            entity.Property("UpdatedAt").CurrentValue = DateTime.Now;
+            if (entity.GetType().GetProperty("UpdatedAt") != null)
+                entity.Property("UpdatedAt").CurrentValue = DateTime.Now;
         }
 
         return base.SaveChanges();
@@ -261,7 +233,8 @@ public class CleanServiceContext : DbContext
 
         foreach (var entity in modifiedEntities)
         {
-            entity.Property("UpdatedAt").CurrentValue = DateTime.Now;
+            if (entity.GetType().GetProperty("UpdatedAt") != null)
+                entity.Property("UpdatedAt").CurrentValue = DateTime.Now;
         }
 
         return base.SaveChangesAsync(cancellationToken);

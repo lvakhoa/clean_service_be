@@ -8,20 +8,21 @@ public class UpdateBookingRequestProfile : Profile
 {
     public UpdateBookingRequestProfile()
     {
-        CreateMap<UpdateBookingDto, PartialBookings>()
-            .ConstructUsing(user => new PartialBookings
+        CreateMap<UpdateBookingRequestDto, PartialBookings>()
+            .ConstructUsing(dto => new PartialBookings
             {
-                HelperId = user.HelperId,
-                Location = user.Location,
-                ScheduledStartTime = user.ScheduledStartTime,
-                ScheduledEndTime = user.ScheduledEndTime,
-                Status = user.Status,
-                CancellationReason = user.CancellationReason,
-                TotalPrice = user.TotalPrice,
-                PaymentStatus = user.PaymentStatus,
-                HelperRating = user.HelperRating,
-                CustomerFeedback = user.CustomerFeedback,
-                HelperFeedback = user.HelperFeedback
+                Id = Guid.Parse(dto.Id),
+                HelperId = dto.HelperId,
+                Location = dto.Location,
+                ScheduledStartTime = dto.ScheduledStartTime,
+                ScheduledEndTime = dto.ScheduledEndTime,
+                Status = dto.Status,
+                CancellationReason = dto.CancellationReason,
+                TotalPrice = dto.TotalPrice,
+                PaymentStatus = dto.PaymentStatus,
+                HelperRating = dto.HelperRating,
+                CustomerFeedback = dto.CustomerFeedback,
+                HelperFeedback = dto.HelperFeedback
             });
     }
 }

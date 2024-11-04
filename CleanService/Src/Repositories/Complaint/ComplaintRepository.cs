@@ -2,7 +2,7 @@ using CleanService.Src.Models;
 
 namespace CleanService.Src.Repositories.Complaint;
 
-public class ComplaintRepository : Repository<Complaints>, IComplaintRepository
+public class ComplaintRepository : Repository<Complaints, PartialComplaints>, IComplaintRepository
 {
     private readonly CleanServiceContext _dbContext;
     

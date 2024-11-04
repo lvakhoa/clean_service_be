@@ -1,14 +1,15 @@
 using CleanService.Src.Modules.Contract.Mapping.DTOs;
+using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Modules.Contract.Services;
 
 public interface IContractService
 {
-    Task<ContractReturnDto> CreateContract(CreateContractDto createContractDto);
+    Task CreateContract(CreateContractRequestDto createContractDto);
     
-    Task<ContractReturnDto?> UpdateContract(Guid id, UpdateContractDto updateContractDto);
+    Task UpdateContract(Guid id, UpdateContractRequestDto updateContractDto);
     
-    Task<ContractReturnDto[]> GetAllContracts();
-
-    Task<ContractReturnDto?> GetContractById(Guid id);
+    Task<Pagination<ContractResponseDto>> GetAllContracts(int? page, int? limit);
+    
+    Task<ContractResponseDto?> GetContractById(Guid id);
 }

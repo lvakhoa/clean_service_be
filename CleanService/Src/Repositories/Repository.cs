@@ -4,76 +4,109 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CleanService.Src.Repositories;
 
-public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
+public class Repository<TEntity, TPartialEntity> : IRepository<TEntity, TPartialEntity>
+    where TEntity : class, new() where TPartialEntity : class
 {
     private readonly CleanServiceContext _dbContext;
-    
+    private readonly DbSet<TEntity> _dbSet;
+
     public Repository(CleanServiceContext dbContext)
     {
         _dbContext = dbContext;
+        _dbSet = dbContext.Set<TEntity>();
     }
-    
-    public void Add(TEntity entity)
+
+    public async Task AddAsync(TEntity entity)
     {
-        _dbContext.Set<TEntity>().Add(entity);
-        _dbContext.SaveChanges();
+        await _dbSet.AddAsync(entity);
     }
-    
-    public void AddMany(IEnumerable<TEntity> entities)
+
+    public async Task AddManyAsync(IEnumerable<TEntity> entities)
     {
-        _dbContext.Set<TEntity>().AddRange(entities);
-        _dbContext.SaveChanges();
+        await _dbSet.AddRangeAsync(entities);
     }
-    
+
     public void Delete(TEntity entity)
     {
-        _dbContext.Set<TEntity>().Remove(entity);
-        _dbContext.SaveChanges();
+        _dbSet.Remove(entity);
     }
-    
+
     public void DeleteMany(Expression<Func<TEntity, bool>> predicate)
     {
         var entities = Find(predicate);
-        _dbContext.Set<TEntity>().RemoveRange(entities);
-        _dbContext.SaveChanges();
+        _dbSet.RemoveRange(entities);
     }
-    
-    public TEntity FindOne(Expression<Func<TEntity, bool>> predicate, FindOptions? findOptions = null)
+
+    public async Task<TEntity?> FindOneAsync(Expression<Func<TEntity, bool>> predicate, FindOptions? findOptions = null)
     {
-        return Get(findOptions).FirstOrDefault(predicate)!;
+        return await Get(findOptions).FirstOrDefaultAsync(predicate);
     }
-    
-    public IQueryable<TEntity> Find(Expression<Func<TEntity, bool>> predicate, FindOptions? findOptions = null)
+
+    public IQueryable<TEntity> Find(Expression<Func<TEntity, bool>> predicate,
+        Expression<Func<TEntity, object>>? order = null, int? page = null, int? limit = null,
+        FindOptions? findOptions = null)
     {
-        return Get(findOptions).Where(predicate);
+        var entity = Get(findOptions).Where(predicate);
+        if (order is not null)
+        {
+            entity = entity.OrderBy(order);
+        }
+
+        if (page is not null && limit is not null)
+        {
+            entity = entity.Skip((page.Value - 1) * limit.Value).Take(limit.Value);
+        }
+
+        return entity;
     }
-    
-    public IQueryable<TEntity> GetAll(FindOptions? findOptions = null)
+
+    public IQueryable<TEntity> GetAll(int? page = null, int? limit = null, FindOptions? findOptions = null)
     {
-        return Get(findOptions);
+        var entity = Get(findOptions).AsQueryable();
+
+        if (page is not null && limit is not null)
+        {
+            entity = entity.Skip((page.Value - 1) * limit.Value).Take(limit.Value);
+        }
+
+        return entity;
     }
-    
-    public void Update(TEntity entity)
+
+    public void Update(TPartialEntity entity, TEntity originalEntity)
     {
-        _dbContext.Set<TEntity>().Update(entity);
-        _dbContext.SaveChanges();
+        TEntity entityToUpdate = new();
+        foreach (var prop in typeof(TEntity).GetProperties())
+        {
+            var updatingValue = entity.GetType().GetProperty(prop.Name)?.GetValue(entity);
+            var originalValue = prop.GetValue(originalEntity);
+            prop.SetValue(entityToUpdate, updatingValue ?? originalValue);
+        }
+
+        _dbSet.Update(entityToUpdate);
     }
-    
-    public bool Any(Expression<Func<TEntity, bool>> predicate)
+
+    public async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate)
     {
-        return _dbContext.Set<TEntity>().Any(predicate);
+        return await _dbSet.AnyAsync(predicate);
     }
-    
-    public int Count(Expression<Func<TEntity, bool>> predicate)
+
+    public async Task<int> CountAsync(Expression<Func<TEntity, bool>>? predicate = null)
     {
-        return _dbContext.Set<TEntity>().Count(predicate);
+        if (predicate is null)
+            return await _dbSet.CountAsync();
+        return await _dbSet.CountAsync(predicate);
     }
-    
+
+    public void Detach(TEntity entity)
+    {
+        _dbContext.Entry(entity).State = EntityState.Detached;
+    }
+
     private DbSet<TEntity> Get(FindOptions? findOptions = null)
     {
         findOptions ??= new FindOptions();
-        var entity = _dbContext.Set<TEntity>();
-        if (findOptions.IsAsNoTracking && findOptions.IsIgnoreAutoIncludes)
+        var entity = _dbSet;
+        if (findOptions is { IsAsNoTracking: true, IsIgnoreAutoIncludes: true })
         {
             entity.IgnoreAutoIncludes().AsNoTracking();
         }
@@ -85,6 +118,7 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : class
         {
             entity.AsNoTracking();
         }
+
         return entity;
     }
 }

@@ -1,17 +1,34 @@
-using CleanService.Src.Modules.Notification.Repositories;
+using CleanService.Src.Modules.Notification.Infrastructures;
+using CleanService.Src.Modules.Notification.Mapping.Profiles;
 using CleanService.Src.Modules.Notification.Services;
-using FirebaseAdmin;
-using Google.Apis.Auth.OAuth2;
-using Newtonsoft.Json;
 
 namespace CleanService.Src.Modules.Notification;
 
 public static class NotificationModule
 {
-    public static IServiceCollection AddNotificationModule(this IServiceCollection services, IConfiguration config)
+    public static IServiceCollection AddNotificationMapping(this IServiceCollection services)
     {
-        services.AddScoped<INotificationService, FirebaseService>();
-        services.AddScoped<INotificationRepository, NotificationRepository>();
+        services
+            .AddAutoMapper(typeof(NotificationResponseProfile));
+
+        return services;
+    }
+    
+    public static IServiceCollection AddNotificationDependency(this IServiceCollection services)
+    {
+        services
+            .AddScoped<INotificationService, FirebaseService>()
+            .AddScoped<INotificationUnitOfWork, NotificationUnitOfWork>();
+        
+        return services;
+    }
+
+    public static IServiceCollection AddNotificationModule(this IServiceCollection services)
+    {
+        services
+            .AddNotificationMapping()
+            .AddNotificationDependency();
+
         return services;
     }
 }

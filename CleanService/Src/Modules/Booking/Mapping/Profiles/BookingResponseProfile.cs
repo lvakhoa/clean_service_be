@@ -8,8 +8,8 @@ public class BookingResponseProfile : Profile
 {
     public BookingResponseProfile()
     {
-        CreateMap<Bookings, BookingReturnDto>()
-            .ConstructUsing(entity => new BookingReturnDto
+        CreateMap<Bookings, BookingResponseDto>()
+            .ConstructUsing(entity => new BookingResponseDto
                 {
                     Id = entity.Id.ToString(),
                     CustomerId = entity.CustomerId,
@@ -30,8 +30,8 @@ public class BookingResponseProfile : Profile
                     UpdatedAt = entity.UpdatedAt,
                 }
             );
-        CreateMap<Users, UserBookingReturn>()
-            .ConstructUsing(entity => new UserBookingReturn
+        CreateMap<Users, UserBookingResponse>()
+            .ConstructUsing(entity => new UserBookingResponse
             {
                 Id = entity.Id,
                 Gender = entity.Gender.ToString(),
@@ -43,8 +43,8 @@ public class BookingResponseProfile : Profile
                 CreatedAt = entity.CreatedAt,
                 UpdatedAt = entity.UpdatedAt
             });
-        CreateMap<ServiceTypes, ServiceTypeBookingReturn>()
-            .ConstructUsing(entity => new ServiceTypeBookingReturn
+        CreateMap<ServiceTypes, ServiceTypeBookingResponse>()
+            .ConstructUsing(entity => new ServiceTypeBookingResponse
             {
                 Id = entity.Id.ToString(),
                 CategoryId = entity.CategoryId.ToString(),
@@ -53,8 +53,8 @@ public class BookingResponseProfile : Profile
                 BasePrice = entity.BasePrice,
                 CreatedAt = entity.CreatedAt
             });
-        CreateMap<BookingDetails, BookingDetailsReturn>()
-            .ConstructUsing(entity => new BookingDetailsReturn
+        CreateMap<BookingDetails, BookingDetailsResponse>()
+            .ConstructUsing(entity => new BookingDetailsResponse
             {
                 Id = entity.Id.ToString(),
                 BookingId = entity.BookingId.ToString(),

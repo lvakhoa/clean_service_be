@@ -19,8 +19,8 @@ public class AuthUnitOfWork : IAuthUnitOfWork
         HelperRepository = helperRepository;
     }
     
-    public void SaveChangesAsync()
+    public async Task SaveChangesAsync()
     {
-        
+        await _dbContext.SaveChangesAsync();
     }
 }

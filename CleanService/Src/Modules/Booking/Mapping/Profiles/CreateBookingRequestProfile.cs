@@ -8,7 +8,7 @@ public class CreateBookingRequestProfile : Profile
 {
     public CreateBookingRequestProfile()
     {
-        CreateMap<CreateBookingDto, Bookings>()
+        CreateMap<CreateBookingRequestDto, Bookings>()
             .ConstructUsing(dto => new Bookings
             {
                 CustomerId = dto.CustomerId,

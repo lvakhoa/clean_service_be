@@ -8,16 +8,17 @@ public class UpdateUserRequestProfile : Profile
 {
     public UpdateUserRequestProfile()
     {
-        CreateMap<UpdateInfoDto, PartialUsers>()
-            .ConstructUsing(user => new PartialUsers
+        CreateMap<UpdateUserRequestDto, PartialUsers>()
+            .ConstructUsing(dto => new PartialUsers
             {
-                FullName = user.FullName,
-                Gender = user.Gender != null ? Enum.Parse<Gender>(user.Gender) : null,
-                ProfilePicture = user.ProfilePicture,
-                DateOfBirth = user.DateOfBirth,
-                Address = user.Address,
-                IdentityCard = user.IdentityCard,
-                PhoneNumber = user.PhoneNumber,
+                Id = dto.Id,
+                FullName = dto.FullName,
+                Gender = dto.Gender != null ? Enum.Parse<Gender>(dto.Gender) : null,
+                ProfilePicture = dto.ProfilePicture,
+                DateOfBirth = dto.DateOfBirth,
+                Address = dto.Address,
+                IdentityCard = dto.IdentityCard,
+                PhoneNumber = dto.PhoneNumber,
             });
     }
 }
