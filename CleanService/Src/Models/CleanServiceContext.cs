@@ -37,6 +37,16 @@ public class CleanServiceContext : DbContext
     {
         // Users entity config
         modelBuilder.Entity<Users>()
+            .Navigation(u => u.Helper)
+            .AutoInclude();
+        modelBuilder.Entity<Users>()
+            .Navigation(u => u.BlacklistedUsers)
+            .AutoInclude();
+        modelBuilder.Entity<Users>()
+            .Navigation(u => u.BlacklistedByUsers)
+            .AutoInclude();
+
+        modelBuilder.Entity<Users>()
             .Property(u => u.CreatedAt)
             .HasDefaultValue(DateTime.Now);
         modelBuilder.Entity<Users>()
@@ -70,37 +80,64 @@ public class CleanServiceContext : DbContext
 
         // Service Categories entity config
         modelBuilder.Entity<ServiceCategories>()
-            .Property(u => u.CreatedAt)
+            .Navigation(s => s.ServiceTypes)
+            .AutoInclude();
+
+        modelBuilder.Entity<ServiceCategories>()
+            .Property(s => s.CreatedAt)
             .HasDefaultValue(DateTime.Now);
         modelBuilder.Entity<ServiceCategories>()
-            .Property(u => u.IsActive)
+            .Property(s => s.IsActive)
             .HasDefaultValue(true);
 
         // Service Types entity config
         modelBuilder.Entity<ServiceTypes>()
-            .Property(u => u.CreatedAt)
+            .Navigation(s => s.RoomPricing)
+            .AutoInclude();
+        modelBuilder.Entity<ServiceTypes>()
+            .Navigation(s => s.DurationPrice)
+            .AutoInclude();
+
+        modelBuilder.Entity<ServiceTypes>()
+            .Property(s => s.CreatedAt)
             .HasDefaultValue(DateTime.Now);
         modelBuilder.Entity<ServiceTypes>()
-            .Property(u => u.IsActive)
+            .Property(s => s.IsActive)
             .HasDefaultValue(true);
 
         // Room Pricing entity config
         modelBuilder.Entity<RoomPricing>()
-            .Property(u => u.CreatedAt)
+            .Property(r => r.CreatedAt)
             .HasDefaultValue(DateTime.Now);
         modelBuilder.Entity<RoomPricing>()
-            .Property(u => u.AdditionalPrice)
+            .Property(r => r.AdditionalPrice)
             .HasDefaultValue(0);
 
         // Duration Price entity config
         modelBuilder.Entity<DurationPrice>()
-            .Property(u => u.CreatedAt)
+            .Property(d => d.CreatedAt)
             .HasDefaultValue(DateTime.Now);
         modelBuilder.Entity<DurationPrice>()
-            .Property(u => u.PriceMultiplier)
+            .Property(d => d.PriceMultiplier)
             .HasDefaultValue(1.00);
 
         // Bookings entity config
+        modelBuilder.Entity<Bookings>()
+            .Navigation(b => b.Customer)
+            .AutoInclude();
+        modelBuilder.Entity<Bookings>()
+            .Navigation(b => b.Helper)
+            .AutoInclude();
+        modelBuilder.Entity<Bookings>()
+            .Navigation(b => b.ServiceType)
+            .AutoInclude();
+        modelBuilder.Entity<Bookings>()
+            .Navigation(b => b.Contract)
+            .AutoInclude();
+        modelBuilder.Entity<Bookings>()
+            .Navigation(b => b.BookingDetails)
+            .AutoInclude();
+
         modelBuilder.Entity<Bookings>()
             .Property(b => b.Status)
             .HasDefaultValue(BookingStatus.Pending);
@@ -116,6 +153,10 @@ public class CleanServiceContext : DbContext
 
         // Booking Details entity config
         modelBuilder.Entity<BookingDetails>()
+            .Navigation(b => b.DurationPrice)
+            .AutoInclude();
+
+        modelBuilder.Entity<BookingDetails>()
             .Property(b => b.BedroomCount)
             .HasDefaultValue(0);
         modelBuilder.Entity<BookingDetails>()
@@ -130,11 +171,11 @@ public class CleanServiceContext : DbContext
         modelBuilder.Entity<BookingDetails>()
             .Property(b => b.CreatedAt)
             .HasDefaultValue(DateTime.Now);
-        
+
         modelBuilder.Entity<BookingDetails>()
-            .HasOne(h => h.Booking)
-            .WithOne(u => u.BookingDetails)
-            .HasForeignKey<BookingDetails>(h => h.BookingId);
+            .HasOne(bd => bd.Booking)
+            .WithOne(b => b.BookingDetails)
+            .HasForeignKey<BookingDetails>(bd => bd.BookingId);
 
         // Contracts entity config
         modelBuilder.Entity<Contracts>()
@@ -142,6 +183,10 @@ public class CleanServiceContext : DbContext
             .HasDefaultValue(DateTime.Now);
 
         // Complaints entity config
+        modelBuilder.Entity<Complaints>()
+            .Navigation(c => c.Booking)
+            .AutoInclude();
+
         modelBuilder.Entity<Complaints>()
             .Property(c => c.Status)
             .HasDefaultValue(ComplaintStatus.Pending);
@@ -151,18 +196,18 @@ public class CleanServiceContext : DbContext
 
         // BlacklistedUsers entity config
         modelBuilder.Entity<BlacklistedUsers>()
-            .Property(c => c.BlacklistedAt)
+            .Property(b => b.BlacklistedAt)
             .HasDefaultValue(DateTime.Now);
         modelBuilder.Entity<BlacklistedUsers>()
-            .Property(c => c.IsPermanent)
+            .Property(b => b.IsPermanent)
             .HasDefaultValue(false);
 
         // Notifications entity config
         modelBuilder.Entity<Notifications>()
-            .Property(c => c.CreatedAt)
+            .Property(n => n.CreatedAt)
             .HasDefaultValue(DateTime.Now);
         modelBuilder.Entity<Notifications>()
-            .Property(c => c.IsRead)
+            .Property(n => n.IsRead)
             .HasDefaultValue(false);
     }
 
@@ -173,7 +218,8 @@ public class CleanServiceContext : DbContext
 
         foreach (var entity in modifiedEntities)
         {
-            entity.Property("UpdatedAt").CurrentValue = DateTime.Now;
+            if (entity.GetType().GetProperty("UpdatedAt") != null)
+                entity.Property("UpdatedAt").CurrentValue = DateTime.Now;
         }
 
         return base.SaveChanges();
@@ -187,7 +233,8 @@ public class CleanServiceContext : DbContext
 
         foreach (var entity in modifiedEntities)
         {
-            entity.Property("UpdatedAt").CurrentValue = DateTime.Now;
+            if (entity.GetType().GetProperty("UpdatedAt") != null)
+                entity.Property("UpdatedAt").CurrentValue = DateTime.Now;
         }
 
         return base.SaveChangesAsync(cancellationToken);

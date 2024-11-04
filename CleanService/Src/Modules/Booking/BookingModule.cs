@@ -1,10 +1,12 @@
 
+using CleanService.Src.Modules.Booking.Infrastructures;
 using CleanService.Src.Modules.Booking.Mapping.Profiles;
-using CleanService.Src.Modules.Booking.Repositories;
 using CleanService.Src.Modules.Booking.Services;
-using CleanService.Src.Modules.Contract.Services;
-using CleanService.Src.Modules.Service.Services;
-using CleanService.Src.Modules.ServiceType.Services;
+using CleanService.Src.Repositories.Booking;
+using CleanService.Src.Repositories.Contract;
+using CleanService.Src.Repositories.DurationPrices;
+using CleanService.Src.Repositories.RoomPricings;
+using CleanService.Src.Repositories.ServiceType;
 
 namespace CleanService.Src.Modules.Booking;
 
@@ -14,7 +16,7 @@ public static class BookingModule
     {
         services
             .AddScoped<IBookingService, BookingService>()
-            .AddScoped<IBookingRepository, BookingRepository>();
+            .AddScoped<IBookingUnitOfWork, BookingUnitOfWork>();
 
         return services;
     }

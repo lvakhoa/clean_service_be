@@ -8,72 +8,63 @@ public class BookingResponseProfile : Profile
 {
     public BookingResponseProfile()
     {
-        CreateMap<Bookings, BookingReturnDto>()
-            .ConstructUsing(user => new BookingReturnDto
+        CreateMap<Bookings, BookingResponseDto>()
+            .ConstructUsing(entity => new BookingResponseDto
                 {
-                    Id = user.Id.ToString(),
-                    CustomerId = user.CustomerId,
-                    HelperId = user.HelperId,
-                    ServiceTypeId = user.ServiceTypeId.ToString(),
-                    Location = user.Location,
-                    ScheduledStartTime = user.ScheduledStartTime,
-                    ScheduledEndTime = user.ScheduledEndTime,
-                    Status = user.Status.ToString(),
-                    CancellationReason = user.CancellationReason,
-                    TotalPrice = user.TotalPrice,
-                    PaymentStatus = user.PaymentStatus.ToString(),
-                    PaymentMethod = user.PaymentMethod,
-                    HelperRating = user.HelperRating,
-                    CustomerFeedback = user.CustomerFeedback,
-                    HelperFeedback = user.HelperFeedback,
-                    CreatedAt = user.CreatedAt,
-                    UpdatedAt = user.UpdatedAt,
-                    Customer = new UserBookingReturn
-                    {
-                        Id = user.Customer.Id,
-                        Gender = user.Customer.Gender.ToString(),
-                        FullName = user.Customer.FullName,
-                        IdentityCard = user.Customer.IdentityCard,
-                        Address = user.Customer.Address,
-                        PhoneNumber = user.Customer.PhoneNumber,
-                        Email = user.Customer.Email,
-                        CreatedAt = user.Customer.CreatedAt,
-                        UpdatedAt = user.Customer.UpdatedAt
-                    },
-                    Helper = new UserBookingReturn
-                    {
-                        Id = user.Customer.Id,
-                        Gender = user.Customer.Gender.ToString(),
-                        FullName = user.Customer.FullName,
-                        IdentityCard = user.Customer.IdentityCard,
-                        Address = user.Customer.Address,
-                        PhoneNumber = user.Customer.PhoneNumber,
-                        Email = user.Customer.Email,
-                        CreatedAt = user.Customer.CreatedAt,
-                        UpdatedAt = user.Customer.UpdatedAt
-                    },
-                    ServiceType = new ServiceTypeBookingReturn
-                    {
-                        Id = user.ServiceType.Id.ToString(),
-                        CategoryId = user.ServiceType.CategoryId.ToString(),
-                        Name = user.ServiceType.Name,
-                        Description = user.ServiceType.Description,
-                        BasePrice = user.ServiceType.BasePrice,
-                        CreatedAt = user.ServiceType.CreatedAt
-                    },
-                    BookingDetails = new BookingDetailsReturn
-                    {
-                        Id = user.BookingDetails.Id.ToString(),
-                        BookingId = user.BookingDetails.BookingId.ToString(),
-                        DurationPriceId = user.BookingDetails.DurationPriceId.ToString(),
-                        BedroomCount = user.BookingDetails.BedroomCount,
-                        BathroomCount = user.BookingDetails.BathroomCount,
-                        KitchenCount = user.BookingDetails.KitchenCount,
-                        LivingRoomCount = user.BookingDetails.LivingRoomCount,
-                        SpecialRequirements = user.BookingDetails.SpecialRequirements,
-                        CreatedAt = user.BookingDetails.CreatedAt
-                    }
+                    Id = entity.Id.ToString(),
+                    CustomerId = entity.CustomerId,
+                    HelperId = entity.HelperId,
+                    ServiceTypeId = entity.ServiceTypeId.ToString(),
+                    Location = entity.Location,
+                    ScheduledStartTime = entity.ScheduledStartTime,
+                    ScheduledEndTime = entity.ScheduledEndTime,
+                    Status = entity.Status.ToString(),
+                    CancellationReason = entity.CancellationReason,
+                    TotalPrice = entity.TotalPrice,
+                    PaymentStatus = entity.PaymentStatus.ToString(),
+                    PaymentMethod = entity.PaymentMethod,
+                    HelperRating = entity.HelperRating,
+                    CustomerFeedback = entity.CustomerFeedback,
+                    HelperFeedback = entity.HelperFeedback,
+                    CreatedAt = entity.CreatedAt,
+                    UpdatedAt = entity.UpdatedAt,
                 }
             );
+        CreateMap<Users, UserBookingResponse>()
+            .ConstructUsing(entity => new UserBookingResponse
+            {
+                Id = entity.Id,
+                Gender = entity.Gender.ToString(),
+                FullName = entity.FullName,
+                IdentityCard = entity.IdentityCard,
+                Address = entity.Address,
+                PhoneNumber = entity.PhoneNumber,
+                Email = entity.Email,
+                CreatedAt = entity.CreatedAt,
+                UpdatedAt = entity.UpdatedAt
+            });
+        CreateMap<ServiceTypes, ServiceTypeBookingResponse>()
+            .ConstructUsing(entity => new ServiceTypeBookingResponse
+            {
+                Id = entity.Id.ToString(),
+                CategoryId = entity.CategoryId.ToString(),
+                Name = entity.Name,
+                Description = entity.Description,
+                BasePrice = entity.BasePrice,
+                CreatedAt = entity.CreatedAt
+            });
+        CreateMap<BookingDetails, BookingDetailsResponse>()
+            .ConstructUsing(entity => new BookingDetailsResponse
+            {
+                Id = entity.Id.ToString(),
+                BookingId = entity.BookingId.ToString(),
+                DurationPriceId = entity.DurationPriceId.ToString(),
+                BedroomCount = entity.BedroomCount,
+                BathroomCount = entity.BathroomCount,
+                KitchenCount = entity.KitchenCount,
+                LivingRoomCount = entity.LivingRoomCount,
+                SpecialRequirements = entity.SpecialRequirements,
+                CreatedAt = entity.CreatedAt
+            });
     }
 }

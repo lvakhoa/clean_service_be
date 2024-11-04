@@ -7,17 +7,17 @@ namespace CleanService.Src.Modules.Auth.Services;
 
 public interface IAuthService
 {
-    public Task<UserReturnDto?> RegisterUser(RegistrationDto registrationDto);
+    public Task RegisterUser(RegistrationRequestDto registrationRequestDto);
     
-    public Task<UserReturnDto?> GetUserById(string id);
+    public Task<UserResponseDto?> GetUserById(string id);
     
-    public Task<UserReturnDto?> UpdateInfo(string id, UpdateInfoDto updateInfoDto);
+    public Task UpdateInfo(string id, UpdateUserRequestDto updateUserRequestDto);
     
-    public Task<HelperReturnDto?> UpdateHelperInfo(string id, UpdateHelperDto updateHelperDto);
+    public Task UpdateHelperInfo(string id, UpdateHelperRequestDto updateHelperRequestDto);
 
-    public Task<Pagination<UserReturnDto>> GetUsers(UserType? userType = null, int? page = null, int? limit = null, UserStatus? status = UserStatus.Active);
+    public Task<Pagination<UserResponseDto>> GetUsers(UserType? userType = null, int? page = null, int? limit = null, UserStatus? status = UserStatus.Active);
 
-    public Task<UserReturnDto?> ActivateUser(string id);
+    public Task ActivateUser(string id);
     
-    public Task<UserReturnDto?> BlockUser(string id);
+    public Task BlockUser(string id);
 }

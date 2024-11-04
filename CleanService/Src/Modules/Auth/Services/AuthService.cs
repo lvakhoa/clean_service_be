@@ -1,102 +1,143 @@
+using System.Linq.Expressions;
 using AutoMapper;
 using CleanService.Src.Models;
+using CleanService.Src.Modules.Auth.Infrastructures;
 using CleanService.Src.Modules.Auth.Mapping.DTOs;
-using CleanService.Src.Modules.Auth.Repositories;
+using CleanService.Src.Repositories;
 using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Modules.Auth.Services;
 
 public class AuthService : IAuthService
 {
-    private readonly IAuthRepository _authRepository;
-    
+    private readonly IAuthUnitOfWork _authUnitOfWork;
+
     private readonly IMapper _mapper;
 
-    public AuthService(IAuthRepository authRepository, IMapper mapper)
+    public AuthService(IAuthUnitOfWork authUnitOfWork, IMapper mapper)
     {
-        _authRepository = authRepository;
+        _authUnitOfWork = authUnitOfWork;
         _mapper = mapper;
     }
-    
-    public async Task<UserReturnDto?> RegisterUser(RegistrationDto registrationDto)
+
+    public async Task RegisterUser(RegistrationRequestDto registrationRequestDto)
     {
-        var user = await _authRepository.GetUserById(registrationDto.Id);
+        var user = await _authUnitOfWork.UserRepository.FindOneAsync(entity => entity.Id == registrationRequestDto.Id,
+            new FindOptions
+            {
+                IsAsNoTracking = true
+            });
+
         if (user == null)
         {
-            var userEntity = _mapper.Map<Users>(registrationDto);
-            var createdUser = await _authRepository.CreateUser(userEntity);
-            var userDto = _mapper.Map<UserReturnDto>(createdUser);
-            return userDto;
+            var userEntity = _mapper.Map<Users>(registrationRequestDto);
+            await _authUnitOfWork.UserRepository.AddAsync(userEntity);
+
+            if (userEntity.UserType == UserType.Helper)
+            {
+                await _authUnitOfWork.HelperRepository.AddAsync(new Helpers
+                {
+                    Id = userEntity.Id
+                });
+            }
+
+            await _authUnitOfWork.SaveChangesAsync();
         }
-        return null;
     }
 
-    public async Task<UserReturnDto?> GetUserById(string id)
+    public async Task<UserResponseDto?> GetUserById(string id)
     {
-        var user = await _authRepository.GetUserById(id);
-        if(user == null)
+        var user = await _authUnitOfWork.UserRepository.FindOneAsync(entity => entity.Id == id,
+            new FindOptions
+            {
+                IsAsNoTracking = true
+            });
+        if (user == null)
             throw new KeyNotFoundException("User not found");
-        
-        var userDto = _mapper.Map<UserReturnDto>(user);
-        
-        return userDto;
-    }
-    
-    public async Task<UserReturnDto?> UpdateInfo(string id, UpdateInfoDto updateInfoDto)
-    {
-        var user = await _authRepository.GetUserById(id);
-        if(user == null)
-            throw new KeyNotFoundException("User not found");
-        
-        var userEntity = _mapper.Map<PartialUsers>(updateInfoDto);
-        var updatedUser = await _authRepository.UpdateInfo(id, userEntity);
-        
-        var userDto = _mapper.Map<UserReturnDto>(updatedUser);
+
+        var userDto = _mapper.Map<UserResponseDto>(user);
+
         return userDto;
     }
 
-    public async Task<HelperReturnDto?> UpdateHelperInfo(string id, UpdateHelperDto updateHelperDto)
+    public async Task UpdateInfo(string id, UpdateUserRequestDto updateUserRequestDto)
     {
-        var helperEntity = _mapper.Map<PartialHelper>(updateHelperDto);
-        var helper = await _authRepository.UpdateHelperInfo(id, helperEntity);
-        if(helper == null)
-            throw new KeyNotFoundException("Helper not found");
-        var helperDto = _mapper.Map<HelperReturnDto>(helper);
-        return helperDto;
+        var user = await _authUnitOfWork.UserRepository.FindOneAsync(entity => entity.Id == id, new FindOptions
+        {
+            IsAsNoTracking = true,
+            IsIgnoreAutoIncludes = true
+        });
+        if (user == null)
+            throw new KeyNotFoundException("User not found");
+        _authUnitOfWork.UserRepository.Detach(user);
+
+        var userEntity = _mapper.Map<PartialUsers>(updateUserRequestDto);
+        _authUnitOfWork.UserRepository.Update(userEntity, user);
+
+        await _authUnitOfWork.SaveChangesAsync();
     }
 
-    public async Task<Pagination<UserReturnDto>> GetUsers(UserType? userType, int? page, int? limit, UserStatus? status = UserStatus.Active)
+    public async Task UpdateHelperInfo(string id, UpdateHelperRequestDto updateHelperRequestDto)
     {
-        var users = await _authRepository.GetUsers(userType, page, limit, status);
-        var response = _mapper.Map<UserReturnDto[]>(users.Results);
+        var helper = await _authUnitOfWork.HelperRepository.FindOneAsync(entity => entity.Id == id, new FindOptions
+        {
+            IsAsNoTracking = true,
+            IsIgnoreAutoIncludes = true
+        });
+        if (helper == null)
+            throw new KeyNotFoundException("User not found");
+        _authUnitOfWork.HelperRepository.Detach(helper);
+
+        var helperEntity = _mapper.Map<PartialHelper>(updateHelperRequestDto);
+        _authUnitOfWork.HelperRepository.Update(helperEntity, helper);
+
+        await _authUnitOfWork.SaveChangesAsync();
+    }
+
+    public async Task<Pagination<UserResponseDto>> GetUsers(UserType? userType, int? page, int? limit,
+        UserStatus? status = UserStatus.Active)
+    {
+        Expression<Func<Users, bool>> predicate = userType == null
+            ? entity => entity.Status == status
+            : entity => entity.UserType == userType && entity.Status == status;
+
+        var users = _authUnitOfWork.UserRepository.Find(predicate,
+            order: entity => entity.FullName, page, limit,
+            new FindOptions
+            {
+                IsAsNoTracking = true
+            });
+        var totalUsers = await _authUnitOfWork.UserRepository.CountAsync(predicate);
+
+        var userDto = _mapper.Map<UserResponseDto[]>(users);
 
         var currentPage = page ?? 1;
-        var currentLimit = (int)(limit ?? users.TotalItems);
+        var currentLimit = limit ?? totalUsers;
 
-        return new Pagination<UserReturnDto>(response, users.TotalItems,
+        return new Pagination<UserResponseDto>(userDto, totalUsers,
             currentPage,
             currentLimit);
     }
-    
-    public async Task<UserReturnDto?> ActivateUser(string id)
+
+    public async Task ActivateUser(string id)
     {
-        var user = await _authRepository.UpdateInfo(id, new PartialUsers()
-        {
-            Status = UserStatus.Active
-        });
-        
-        var userDto = _mapper.Map<UserReturnDto>(user);
-        return userDto;
+        var user = await _authUnitOfWork.UserRepository.FindOneAsync(entity => entity.Id == id);
+        if (user == null)
+            throw new KeyNotFoundException("User not found");
+
+        user.Status = UserStatus.Active;
+
+        await _authUnitOfWork.SaveChangesAsync();
     }
 
-    public async Task<UserReturnDto?> BlockUser(string id)
+    public async Task BlockUser(string id)
     {
-        var user = await _authRepository.UpdateInfo(id, new PartialUsers
-        {
-            Status = UserStatus.Blocked
-        });
-        
-        var userDto = _mapper.Map<UserReturnDto>(user);
-        return userDto;
+        var user = await _authUnitOfWork.UserRepository.FindOneAsync(entity => entity.Id == id);
+        if (user == null)
+            throw new KeyNotFoundException("User not found");
+
+        user.Status = UserStatus.Blocked;
+
+        await _authUnitOfWork.SaveChangesAsync();
     }
 }

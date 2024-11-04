@@ -33,8 +33,4 @@
       <PackageReference Include="Resend" Version="0.0.7" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Src\Modules\Contract\Mapping\Profiles\" />
-    </ItemGroup>
-
 </Project>

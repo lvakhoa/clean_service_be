@@ -13,7 +13,7 @@ public class BookingDetails
     public Guid BookingId { get; set; }
     
     [ForeignKey(nameof(DurationPrice))]
-    public Guid DurationPriceId { get; set; }
+    public Guid? DurationPriceId { get; set; }
     
     public int BedroomCount { get; set; }
     
@@ -30,7 +30,7 @@ public class BookingDetails
     
     public virtual Bookings Booking { get; set; } = null!;
     
-    public virtual DurationPrice? DurationPrice { get; set; } = null!;
+    public virtual DurationPrice? DurationPrice { get; set; }
 }
 
 public class PartialBookingDetails
