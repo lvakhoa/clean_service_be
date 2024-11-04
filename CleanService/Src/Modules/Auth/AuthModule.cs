@@ -3,10 +3,8 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
 using CleanService.Src.Constant;
-using CleanService.Src.Models;
-using CleanService.Src.Modules.Auth.Mapping.DTOs;
+using CleanService.Src.Modules.Auth.Infrastructures;
 using CleanService.Src.Modules.Auth.Mapping.Profiles;
-using CleanService.Src.Modules.Auth.Repositories;
 using CleanService.Src.Modules.Auth.Services;
 using CleanService.Src.Utils;
 using Microsoft.AspNetCore.Authentication;
@@ -66,7 +64,7 @@ public static class AuthModule
                 {
                     // var authRepository = context.HttpContext.RequestServices.GetRequiredService<IAuthRepository>();
                     // var role = context.Principal?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-                    
+
                     var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
                     request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                     request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);
@@ -77,7 +75,7 @@ public static class AuthModule
                     var user = await response.Content.ReadFromJsonAsync<JsonElement>();
 
                     context.RunClaimActions(user);
-                    
+
                     // var claim = context.Principal?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
                 }
             };
@@ -89,8 +87,9 @@ public static class AuthModule
 
     public static IServiceCollection AddAuthDependency(this IServiceCollection services)
     {
-        services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<IAuthRepository, AuthRepository>();
+        services
+            .AddScoped<IAuthService, AuthService>()
+            .AddScoped<IAuthUnitOfWork, AuthUnitOfWork>();
 
         return services;
     }
@@ -98,11 +97,22 @@ public static class AuthModule
     public static IServiceCollection AddAuthMapping(this IServiceCollection services)
     {
         services
-            .AddAutoMapper(typeof(UserResponseProfile))
             .AddAutoMapper(typeof(RegistrationRequestProfile))
             .AddAutoMapper(typeof(UpdateUserRequestProfile))
             .AddAutoMapper(typeof(UpdateHelperRequestProfile))
+            .AddAutoMapper(typeof(UserResponseProfile))
             .AddAutoMapper(typeof(HelperResponseProfile));
+
+        return services;
+    }
+
+    public static IServiceCollection AddAuthModule(this IServiceCollection services, IConfiguration config)
+    {
+        services
+            .AddTransient<IClaimsTransformation, ClaimsTransformation>()
+            .AddAuthScheme(config)
+            .AddAuthDependency()
+            .AddAuthMapping();
 
         return services;
     }

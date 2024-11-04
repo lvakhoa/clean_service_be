@@ -4,13 +4,16 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace CleanService.Src.Models;
 
 public class BookingDetails
-{
+{ 
     [Key]
     public Guid Id { get; set; }
     
     [Required]
     [ForeignKey(nameof(Booking))]
     public Guid BookingId { get; set; }
+    
+    [ForeignKey(nameof(DurationPrice))]
+    public Guid? DurationPriceId { get; set; }
     
     public int BedroomCount { get; set; }
     
@@ -26,6 +29,8 @@ public class BookingDetails
     public DateTime CreatedAt { get; set; }
     
     public virtual Bookings Booking { get; set; } = null!;
+    
+    public virtual DurationPrice? DurationPrice { get; set; }
 }
 
 public class PartialBookingDetails

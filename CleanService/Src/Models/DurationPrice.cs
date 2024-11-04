@@ -24,6 +24,8 @@ public class DurationPrice
     public DateTime CreatedAt { get; set; }
     
     public virtual ServiceTypes ServiceType { get; set; } = null!;
+    
+    public virtual ICollection<BookingDetails> BookingDetails { get; set; } = new List<BookingDetails>();
 }
 
 public class PartialDurationPrice
