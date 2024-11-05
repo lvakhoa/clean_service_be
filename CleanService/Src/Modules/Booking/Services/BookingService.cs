@@ -1,58 +1,59 @@
 using AutoMapper;
 using CleanService.Src.Models;
+using CleanService.Src.Modules.Booking.Infrastructures;
 using CleanService.Src.Modules.Booking.Mapping.DTOs;
-using CleanService.Src.Modules.Booking.Repositories;
-using CleanService.Src.Modules.Contract.Mapping.DTOs;
-using CleanService.Src.Modules.Contract.Repositories;
-using CleanService.Src.Modules.ServicePricing.Repositories;
-using CleanService.Src.Modules.ServiceType.Repositories;
+using CleanService.Src.Repositories;
+using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Modules.Booking.Services;
 
 public class BookingService : IBookingService
 {
-    private readonly IBookingRepository _bookingRepository;
-    private readonly IServiceTypeRepository _serviceTypeRepository;
-    private readonly IServicePricingRepository _servicePricingRepository;
-    private readonly IContractRepository _contractRepository;
+    private readonly IBookingUnitOfWork _bookingUnitOfWork;
     private readonly IMapper _mapper;
 
-    public BookingService(IBookingRepository bookingRepository, IServiceTypeRepository serviceTypeRepository,
-        IServicePricingRepository servicePricingRepository,
-        IContractRepository contractRepository, IMapper mapper)
+    public BookingService(IBookingUnitOfWork bookingUnitOfWork, IMapper mapper)
     {
-        _bookingRepository = bookingRepository;
-        _serviceTypeRepository = serviceTypeRepository;
-        _servicePricingRepository = servicePricingRepository;
-        _contractRepository = contractRepository;
+        _bookingUnitOfWork = bookingUnitOfWork;
         _mapper = mapper;
     }
 
-    public async Task<string> CreateBooking(CreateBookingDto createBookingDto)
+    public async Task CreateBooking(CreateBookingRequestDto createBookingDto)
     {
         var booking = _mapper.Map<Bookings>(createBookingDto);
+        
+        var customer = await _bookingUnitOfWork.UserRepository.FindOneAsync(entity => entity.Id == booking.CustomerId);
+        if (customer == null)
+            throw new KeyNotFoundException("Customer not found");
+        var serviceType =
+            await _bookingUnitOfWork.ServiceTypeRepository.FindOneAsync(entity => entity.Id == booking.ServiceTypeId);
+        if(serviceType == null)
+            throw new KeyNotFoundException("Service type not found");
 
         /*
          Calculate the pricing for booking based on:
          - Room Type (Bedroom, Bathroom, Kitchen, Living Room)
          - Duration Price
          */
-        var selectedService = await _serviceTypeRepository.GetServiceById(booking.ServiceTypeId);
-        var basePrice = selectedService?.BasePrice ?? 0;
+        var basePrice = serviceType.BasePrice;
         var bedroomPricing =
-            (await _servicePricingRepository.GetUniqueRoomPricingType(RoomType.Bedroom,
-                booking.BookingDetails.BedroomCount))?.AdditionalPrice ?? 0;
+            (await _bookingUnitOfWork.RoomPricingRepository.FindOneAsync(entity =>
+                entity.RoomType == RoomType.Bedroom && entity.RoomCount == booking.BookingDetails.BedroomCount))
+            ?.AdditionalPrice ?? 0;
         var bathroomPricing =
-            (await _servicePricingRepository.GetUniqueRoomPricingType(RoomType.Bathroom,
-                booking.BookingDetails.BathroomCount))?.AdditionalPrice ?? 0;
+            (await _bookingUnitOfWork.RoomPricingRepository.FindOneAsync(entity =>
+                entity.RoomType == RoomType.Bathroom && entity.RoomCount == booking.BookingDetails.BathroomCount))
+            ?.AdditionalPrice ?? 0;
         var kitchenPricing =
-            (await _servicePricingRepository.GetUniqueRoomPricingType(RoomType.Kitchen,
-                booking.BookingDetails.KitchenCount))?.AdditionalPrice ?? 0;
+            (await _bookingUnitOfWork.RoomPricingRepository.FindOneAsync(entity =>
+                entity.RoomType == RoomType.Kitchen && entity.RoomCount == booking.BookingDetails.KitchenCount))
+            ?.AdditionalPrice ?? 0;
         var livingRoomPricing =
-            (await _servicePricingRepository.GetUniqueRoomPricingType(RoomType.LivingRoom,
-                booking.BookingDetails.LivingRoomCount))?.AdditionalPrice ?? 0;
-        var durationPricing = (await _servicePricingRepository
-                .GetDurationPriceTypeById(booking.BookingDetails.DurationPriceId ?? Guid.Empty))
+            (await _bookingUnitOfWork.RoomPricingRepository.FindOneAsync(entity =>
+                entity.RoomType == RoomType.LivingRoom && entity.RoomCount == booking.BookingDetails.LivingRoomCount))
+            ?.AdditionalPrice ?? 0;
+        var durationPricing = (await _bookingUnitOfWork.DurationPriceRepository
+                .FindOneAsync(entity => entity.Id == booking.BookingDetails.DurationPriceId))
             ?.PriceMultiplier ?? 0;
 
         var totalPrice = basePrice + bedroomPricing + bathroomPricing +
@@ -60,40 +61,60 @@ public class BookingService : IBookingService
                          basePrice * durationPricing;
         booking.TotalPrice = totalPrice;
 
-        var bookingEntity = await _bookingRepository.CreateBooking(booking);
+        await _bookingUnitOfWork.BookingRepository.AddAsync(booking);
 
-        await _contractRepository.CreateContract(new CreateContractDto
+        await _bookingUnitOfWork.ContractRepository.AddAsync(new Contracts()
         {
             BookingId = booking.Id,
             Content = "Clean at " + booking.Location
         });
-        return bookingEntity.Id.ToString();
+
+        await _bookingUnitOfWork.SaveChangesAsync();
     }
 
-    public async Task<BookingReturnDto?> UpdateBooking(Guid id, UpdateBookingDto updateBookingDto)
+    public async Task UpdateBooking(Guid id, UpdateBookingRequestDto updateBookingDto)
     {
-        var booking = await _bookingRepository.GetBookingById(id);
+        var booking = await _bookingUnitOfWork.BookingRepository.FindOneAsync(entity => entity.Id == id, new FindOptions
+        {
+            IsIgnoreAutoIncludes = true
+        });
         if (booking == null)
             throw new KeyNotFoundException("Booking not found");
+        _bookingUnitOfWork.BookingRepository.Detach(booking);
 
         var updateBooking = _mapper.Map<PartialBookings>(updateBookingDto);
-        var bookingEntity = await _bookingRepository.UpdateBooking(id, updateBooking);
-        var bookingDto = _mapper.Map<BookingReturnDto>(bookingEntity);
+        _bookingUnitOfWork.BookingRepository.Update(updateBooking, booking);
 
-        return bookingDto;
+        await _bookingUnitOfWork.SaveChangesAsync();
     }
 
-    public async Task<BookingReturnDto[]> GetAllBookings()
+    public async Task<Pagination<BookingResponseDto>> GetAllBookings(int? page, int? limit)
     {
-        var bookings = await _bookingRepository.GetAllBookings();
-        var bookingsDto = _mapper.Map<BookingReturnDto[]>(bookings);
-        return bookingsDto;
+        var bookings = _bookingUnitOfWork.BookingRepository.GetAll(page, limit,
+            new FindOptions()
+            {
+                IsAsNoTracking = true
+            });
+        var totalBookings = await _bookingUnitOfWork.BookingRepository.CountAsync();
+
+        var bookingDtos = _mapper.Map<BookingResponseDto[]>(bookings);
+
+        var currentPage = page ?? 1;
+        var currentLimit = limit ?? totalBookings;
+
+        return new Pagination<BookingResponseDto>(bookingDtos, totalBookings,
+            currentPage,
+            currentLimit);
     }
 
-    public async Task<BookingReturnDto?> GetBookingById(Guid id)
+    public async Task<BookingResponseDto?> GetBookingById(Guid id)
     {
-        var booking = await _bookingRepository.GetBookingById(id);
-        var bookingDto = _mapper.Map<BookingReturnDto>(booking);
+        var booking = await _bookingUnitOfWork.BookingRepository.FindOneAsync(entity => entity.Id == id)
+            .ContinueWith(task => _mapper.Map<BookingResponseDto>(task.Result));
+        if(booking == null)
+            throw new KeyNotFoundException("Booking not found");
+        
+        var bookingDto = _mapper.Map<BookingResponseDto>(booking);
         return bookingDto;
     }
 }

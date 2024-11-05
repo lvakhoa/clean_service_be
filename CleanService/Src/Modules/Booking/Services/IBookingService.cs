@@ -1,16 +1,16 @@
-using CleanService.Src.Models;
 using CleanService.Src.Modules.Booking.Mapping.DTOs;
+using Pagination.EntityFrameworkCore.Extensions;
 
 namespace  CleanService.Src.Modules.Booking.Services;
 
 public interface IBookingService
 {
-    Task<string> CreateBooking(CreateBookingDto createBookingDto);
+    Task CreateBooking(CreateBookingRequestDto createBookingDto);
     
-    Task<BookingReturnDto?> UpdateBooking(Guid id, UpdateBookingDto updateBookingDto);
+    Task UpdateBooking(Guid id, UpdateBookingRequestDto updateBookingDto);
     
-    Task<BookingReturnDto[]> GetAllBookings();
+    Task<Pagination<BookingResponseDto>> GetAllBookings(int? page, int? limit);
 
-    Task<BookingReturnDto?> GetBookingById(Guid id);
+    Task<BookingResponseDto?> GetBookingById(Guid id);
 }
 

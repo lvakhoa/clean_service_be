@@ -1,6 +1,6 @@
 using AutoMapper;
 using CleanService.Src.Models;
-using CleanService.Src.Modules.Service.DTOs;
+using CleanService.Src.Modules.ServiceType.Mapping.DTOs;
 
 namespace CleanService.Src.Modules.ServiceType.Mapping.Profiles;
 
@@ -8,8 +8,8 @@ public class ServiceTypeResponseProfile : Profile
 {
     public ServiceTypeResponseProfile()
     {
-        CreateMap<ServiceTypes, ServiceTypeReturnDto>()
-            .ConstructUsing(entity => new ServiceTypeReturnDto
+        CreateMap<ServiceTypes, ServiceTypeResponseDto>()
+            .ConstructUsing(entity => new ServiceTypeResponseDto
             {
                 Id = entity.Id.ToString(),
                 CategoryId = entity.CategoryId.ToString(),

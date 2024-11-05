@@ -8,20 +8,20 @@ public class UserResponseProfile : Profile
 {
     public UserResponseProfile()
     {
-        CreateMap<Users, UserReturnDto>()
-            .ConstructUsing(user => new UserReturnDto
+        CreateMap<Users, UserResponseDto>()
+            .ConstructUsing(entity => new UserResponseDto
             {
-                Id = user.Id,
-                FullName = user.FullName,
-                UserType = user.UserType.ToString(),
-                Gender = user.Gender.ToString(),
-                ProfilePicture = user.ProfilePicture,
-                DateOfBirth = user.DateOfBirth,
-                Address = user.Address,
-                Email = user.Email,
-                PhoneNumber = user.PhoneNumber,
-                CreatedAt = user.CreatedAt,
-                UpdatedAt = user.UpdatedAt
+                Id = entity.Id,
+                FullName = entity.FullName,
+                UserType = entity.UserType.ToString(),
+                Gender = entity.Gender.ToString(),
+                ProfilePicture = entity.ProfilePicture,
+                DateOfBirth = entity.DateOfBirth,
+                Address = entity.Address,
+                Email = entity.Email,
+                PhoneNumber = entity.PhoneNumber,
+                CreatedAt = entity.CreatedAt,
+                UpdatedAt = entity.UpdatedAt
             });
     }
 }

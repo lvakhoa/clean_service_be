@@ -4,7 +4,7 @@ using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Repositories.User;
 
-public class UserRepository : Repository<Users>, IUserRepository
+public class UserRepository : Repository<Users, PartialUsers>, IUserRepository
 {
     private readonly CleanServiceContext _dbContext;
 

@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CleanService.Src.Repositories.ServiceType;
 
-public class ServiceTypeRepository : Repository<ServiceTypes>, IServiceTypeRepository
+public class ServiceTypeRepository : Repository<ServiceTypes, PartialServiceTypes>, IServiceTypeRepository
 {
     private readonly CleanServiceContext _dbContext;
 

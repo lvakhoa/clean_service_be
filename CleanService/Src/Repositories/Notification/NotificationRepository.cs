@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CleanService.Src.Repositories.Notification;
 
-public class NotificationRepository : Repository<Notifications>, INotificationRepository
+public class NotificationRepository : Repository<Notifications, PartialNotification>, INotificationRepository
 {
     private readonly CleanServiceContext _dbContext;
     

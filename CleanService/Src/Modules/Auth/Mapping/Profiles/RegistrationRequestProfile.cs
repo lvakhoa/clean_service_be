@@ -8,13 +8,13 @@ public class RegistrationRequestProfile : Profile
 {
     public RegistrationRequestProfile()
     {
-        CreateMap<RegistrationDto, Users>()
-            .ConstructUsing(user => new Users
+        CreateMap<RegistrationRequestDto, Users>()
+            .ConstructUsing(dto => new Users
             {
-                Id = user.Id,
-                Email = user.Email,
-                FullName = user.Fullname,
-                UserType = user.UserType,
+                Id = dto.Id,
+                Email = dto.Email,
+                FullName = dto.Fullname,
+                UserType = dto.UserType,
             });
     }
 }

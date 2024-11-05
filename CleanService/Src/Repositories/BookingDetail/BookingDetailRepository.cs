@@ -2,7 +2,7 @@ using CleanService.Src.Models;
 
 namespace CleanService.Src.Repositories.BookingDetail;
 
-public class BookingDetailRepository : Repository<BookingDetails>, IBookingDetailRepository
+public class BookingDetailRepository : Repository<BookingDetails, PartialBookingDetails>, IBookingDetailRepository
 {
     private readonly CleanServiceContext _dbContext;
     
