@@ -18,38 +18,26 @@ public class SchedulerController : Controller
         _schedulerService = schedulerService;
     }
     
-    [HttpGet]
-    public async Task<ActionResult<BookingResponseDto[]>> GetScheduledBookings(int? page, int? limit)
-    {
-        var result = await _schedulerService.GetAllScheduledBookings(page, limit);
-        return Ok(new SuccessResponse
-        {
-            StatusCode = HttpStatusCode.OK,
-            Message = "Get all bookings successfully",
-            Data = result
-        });
-    }
+    // [HttpGet("all")]
+    // public async Task<ActionResult<BookingResponseDto[]>> GetScheduledBookings(int? page, int? limit)
+    // {
+    //     var result = await _schedulerService.GetAllScheduledBookings(page, limit);
+    //     return Ok(new SuccessResponse
+    //     {
+    //         StatusCode = HttpStatusCode.OK,
+    //         Message = "Get all bookings successfully",
+    //         Data = result
+    //     });
+    // }
     
-    [HttpGet("helper/{id}")]
-    public async Task<ActionResult<BookingResponseDto[]>> GetScheduledBookingByHelperId(string id, int? page, int? limit)
+    [HttpGet]
+    public async Task<ActionResult<BookingResponseDto[]>> GetScheduledBookingByHelperId(string? helperId,string? customerId, int? page, int? limit)
     {
-        var result = await _schedulerService.GetScheduledBookingByHelperId(id,page, limit);
+        var result = await _schedulerService.QueryScheduledBooking(helperId, customerId, page, limit);
         return Ok(new SuccessResponse
         {
             StatusCode = HttpStatusCode.OK,
             Message = "Get bookings by helper id successfully",
-            Data = result
-        });
-    }
-    
-    [HttpGet("customer/{id}")]
-    public async Task<ActionResult<BookingResponseDto[]>> GetScheduledBookingByCustomerId(string id, int? page, int? limit)
-    {
-        var result = await _schedulerService.GetScheduledBookingByCustomerId(id,page, limit);
-        return Ok(new SuccessResponse
-        {
-            StatusCode = HttpStatusCode.OK,
-            Message = "Get bookings by customer id successfully",
             Data = result
         });
     }

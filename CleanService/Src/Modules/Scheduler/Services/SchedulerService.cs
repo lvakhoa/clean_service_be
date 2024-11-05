@@ -39,7 +39,8 @@ public class SchedulerService : ISchedulerService
 
     public async Task<BookingResponseDto?> GetScheduledBookingById(Guid id)
     {
-        var booking =  _bookingUnitOfWork.BookingRepository.Find(entity => entity.Id == id);
+        var booking = await  _bookingUnitOfWork.BookingRepository.FindOneAsync(entity => entity.Id == id)
+            .ContinueWith(task => _mapper.Map<BookingResponseDto>(task.Result));
         if(booking == null)
             throw new KeyNotFoundException("Booking not found");
         
@@ -47,11 +48,12 @@ public class SchedulerService : ISchedulerService
         return bookingDto;
     }
 
-    public async Task<Pagination<BookingResponseDto>> GetScheduledBookingByHelperId(string helperId, int? page, int? limit)
+    public async Task<Pagination<BookingResponseDto>> QueryScheduledBooking(string? helperId,string? customerId, int? page, int? limit)
     {
         
         var booking =  _bookingUnitOfWork.BookingRepository.Find(
-            entity => entity.HelperId == helperId,
+            entity => (customerId == null || entity.CustomerId == customerId) && 
+                      (helperId == null || entity.HelperId == helperId),
             x => x.ScheduledStartTime,
             page,
             limit,
@@ -59,33 +61,8 @@ public class SchedulerService : ISchedulerService
             {
                 IsAsNoTracking = true
             });
-        var totalCount = await _bookingUnitOfWork.BookingRepository.CountAsync(x => x.HelperId == helperId);
-
-        var bookingDtos = _mapper.Map<BookingResponseDto[]>(booking);
-        var currentPage = page ?? 1;
-        var currentLimit = limit ?? totalCount;
-
-        return new Pagination<BookingResponseDto>
-        (
-            bookingDtos,
-            totalCount,
-            currentPage,
-            currentLimit
-        );
-    }
-    
-    public async Task<Pagination<BookingResponseDto>> GetScheduledBookingByCustomerId(string customerId, int? page, int? limit)
-    {
-        var booking =  _bookingUnitOfWork.BookingRepository.Find(
-            entity => entity.CustomerId == customerId,
-            x => x.ScheduledStartTime,
-            page,
-            limit,
-            new FindOptions()
-            {
-                IsAsNoTracking = true
-            });
-        var totalCount = await _bookingUnitOfWork.BookingRepository.CountAsync(x => x.CustomerId == customerId);
+        var totalCount = await _bookingUnitOfWork.BookingRepository.CountAsync(x => (customerId == null || x.CustomerId == customerId) && 
+            (helperId == null || x.HelperId == helperId));
 
         var bookingDtos = _mapper.Map<BookingResponseDto[]>(booking);
         var currentPage = page ?? 1;
