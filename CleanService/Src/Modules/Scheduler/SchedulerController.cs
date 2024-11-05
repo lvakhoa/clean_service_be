@@ -29,6 +29,30 @@ public class SchedulerController : Controller
             Data = result
         });
     }
+    
+    [HttpGet("helper/{id}")]
+    public async Task<ActionResult<BookingResponseDto[]>> GetScheduledBookingByHelperId(string id, int? page, int? limit)
+    {
+        var result = await _schedulerService.GetScheduledBookingByHelperId(id,page, limit);
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Get bookings by helper id successfully",
+            Data = result
+        });
+    }
+    
+    [HttpGet("customer/{id}")]
+    public async Task<ActionResult<BookingResponseDto[]>> GetScheduledBookingByCustomerId(string id, int? page, int? limit)
+    {
+        var result = await _schedulerService.GetScheduledBookingByCustomerId(id,page, limit);
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Get bookings by customer id successfully",
+            Data = result
+        });
+    }
 
     [HttpGet("{id}")]
     public async Task<ActionResult<BookingResponseDto>> GetScheduledBookingById(Guid id)
@@ -42,6 +66,8 @@ public class SchedulerController : Controller
             Data = booking
         });
     }
+
+    
 
     [HttpPatch("cancel/{id}")]
     public async Task<ActionResult> CancelScheduledBooking(Guid id)

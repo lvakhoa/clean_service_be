@@ -12,7 +12,7 @@ public class AuthUnitOfWork : IAuthUnitOfWork
     
     public IHelperRepository HelperRepository { get; }
     
-    public AuthUnitOfWork(CleanServiceContext dbContext, UserRepository userRepository, IHelperRepository helperRepository)
+    public AuthUnitOfWork(CleanServiceContext dbContext, IUserRepository userRepository, IHelperRepository helperRepository)
     {
         _dbContext = dbContext;
         UserRepository = userRepository;
