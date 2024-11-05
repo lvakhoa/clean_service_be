@@ -5,9 +5,9 @@ namespace CleanService.Src.Modules.Auth.Infrastructures;
 
 public interface IAuthUnitOfWork
 {
-    // IUserRepository UserRepository { get; }
-    //
-    // IHelperRepository HelperRepository { get; }
+    IUserRepository UserRepository { get; }
+    
+    IHelperRepository HelperRepository { get; }
     
     Task SaveChangesAsync();
 }

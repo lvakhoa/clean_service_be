@@ -1,6 +1,6 @@
 using CleanService.Src.Modules.Booking;
+using CleanService.Src.Modules.Booking.Infrastructures;
 using CleanService.Src.Modules.Booking.Mapping.Profiles;
-using CleanService.Src.Modules.Booking.Repositories;
 using CleanService.Src.Modules.Booking.Services;
 using CleanService.Src.Modules.Scheduler.Services;
 
@@ -12,7 +12,7 @@ public static class SchedulerModule
     {
         services
             .AddScoped<ISchedulerService, SchedulerService>()
-            .AddScoped<IBookingRepository, BookingRepository>();
+            .AddScoped<IBookingUnitOfWork, BookingUnitOfWork>();
 
         return services;
     }
