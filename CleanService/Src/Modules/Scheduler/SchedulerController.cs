@@ -64,7 +64,7 @@ public class SchedulerController : Controller
         return Ok(new SuccessResponse
         {
             StatusCode = HttpStatusCode.OK,
-            Message = "Update booking successfully"
+            Message = "Cancel booking successfully"
         });
         // TODO: notification to admin
         // TODO: refund to customer

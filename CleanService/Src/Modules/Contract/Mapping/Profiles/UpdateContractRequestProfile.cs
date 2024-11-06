@@ -11,7 +11,7 @@ public class UpdateContractRequestProfile : Profile
         CreateMap<UpdateContractRequestDto, PartialContracts>()
             .ConstructUsing(dto => new PartialContracts
             {
-                Id = Guid.Parse(dto.Id),
+                //Id = Guid.Parse(dto.Id),
                 BookingId = dto.BookingId != null ? Guid.Parse(dto.BookingId) : null,
                 Content = dto.Content
             });

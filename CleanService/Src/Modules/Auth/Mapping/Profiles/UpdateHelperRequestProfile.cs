@@ -11,7 +11,7 @@ public class UpdateHelperRequestProfile : Profile
         CreateMap<UpdateHelperRequestDto, PartialHelper>()
             .ConstructUsing(dto => new PartialHelper
             {
-                Id = dto.Id,
+                //Id = dto.Id,
                 ExperienceDescription = dto.ExperienceDescription,
                 ResumeUploaded = dto.ResumeUploaded,
                 ServicesOffered = dto.ServicesOffered != null

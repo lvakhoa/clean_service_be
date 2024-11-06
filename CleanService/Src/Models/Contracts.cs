@@ -22,7 +22,7 @@ public class Contracts
 
 public class PartialContracts
 {
-    public Guid? Id { get; set; }
+    //public Guid? Id { get; set; }
     
     public Guid? BookingId { get; set; }
     

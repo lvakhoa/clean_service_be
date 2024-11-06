@@ -88,7 +88,7 @@ public enum PaymentStatus
 
 public class PartialBookings
 {
-    public Guid? Id { get; set; }
+    //public Guid? Id { get; set; }
 
     public string? CustomerId { get; set; } = null!;
 

@@ -36,7 +36,7 @@ public class BlacklistedUsers
 
 public class PartialBlacklistedUsers
 {
-    public Guid? Id { get; set; }
+    //public Guid? Id { get; set; }
     
     public string? UserId { get; set; } = null!;
     

@@ -90,7 +90,7 @@ public enum Gender
 
 public class PartialUsers
 {
-    public string? Id { get; set; }
+    //public string? Id { get; set; }
 
     public UserType? UserType { get; set; }
 

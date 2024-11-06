@@ -5,7 +5,7 @@ namespace CleanService.Src.Modules.Auth.Mapping.DTOs;
 
 public class UpdateUserRequestDto
 {
-    public string Id { get; set; } = null!;
+    //public string Id { get; set; } = null!;
     
     public string? ProfilePicture { get; set; }
     

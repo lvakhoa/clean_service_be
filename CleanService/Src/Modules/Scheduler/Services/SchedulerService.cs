@@ -44,8 +44,8 @@ public class SchedulerService : ISchedulerService
         if(booking == null)
             throw new KeyNotFoundException("Booking not found");
         
-        var bookingDto = _mapper.Map<BookingResponseDto>(booking);
-        return bookingDto;
+        //var bookingDto = _mapper.Map<BookingResponseDto>(booking);
+        return booking;
     }
 
     public async Task<Pagination<BookingResponseDto>> QueryScheduledBooking(string? helperId,string? customerId, int? page, int? limit)
@@ -55,6 +55,7 @@ public class SchedulerService : ISchedulerService
             entity => (customerId == null || entity.CustomerId == customerId) && 
                       (helperId == null || entity.HelperId == helperId),
             x => x.ScheduledStartTime,
+            true,
             page,
             limit,
             new FindOptions()
@@ -88,10 +89,15 @@ public class SchedulerService : ISchedulerService
         
         _bookingUnitOfWork.BookingRepository.Detach(booking);
 
-        var updateBooking = _mapper.Map<PartialBookings>(new UpdateBookingRequestDto()
+        // var updateBooking = _mapper.Map<PartialBookings>(new UpdateBookingRequestDto()
+        // {
+        //     Status = BookingStatus.Cancelled
+        // });
+
+        var updateBooking = new PartialBookings()
         {
-            Status = BookingStatus.Cancelled
-        });
+            Status = BookingStatus.Cancelled,
+        };
         _bookingUnitOfWork.BookingRepository.Update(updateBooking, booking);
 
         await _bookingUnitOfWork.SaveChangesAsync();
