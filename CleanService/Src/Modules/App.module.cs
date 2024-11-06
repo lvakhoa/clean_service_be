@@ -2,6 +2,7 @@ using CleanService.Src.Modules.Auth;
 using CleanService.Src.Modules.Booking;
 using CleanService.Src.Modules.Contract;
 using CleanService.Src.Modules.Mail;
+using CleanService.Src.Modules.Manage;
 using CleanService.Src.Modules.Notification;
 using CleanService.Src.Modules.ServiceType;
 using CleanService.Src.Repositories;
@@ -56,6 +57,10 @@ public static class AppModule
         // Inject Contract Module
         services
             .AddContractModule();
+        
+        // Inject Manage Module
+        services
+            .AddManageModule();
         
         return services;
     }
