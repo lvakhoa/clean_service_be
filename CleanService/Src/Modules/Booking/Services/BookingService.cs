@@ -69,7 +69,20 @@ public class BookingService : IBookingService
             Content = "Clean at " + booking.Location
         });
 
+        booking.HelperId = await AssignHelperToBooking(booking);
+        
+        if (booking.HelperId == null)
+        {
+            booking.Status = BookingStatus.Cancelled;
+            // Send notification to customer that no helper is available
+        }
+        else
+        {
+            booking.Status = BookingStatus.Confirmed;
+        }
+        
         await _bookingUnitOfWork.SaveChangesAsync();
+        
     }
 
     public async Task UpdateBooking(Guid id, UpdateBookingRequestDto updateBookingDto)
@@ -117,4 +130,63 @@ public class BookingService : IBookingService
         var bookingDto = _mapper.Map<BookingResponseDto>(booking);
         return bookingDto;
     }
+    
+    public async Task<string?> AssignHelperToBooking(Bookings booking)
+    {
+        // Get the customer who made the booking
+        var customer = booking.Customer;
+
+        // Get the list of all helpers
+        var allHelpers = _bookingUnitOfWork.UserRepository.Find(x => x.UserType == UserType.Helper).ToList();
+        var availableHelpers = new List<Users>();
+
+        int? minJobTaken = null;
+        var relevantStatuses = new List<BookingStatus> { BookingStatus.Pending, BookingStatus.Confirmed, BookingStatus.InProgress };
+
+        foreach (var helper in allHelpers)
+        {
+            // Get the list of bookings for the current helper
+            var helperBookings = await _bookingUnitOfWork.BookingRepository.GetBookingByUserId(relevantStatuses, helper.Id, UserType.Helper);
+            var jobCount = helperBookings.Count(x => x.Status is BookingStatus.Completed or BookingStatus.Confirmed or BookingStatus.InProgress);
+
+            // Check if the helper is available during the requested time
+            var isAvailable = helperBookings.All(x =>
+                !relevantStatuses.Contains(x.Status) ||
+                x.ScheduledEndTime <= booking.ScheduledStartTime ||
+                x.ScheduledStartTime >= booking.ScheduledEndTime
+            );
+            
+            // Check the helper with the least job taken this month
+            if (!isAvailable) continue;
+            if (minJobTaken == null || jobCount < minJobTaken)
+            {
+                minJobTaken = jobCount;
+                availableHelpers.Clear();
+                availableHelpers.Add(helper);
+            }
+            else if (jobCount == minJobTaken)
+            {
+                availableHelpers.Add(helper);
+            }
+        }
+
+        // Filter out helpers who are blacklisted by the customer
+        availableHelpers = availableHelpers.Where(x => !customer.BlacklistedByUsers.Any(y => y.UserId == x.Id)).ToList();
+
+        // Filter out helpers who do not offer the required service
+        availableHelpers = availableHelpers
+            .Where(x => x.Helper?.ServicesOffered != null && x.Helper.ServicesOffered.Contains(booking.ServiceTypeId))
+            .ToList();
+
+        if (!availableHelpers.Any()) return null;
+
+        // Find the most suitable helpers with the least number of jobs taken
+
+        // Randomly choose a helper from the most suitable helpers
+        var random = new Random();
+        var selectedHelper = availableHelpers[random.Next(availableHelpers.Count)];
+
+        return selectedHelper.Id;
+    }
+    
 }

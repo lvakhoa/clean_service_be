@@ -25,4 +25,6 @@ public class UserRepository : Repository<Users, PartialUsers>, IUserRepository
             .Select(x => x.NotificationToken)
             .ToArrayAsync();
     }
+    
+    
 }
