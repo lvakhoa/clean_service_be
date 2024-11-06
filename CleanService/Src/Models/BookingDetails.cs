@@ -35,7 +35,7 @@ public class BookingDetails
 
 public class PartialBookingDetails
 {
-    public Guid? Id { get; set; }
+    //public Guid? Id { get; set; }
     
     public Guid? BookingId { get; set; }
     

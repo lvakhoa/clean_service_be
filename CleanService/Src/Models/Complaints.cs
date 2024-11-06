@@ -50,7 +50,7 @@ public enum ComplaintStatus
 
 public class PartialComplaints
 {
-    public Guid? Id { get; set; }
+    //public Guid? Id { get; set; }
     
     public Guid? BookingId { get; set; }
     

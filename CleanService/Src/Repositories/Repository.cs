@@ -43,13 +43,15 @@ public class Repository<TEntity, TPartialEntity> : IRepository<TEntity, TPartial
     }
 
     public IQueryable<TEntity> Find(Expression<Func<TEntity, bool>> predicate,
-        Expression<Func<TEntity, object>>? order = null, int? page = null, int? limit = null,
+        Expression<Func<TEntity, object>>? order = null,
+        bool isDescending = false, 
+        int? page = null, int? limit = null,
         FindOptions? findOptions = null)
     {
         var entity = Get(findOptions).Where(predicate);
         if (order is not null)
         {
-            entity = entity.OrderBy(order);
+            entity = isDescending ? entity.OrderByDescending(order) : entity.OrderBy(order);
         }
 
         if (page is not null && limit is not null)

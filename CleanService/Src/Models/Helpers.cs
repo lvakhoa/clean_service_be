@@ -40,7 +40,7 @@ public class Helpers
 
 public class PartialHelper
 {
-    public string? Id { get; set; }
+    //public string? Id { get; set; }
     
     public string? ExperienceDescription { get; set; }
     

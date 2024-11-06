@@ -5,7 +5,7 @@ namespace CleanService.Src.Modules.Booking.Mapping.DTOs
 {
     public class UpdateBookingRequestDto
     {
-        public string Id { get; set; } = null!;
+        //public string Id { get; set; } = null!;
         
         public string? HelperId { get; set; }
 

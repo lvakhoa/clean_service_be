@@ -13,7 +13,7 @@ using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Modules.Auth;
 
-[Authorize]
+// [Authorize]
 [Route("[controller]")]
 public class AuthController : Controller
 {
@@ -103,14 +103,14 @@ public class AuthController : Controller
     }
 
     [HttpPatch("helper/{id}")]
-    [ModelValidation]
+    // [ModelValidation]
     public async Task<IActionResult> UpdateHelperInfo(string id, [FromBody] UpdateHelperRequestDto updateHelperRequestDto)
     {
-        var currentUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
-        if (currentUserId != id && !User.IsInRole(UserType.Admin.ToString()))
-        {
-            throw new ExceptionResponse(HttpStatusCode.Forbidden, "Forbidden", ExceptionConvention.Forbidden);
-        }
+        // var currentUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
+        // if (currentUserId != id && !User.IsInRole(UserType.Admin.ToString()))
+        // {
+        //     throw new ExceptionResponse(HttpStatusCode.Forbidden, "Forbidden", ExceptionConvention.Forbidden);
+        // }
 
         await _authService.UpdateHelperInfo(id, updateHelperRequestDto);
         return Ok(new SuccessResponse

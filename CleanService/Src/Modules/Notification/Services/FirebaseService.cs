@@ -104,7 +104,7 @@ public class FirebaseService : INotificationService
     public async Task<Pagination<NotificationResponseDto>> GetNotifications(string userId, int? page, int? limit)
     {
         var notifications = _notificationUnitOfWork.NotificationRepository.Find(entity => entity.UserId == userId,
-            order: null, page, limit, new FindOptions
+            order: null, false, page, limit, new FindOptions
             {
                 IsAsNoTracking = true
             });

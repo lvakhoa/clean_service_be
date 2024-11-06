@@ -102,7 +102,7 @@ public class AuthService : IAuthService
             : entity => entity.UserType == userType && entity.Status == status;
 
         var users = _authUnitOfWork.UserRepository.Find(predicate,
-            order: entity => entity.FullName, page, limit,
+            order: entity => entity.FullName, false, page, limit,
             new FindOptions
             {
                 IsAsNoTracking = true

@@ -11,7 +11,7 @@ public class UpdateBookingRequestProfile : Profile
         CreateMap<UpdateBookingRequestDto, PartialBookings>()
             .ConstructUsing(dto => new PartialBookings
             {
-                Id = Guid.Parse(dto.Id),
+                //Id = Guid.Parse(dto.Id),
                 HelperId = dto.HelperId,
                 Location = dto.Location,
                 ScheduledStartTime = dto.ScheduledStartTime,

@@ -4,7 +4,7 @@ namespace CleanService.Src.Modules.ServiceType.Mapping.DTOs;
 
 public class UpdateServiceTypeRequestDto
 {
-    public string Id { get; set; } = null!;
+    //public string Id { get; set; } = null!;
     
     public string? CategoryId { get; set; }
     

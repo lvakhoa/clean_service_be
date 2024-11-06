@@ -40,7 +40,7 @@ public enum NotificationType
 
 public class PartialNotification
 {
-    public Guid? Id { get; set; }
+    //public Guid? Id { get; set; }
     
     public string? Title { get; set; }
     
