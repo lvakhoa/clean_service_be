@@ -15,5 +15,13 @@ public interface IBookingService
     Task<BookingResponseDto?> GetBookingById(Guid id);
     
     Task<string?> AssignHelperToBooking(Bookings booking);
+    
+    Task CreateComplaint(CreateComplaintDto createComplaintDto);
+    
+    Task UpdateComplaint(Guid id, UpdateComplaintDto updateComplaintDto);
+    
+    Task<Pagination<ComplaintResponseDto>> GetAllComplaints(int? page, int? limit);
+    
+    Task<Pagination<ComplaintResponseDto>> GetComplaintByCustomerId(string id,int? page, int? limit);
 }
 

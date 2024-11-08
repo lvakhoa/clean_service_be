@@ -120,6 +120,27 @@ public class BookingService : IBookingService
             currentLimit);
     }
 
+    public async Task<Pagination<ComplaintResponseDto>> GetAllComplaints(int? page, int? limit)
+    {
+        var complaints = _bookingUnitOfWork.ComplaintRepository.GetAll(page, limit,
+            new FindOptions()
+            {
+                IsAsNoTracking = true
+            });
+        var totalComplaints = await _bookingUnitOfWork.ComplaintRepository.CountAsync();
+        
+        var complaintDtos = _mapper.Map<ComplaintResponseDto[]>(complaints);
+        
+        var currentPage = page ?? 1;
+        var currentLimit = limit ?? totalComplaints;
+        
+        return new Pagination<ComplaintResponseDto>(
+            complaintDtos,
+            totalComplaints,
+            currentPage,
+            currentLimit);
+    }
+
     public async Task<BookingResponseDto?> GetBookingById(Guid id)
     {
         var booking = await _bookingUnitOfWork.BookingRepository.FindOneAsync(entity => entity.Id == id)
@@ -187,6 +208,67 @@ public class BookingService : IBookingService
         var selectedHelper = availableHelpers[random.Next(availableHelpers.Count)];
 
         return selectedHelper.Id;
+    }
+
+    public async Task CreateComplaint(CreateComplaintDto createComplaintDto)
+    {
+        if (createComplaintDto == null)
+        {
+            throw new ArgumentNullException(nameof(createComplaintDto), "Complaint data cannot be null.");
+        }
+        var complaint = _mapper.Map<Complaints>(createComplaintDto);
+        
+        var booking = await _bookingUnitOfWork.BookingRepository.FindOneAsync(entity => entity.Id == createComplaintDto.BookingId);
+        if(booking == null)
+            throw new KeyNotFoundException("Booking not found");
+        var reportedBy = await _bookingUnitOfWork.UserRepository.FindOneAsync(entity => entity.Id == createComplaintDto.ReportedById);
+        if (reportedBy == null)
+            throw new KeyNotFoundException("Reported by not found");
+        var reportedUser = await _bookingUnitOfWork.UserRepository.FindOneAsync(entity => entity.Id == createComplaintDto.ReportedById);
+        if (reportedUser == null)
+            throw new KeyNotFoundException("Reported user not found");
+        
+        await _bookingUnitOfWork.ComplaintRepository.AddAsync(complaint);
+            
+        await _bookingUnitOfWork.SaveChangesAsync();
+            
+    }
+    
+    public async Task UpdateComplaint(Guid id, UpdateComplaintDto updateComplaintDto)
+    {
+        var complaint = await _bookingUnitOfWork.ComplaintRepository.FindOneAsync(entity => entity.Id == id, new FindOptions
+        {
+            IsIgnoreAutoIncludes = true
+        });
+        if(complaint == null)
+            throw new KeyNotFoundException("Complaint not found");
+        _bookingUnitOfWork.ComplaintRepository.Detach(complaint);
+        
+        var updateComplaint = _mapper.Map<PartialComplaints>(updateComplaintDto);
+        _bookingUnitOfWork.ComplaintRepository.Update(updateComplaint, complaint);
+        
+        await _bookingUnitOfWork.SaveChangesAsync();
+    }
+
+    public async Task<Pagination<ComplaintResponseDto>> GetComplaintByCustomerId(string id, int? page, int? limit)
+    {
+        var complaints = _bookingUnitOfWork.ComplaintRepository.Find(
+            entity => id == entity.ReportedById,
+            x => x.CreatedAt,
+            true,
+            page,
+            limit,
+            new FindOptions()
+            {
+                IsIgnoreAutoIncludes = true
+            });
+        var totalCount = complaints.Count();
+        var complaintDtos = _mapper.Map<ComplaintResponseDto[]>(complaints);
+        
+        var currentPage = page ?? 1;
+        var currentLimit = limit ?? totalCount;
+        
+        return new Pagination<ComplaintResponseDto>(complaintDtos,totalCount, currentPage, currentLimit);
     }
     
 }
