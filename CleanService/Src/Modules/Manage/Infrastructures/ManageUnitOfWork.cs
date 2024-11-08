@@ -1,7 +1,9 @@
 using CleanService.Src.Models;
 using CleanService.Src.Repositories.Booking;
+using CleanService.Src.Repositories.Complaint;
 using CleanService.Src.Repositories.Contract;
 using CleanService.Src.Repositories.DurationPrices;
+using CleanService.Src.Repositories.Helper;
 using CleanService.Src.Repositories.RoomPricings;
 using CleanService.Src.Repositories.ServiceType;
 using CleanService.Src.Repositories.User;
@@ -15,6 +17,10 @@ public class ManageUnitOfWork : IManageUnitOfWork
     public IBookingRepository BookingRepository { get; }
     
     public IUserRepository UserRepository { get; }
+    
+    public IHelperRepository HelperRepository { get; }
+    
+    public IComplaintRepository ComplaintRepository { get; }
 
     public IServiceTypeRepository ServiceTypeRepository { get; }
 
@@ -26,7 +32,7 @@ public class ManageUnitOfWork : IManageUnitOfWork
 
     public ManageUnitOfWork(CleanServiceContext dbContext, IBookingRepository bookingRepository, IUserRepository userRepository, IServiceTypeRepository serviceTypeRepository,
         IDurationPriceRepository durationPriceRepository, IRoomPricingRepository roomPricingRepository,
-        IContractRepository contractRepository)
+        IContractRepository contractRepository, IHelperRepository helperRepository, IComplaintRepository complaintRepository)
     {
         _dbContext = dbContext;
         BookingRepository = bookingRepository;
@@ -35,6 +41,8 @@ public class ManageUnitOfWork : IManageUnitOfWork
         DurationPriceRepository = durationPriceRepository;
         RoomPricingRepository = roomPricingRepository;
         ContractRepository = contractRepository;
+        HelperRepository = helperRepository;
+        ComplaintRepository = complaintRepository;
     }
 
     public async Task SaveChangesAsync()

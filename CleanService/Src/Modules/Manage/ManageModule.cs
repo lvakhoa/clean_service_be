@@ -1,5 +1,7 @@
 
 using CleanService.Src.Modules.Manage.Infrastructures;
+using CleanService.Src.Modules.Manage.Mapping.DTOs;
+using CleanService.Src.Modules.Manage.Mapping.Profiles;
 using CleanService.Src.Modules.Manage.Services;
 using CleanService.Src.Repositories.Contract;
 using CleanService.Src.Repositories.DurationPrices;
@@ -19,20 +21,21 @@ public static class ManageModule
         return services;
     }
 
-    // public static IServiceCollection AddManageMapping(this IServiceCollection services)
-    // {
-    //     services
-    //         .AddAutoMapper(typeof(CreateManageRequestProfile))
-    //         .AddAutoMapper(typeof(ManageResponseProfile))
-    //         .AddAutoMapper(typeof(UpdateManageRequestProfile));
-    //
-    //     return services;
-    // }
+    public static IServiceCollection AddManageMapping(this IServiceCollection services)
+    {
+        services
+            .AddAutoMapper(typeof(HelperDetailResponseProfile))
+            .AddAutoMapper(typeof(ComplaintResponseProfile))
+            .AddAutoMapper(typeof(UpdateComplaintRequestProfile));
+        
+        return services;
+    }
     
     public static IServiceCollection AddManageModule(this IServiceCollection services)
     {
         services
-            .AddManageDependency();
+            .AddManageDependency()
+            .AddManageMapping();
 
         return services;
     }
