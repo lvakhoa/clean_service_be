@@ -4,10 +4,11 @@ using CleanService.Src.Modules.Manage.Mapping.DTOs;
 
 namespace CleanService.Src.Modules.Manage.Mapping.Profiles;
 
-public class ComplaintResponseProfile: Profile
+public class ComplaintProfile: Profile
 {
-    public ComplaintResponseProfile()
+    public ComplaintProfile()
     {
+        //For Response
         CreateMap<Complaints, ComplaintResponseDto>()
             .ConstructUsing(entity => new ComplaintResponseDto
             {
@@ -20,6 +21,15 @@ public class ComplaintResponseProfile: Profile
                 Status = entity.Status.ToString(),
                 CreatedAt = entity.CreatedAt,
                 ResolvedAt = entity.ResolvedAt
+            });
+        
+        //For Update
+        CreateMap<UpdateComplaintRequestDto, PartialComplaints>()
+            .ConstructUsing(entity => new PartialComplaints
+            {
+                Status = entity.Status,
+                Reason = entity.Reason,
+                Resolution = entity.Resolution
             });
     }
 }

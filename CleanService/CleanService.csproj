@@ -33,4 +33,20 @@
       <PackageReference Include="Resend" Version="0.0.7" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Compile Remove="Src\Modules\Manage\Mapping\DTOs\ServiceType\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <EmbeddedResource Remove="Src\Modules\Manage\Mapping\DTOs\ServiceType\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Content Remove="Src\Modules\Manage\Mapping\DTOs\ServiceType\**" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Src\Modules\Manage\Mapping\DTOs\ServiceType\**" />
+    </ItemGroup>
+
 </Project>

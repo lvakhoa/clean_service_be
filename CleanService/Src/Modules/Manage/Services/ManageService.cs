@@ -5,6 +5,7 @@ using CleanService.Src.Models;
 using CleanService.Src.Modules.Booking.Mapping.DTOs;
 using CleanService.Src.Modules.Manage.Infrastructures;
 using CleanService.Src.Modules.Manage.Mapping.DTOs;
+using CleanService.Src.Modules.Manage.Mapping.DTOs.RoomPricing;
 using CleanService.Src.Repositories;
 using Pagination.EntityFrameworkCore.Extensions;
 
@@ -60,12 +61,12 @@ public class ManageService : IManageService
             });
         
         var totalComplaints = complaints.ToList().Count;
-        var complaintDto = _mapper.Map<ComplaintResponseDto[]>(complaints);
+        var complaintDto = _mapper.Map<ComplaintResponseDto[]>(complaints.ToList());
         
         var currentPage = page ?? 1;
         var currentLimit = limit ?? totalComplaints;
         
-        return Task.FromResult(new Pagination<ComplaintResponseDto>(complaintDto, complaints.ToList().Count, currentPage, currentLimit));
+        return Task.FromResult(new Pagination<ComplaintResponseDto>(complaintDto, totalComplaints, currentPage, currentLimit));
     }
 
     public async Task UpdateComplaint(Guid id, UpdateComplaintRequestDto updateComplaintRequestDto)
@@ -104,6 +105,74 @@ public class ManageService : IManageService
     {
         throw new NotImplementedException();
     }
+
+    public Task<Pagination<RoomPricingResponseDto>> GetRoomPricing(int? page, int? limit)
+    {
+        var roomPricings = _manageUnitOfWork.RoomPricingRepository.Find(
+            entity => true,
+            entity => entity.CreatedAt,
+            null,
+            null,
+            new FindOptions
+            {
+                IsAsNoTracking = true,
+                Includes = new Expression<Func<RoomPricing, object>>[]
+                {
+                    x => x.ServiceType
+                }
+            });
     
-    
+        var totalRoomPricings = roomPricings.ToList().Count;
+        if (roomPricings.ToList()[0].ServiceType == null) 
+            throw new KeyNotFoundException("Service Type not found");
+        var roomPricingDto = _mapper.Map<RoomPricingResponseDto[]>(roomPricings.ToList());
+
+        var currentPage = page ?? 1;
+        var currentLimit = limit ?? totalRoomPricings;
+
+        return Task.FromResult(new Pagination<RoomPricingResponseDto>(roomPricingDto, totalRoomPricings, currentPage, currentLimit));
+    }
+
+    public async Task CreateRoomPricing(CreateRoomPricingRequestDto createRoomPricingRequestDto)
+    {
+        var roomPricing = _mapper.Map<RoomPricing>(createRoomPricingRequestDto);
+        
+        var serviceType = await _manageUnitOfWork.ServiceTypeRepository.FindOneAsync(entity => entity.Id == roomPricing.ServiceTypeId);
+        if(serviceType == null)
+            throw new KeyNotFoundException("Service Type not found");
+        
+        await _manageUnitOfWork.RoomPricingRepository.AddAsync(roomPricing);
+        
+        await _manageUnitOfWork.SaveChangesAsync();
+    }
+
+    public Task UpdateRoomPricing(Guid id, UpdateRoomPricingRequestDto updateRoomPricingRequestDto)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task DeleteRoomPricing(Guid id)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Pagination<DurationPricingResponseDto>> GetDurationPrices(int? page, int? limit)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task CreateDurationPrice(CreateDurationPriceRequestDto createDurationPriceRequestDto)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task UpdateDurationPrice(Guid id, UpdateDurationPriceRequestDto updateDurationPriceRequestDto)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task DeleteDurationPrice(Guid id)
+    {
+        throw new NotImplementedException();
+    }
 }

@@ -7,6 +7,7 @@ using CleanService.Src.Modules.Auth.Services;
 using CleanService.Src.Modules.Booking.Mapping.DTOs;
 using CleanService.Src.Modules.Booking.Services;
 using CleanService.Src.Modules.Manage.Mapping.DTOs;
+using CleanService.Src.Modules.Manage.Mapping.DTOs.RoomPricing;
 using CleanService.Src.Modules.Manage.Services;
 using CleanService.Src.Utils;
 using Microsoft.AspNetCore.Http.HttpResults;
@@ -98,6 +99,38 @@ public class ManageController : Controller
         {
             StatusCode = HttpStatusCode.OK,
             Message = "Delete complaint successfully"
+        });
+    }
+    
+    [HttpGet("room-pricing")]
+    public async Task<ActionResult<Pagination<RoomPricingResponseDto>>> GetRoomPricings(int? page, int? limit)
+    {
+        if (page < 1 || limit < 1)
+        {
+            throw new ExceptionResponse(HttpStatusCode.BadRequest, "Page or limit param is negative",
+                ExceptionConvention.ValidationFailed);
+        }
+        
+        var roomPricings = await _manageService.GetRoomPricing(page, limit);
+        
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Get room pricings successfully",
+            Data = roomPricings
+        });
+    }
+    
+    [HttpPost("room-pricing")]
+    [ModelValidation]
+    public async Task<IActionResult> CreateRoomPricing([FromBody] CreateRoomPricingRequestDto createRoomPricingRequestDto)
+    {
+        await _manageService.CreateRoomPricing(createRoomPricingRequestDto);
+        
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Create room pricing successfully"
         });
     }
 }
