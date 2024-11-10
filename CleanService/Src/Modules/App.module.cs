@@ -4,6 +4,7 @@ using CleanService.Src.Modules.Contract;
 using CleanService.Src.Modules.Mail;
 using CleanService.Src.Modules.Notification;
 using CleanService.Src.Modules.Payment;
+using CleanService.Src.Modules.Scheduler;
 using CleanService.Src.Modules.ServiceType;
 using CleanService.Src.Repositories;
 using CleanService.Src.Repositories.BlacklistedUser;
@@ -69,6 +70,10 @@ public static class AppModule
         // Inject Payment Module
         services
             .AddPaymentModule();
+        
+        // Inject Scheduler Module
+        services
+            .AddSchedulerModule();
         
         return services;
     }
