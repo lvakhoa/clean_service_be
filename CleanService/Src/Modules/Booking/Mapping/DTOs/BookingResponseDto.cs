@@ -11,7 +11,7 @@ public class BookingResponseDto
     
     public string ServiceTypeId { get; set; } = null!;
     
-    public string? Location { get; set; }
+    public string Location { get; set; } = null!;
     
     public DateTime ScheduledStartTime { get; set; }
     
@@ -29,21 +29,21 @@ public class BookingResponseDto
     
     public decimal? HelperRating { get; set; }
     
-    public string? CustomerFeedback { get; set; }
-    
-    public string? HelperFeedback { get; set; }
-    
     public DateTime CreatedAt { get; set; }
     
     public DateTime UpdatedAt { get; set; }
     
     public UserBookingResponse Customer { get; set; } = null!;
     
-    public UserBookingResponse? Helper { get; set; }
+    public HelperBookingResponse? Helper { get; set; }
     
     public ServiceTypeBookingResponse ServiceType { get; set; } = null!;
     
     public BookingDetailsResponse BookingDetails { get; set; } = null!;
+    
+    public List<FeedbackResponse>? Feedbacks { get; set; }
+
+    public List<RefundResponse>? Refunds { get; set; }
 }
 
 public class UserBookingResponse
@@ -65,6 +65,21 @@ public class UserBookingResponse
     public DateTime CreatedAt { get; set; }
 
     public DateTime UpdatedAt { get; set; }
+}
+
+public class HelperBookingResponse
+{
+    public string Id { get; set; } = null!;
+
+    public string? ExperienceDescription { get; set; } = null!;
+
+    public string[]? ServicesOffered { get; set; }
+
+    public decimal HourlyRate { get; set; }
+
+    public decimal AverageRating { get; set; }
+    
+    public UserBookingResponse User { get; set; } = null!;
 }
 
 public class ServiceTypeBookingResponse
@@ -101,4 +116,34 @@ public class BookingDetailsResponse
     public string? SpecialRequirements { get; set; }
     
     public DateTime CreatedAt { get; set; }
+}
+
+public class FeedbackResponse
+{
+    public string Id { get; set; } = null!;
+    
+    public string BookingId { get; set; } = null!;
+    
+    public string Title { get; set; } = null!;
+    
+    public string Description { get; set; } = null!;
+    
+    public DateTime CreatedAt { get; set; }
+    
+    public DateTime UpdatedAt { get; set; }
+}
+
+public class RefundResponse
+{
+    public string Id { get; set; } = null!;
+    
+    public string BookingId { get; set; } = null!;
+    
+    public string Reason { get; set; } = null!;
+    
+    public string  Status { get; set; } = null!;
+    
+    public DateTime CreatedAt { get; set; }
+    
+    public DateTime ResolvedAt { get; set; }
 }

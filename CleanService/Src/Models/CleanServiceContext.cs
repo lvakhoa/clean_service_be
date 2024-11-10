@@ -12,6 +12,8 @@ public class CleanServiceContext : DbContext
     public virtual DbSet<Users> Users { get; set; } = null!;
 
     public virtual DbSet<Helpers> Helpers { get; set; } = null!;
+    
+    public virtual DbSet<HelperAvailability> HelperAvailability { get; set; } = null!;
 
     public virtual DbSet<ServiceCategories> ServiceCategory { get; set; } = null!;
 
@@ -24,10 +26,14 @@ public class CleanServiceContext : DbContext
     public virtual DbSet<Bookings> Bookings { get; set; } = null!;
 
     public virtual DbSet<BookingDetails> BookingDetails { get; set; } = null!;
+    
+    public virtual DbSet<BookingContracts> BookingContracts { get; set; } = null!;
 
     public virtual DbSet<Contracts> Contracts { get; set; } = null!;
-
-    public virtual DbSet<Complaints> Complaints { get; set; } = null!;
+    
+    public virtual DbSet<Feedbacks> Feedbacks { get; set; } = null!;
+    
+    public virtual DbSet<Refunds> Refunds { get; set; } = null!;
 
     public virtual DbSet<BlacklistedUsers> BlacklistedUsers { get; set; } = null!;
 
@@ -55,6 +61,9 @@ public class CleanServiceContext : DbContext
         modelBuilder.Entity<Users>()
             .Property(u => u.Status)
             .HasDefaultValue(UserStatus.Active);
+        modelBuilder.Entity<Users>()
+            .Property(u => u.NumberOfViolation)
+            .HasDefaultValue(0);
 
         // Helpers entity config
         modelBuilder.Entity<Helpers>()
@@ -78,6 +87,17 @@ public class CleanServiceContext : DbContext
             .WithOne(u => u.Helper)
             .HasForeignKey<Helpers>(h => h.Id);
 
+        // Helper Availability entity config
+        modelBuilder.Entity<HelperAvailability>()
+            .Property(ha => ha.Status)
+            .HasDefaultValue(AvailabilityStatus.Pending);
+        modelBuilder.Entity<HelperAvailability>()
+            .Property(ha => ha.CreatedAt)
+            .HasDefaultValue(DateTime.Now);
+        modelBuilder.Entity<HelperAvailability>()
+            .Property(ha => ha.UpdatedAt)
+            .HasDefaultValue(DateTime.Now);
+        
         // Service Categories entity config
         modelBuilder.Entity<ServiceCategories>()
             .Navigation(s => s.ServiceTypes)
@@ -137,6 +157,12 @@ public class CleanServiceContext : DbContext
         modelBuilder.Entity<Bookings>()
             .Navigation(b => b.BookingDetails)
             .AutoInclude();
+        modelBuilder.Entity<Bookings>()
+            .Navigation(b => b.Feedbacks)
+            .AutoInclude();
+        modelBuilder.Entity<Bookings>()
+            .Navigation(b => b.Refunds)
+            .AutoInclude();
 
         modelBuilder.Entity<Bookings>()
             .Property(b => b.Status)
@@ -176,23 +202,35 @@ public class CleanServiceContext : DbContext
             .HasOne(bd => bd.Booking)
             .WithOne(b => b.BookingDetails)
             .HasForeignKey<BookingDetails>(bd => bd.BookingId);
+        
+        // Booking Contracts entity config
+        modelBuilder.Entity<BookingContracts>()
+            .Property(bc => bc.CreatedAt)
+            .HasDefaultValue(DateTime.Now);
 
         // Contracts entity config
         modelBuilder.Entity<Contracts>()
             .Property(c => c.CreatedAt)
             .HasDefaultValue(DateTime.Now);
-
-        // Complaints entity config
-        modelBuilder.Entity<Complaints>()
-            .Navigation(c => c.Booking)
-            .AutoInclude();
-
-        modelBuilder.Entity<Complaints>()
-            .Property(c => c.Status)
-            .HasDefaultValue(ComplaintStatus.Pending);
-        modelBuilder.Entity<Complaints>()
-            .Property(c => c.CreatedAt)
+        modelBuilder.Entity<Contracts>()
+            .Property(c => c.UpdatedAt)
             .HasDefaultValue(DateTime.Now);
+        
+        // Feedback entity config
+        modelBuilder.Entity<Feedbacks>()
+            .Property(f => f.CreatedAt)
+            .HasDefaultValue(DateTime.Now);
+        modelBuilder.Entity<Feedbacks>()
+            .Property(f => f.UpdatedAt)
+            .HasDefaultValue(DateTime.Now);
+        
+        // Refunds entity config
+        modelBuilder.Entity<Refunds>()
+            .Property(r => r.CreatedAt)
+            .HasDefaultValue(DateTime.Now);
+        modelBuilder.Entity<Refunds>()
+            .Property(r => r.Status)
+            .HasDefaultValue(RefundStatus.Pending);
 
         // BlacklistedUsers entity config
         modelBuilder.Entity<BlacklistedUsers>()

@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CleanService.Migrations
 {
     [DbContext(typeof(CleanServiceContext))]
-    [Migration("20241030031236_NullingUserRequireField")]
-    partial class NullingUserRequireField
+    [Migration("20241110052523_AddFeedback")]
+    partial class AddFeedback
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -34,7 +34,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("BlacklistedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 10, 30, 10, 12, 34, 947, DateTimeKind.Local).AddTicks(9082));
+                        .HasDefaultValue(new DateTime(2024, 11, 10, 12, 25, 22, 727, DateTimeKind.Local).AddTicks(1853));
 
                     b.Property<string>("BlacklistedBy")
                         .IsRequired()
@@ -66,6 +66,32 @@ namespace CleanService.Migrations
                     b.ToTable("BlacklistedUsers");
                 });
 
+            modelBuilder.Entity("CleanService.Src.Models.BookingContracts", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("BookingId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasDefaultValue(new DateTime(2024, 11, 10, 12, 25, 22, 726, DateTimeKind.Local).AddTicks(4413));
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookingId")
+                        .IsUnique();
+
+                    b.ToTable("BookingContracts");
+                });
+
             modelBuilder.Entity("CleanService.Src.Models.BookingDetails", b =>
                 {
                     b.Property<Guid>("Id")
@@ -88,7 +114,10 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 10, 30, 10, 12, 34, 946, DateTimeKind.Local).AddTicks(6745));
+                        .HasDefaultValue(new DateTime(2024, 11, 10, 12, 25, 22, 726, DateTimeKind.Local).AddTicks(466));
+
+                    b.Property<Guid?>("DurationPriceId")
+                        .HasColumnType("char(36)");
 
                     b.Property<int>("KitchenCount")
                         .ValueGeneratedOnAdd()
@@ -108,6 +137,8 @@ namespace CleanService.Migrations
                     b.HasIndex("BookingId")
                         .IsUnique();
 
+                    b.HasIndex("DurationPriceId");
+
                     b.ToTable("BookingDetails");
                 });
 
@@ -123,17 +154,11 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 10, 30, 10, 12, 34, 945, DateTimeKind.Local).AddTicks(9434));
-
-                    b.Property<string>("CustomerFeedback")
-                        .HasColumnType("longtext");
+                        .HasDefaultValue(new DateTime(2024, 11, 10, 12, 25, 22, 725, DateTimeKind.Local).AddTicks(2999));
 
                     b.Property<string>("CustomerId")
                         .IsRequired()
                         .HasColumnType("varchar(255)");
-
-                    b.Property<string>("HelperFeedback")
-                        .HasColumnType("longtext");
 
                     b.Property<string>("HelperId")
                         .HasColumnType("varchar(255)")
@@ -144,7 +169,12 @@ namespace CleanService.Migrations
                         .HasColumnType("decimal(2,1)");
 
                     b.Property<string>("Location")
+                        .IsRequired()
                         .HasColumnType("longtext");
+
+                    b.Property<int>("OrderId")
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("int");
 
                     b.Property<string>("PaymentMethod")
                         .HasMaxLength(50)
@@ -178,7 +208,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 10, 30, 10, 12, 34, 946, DateTimeKind.Local).AddTicks(926));
+                        .HasDefaultValue(new DateTime(2024, 11, 10, 12, 25, 22, 725, DateTimeKind.Local).AddTicks(4320));
 
                     b.HasKey("Id");
 
@@ -186,57 +216,12 @@ namespace CleanService.Migrations
 
                     b.HasIndex("HelperId");
 
+                    b.HasIndex("OrderId")
+                        .IsUnique();
+
                     b.HasIndex("ServiceTypeId");
 
                     b.ToTable("Bookings");
-                });
-
-            modelBuilder.Entity("CleanService.Src.Models.Complaints", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("char(36)");
-
-                    b.Property<Guid>("BookingId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<DateTime>("CreatedAt")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 10, 30, 10, 12, 34, 947, DateTimeKind.Local).AddTicks(6942));
-
-                    b.Property<string>("Reason")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("ReportedById")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("ReportedUserId")
-                        .IsRequired()
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("Resolution")
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTime>("ResolvedAt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("Status")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(0);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("BookingId");
-
-                    b.HasIndex("ReportedById");
-
-                    b.HasIndex("ReportedUserId");
-
-                    b.ToTable("Complaints");
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.Contracts", b =>
@@ -245,21 +230,21 @@ namespace CleanService.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("char(36)");
 
-                    b.Property<Guid>("BookingId")
-                        .HasColumnType("char(36)");
-
-                    b.Property<string>("Content")
-                        .HasColumnType("longtext");
-
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 10, 30, 10, 12, 34, 947, DateTimeKind.Local).AddTicks(3417));
+                        .HasDefaultValue(new DateTime(2024, 11, 10, 12, 25, 22, 726, DateTimeKind.Local).AddTicks(5731));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasDefaultValue(new DateTime(2024, 11, 10, 12, 25, 22, 726, DateTimeKind.Local).AddTicks(6687));
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BookingId")
-                        .IsUnique();
 
                     b.ToTable("Contracts");
                 });
@@ -273,7 +258,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 10, 30, 10, 12, 34, 945, DateTimeKind.Local).AddTicks(3782));
+                        .HasDefaultValue(new DateTime(2024, 11, 10, 12, 25, 22, 724, DateTimeKind.Local).AddTicks(6456));
 
                     b.Property<int>("DurationHours")
                         .HasColumnType("int");
@@ -293,6 +278,96 @@ namespace CleanService.Migrations
                         .IsUnique();
 
                     b.ToTable("DurationPrice");
+                });
+
+            modelBuilder.Entity("CleanService.Src.Models.Feedbacks", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("BookingId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasDefaultValue(new DateTime(2024, 11, 10, 12, 25, 22, 726, DateTimeKind.Local).AddTicks(7635));
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasDefaultValue(new DateTime(2024, 11, 10, 12, 25, 22, 726, DateTimeKind.Local).AddTicks(8687));
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookingId");
+
+                    b.ToTable("Feedbacks");
+                });
+
+            modelBuilder.Entity("CleanService.Src.Models.HelperAvailability", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<string>("ApprovedBy")
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasDefaultValue(new DateTime(2024, 11, 10, 12, 25, 22, 723, DateTimeKind.Local).AddTicks(6885));
+
+                    b.Property<DateTime>("EndDatetime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("HelperId")
+                        .IsRequired()
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("RejectionReason")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("RequestReason")
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("StartDatetime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("varchar(24)")
+                        .HasDefaultValue("Pending");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("varchar(24)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasDefaultValue(new DateTime(2024, 11, 10, 12, 25, 22, 723, DateTimeKind.Local).AddTicks(8113));
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ApprovedBy");
+
+                    b.HasIndex("Status");
+
+                    b.HasIndex("HelperId", "StartDatetime", "EndDatetime");
+
+                    b.ToTable("HelperAvailability");
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.Helpers", b =>
@@ -319,7 +394,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 10, 30, 10, 12, 34, 944, DateTimeKind.Local).AddTicks(135));
+                        .HasDefaultValue(new DateTime(2024, 11, 10, 12, 25, 22, 723, DateTimeKind.Local).AddTicks(287));
 
                     b.Property<string>("ExperienceDescription")
                         .HasColumnType("longtext");
@@ -338,7 +413,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 10, 30, 10, 12, 34, 944, DateTimeKind.Local).AddTicks(1745));
+                        .HasDefaultValue(new DateTime(2024, 11, 10, 12, 25, 22, 723, DateTimeKind.Local).AddTicks(1576));
 
                     b.HasKey("Id");
 
@@ -361,7 +436,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 10, 30, 10, 12, 34, 948, DateTimeKind.Local).AddTicks(1798));
+                        .HasDefaultValue(new DateTime(2024, 11, 10, 12, 25, 22, 727, DateTimeKind.Local).AddTicks(4368));
 
                     b.Property<bool>("IsRead")
                         .ValueGeneratedOnAdd()
@@ -390,6 +465,40 @@ namespace CleanService.Migrations
                     b.ToTable("Notifications");
                 });
 
+            modelBuilder.Entity("CleanService.Src.Models.Refunds", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid>("BookingId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("datetime(6)")
+                        .HasDefaultValue(new DateTime(2024, 11, 10, 12, 25, 22, 726, DateTimeKind.Local).AddTicks(9740));
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTime>("ResolvedAt")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("varchar(24)")
+                        .HasDefaultValue("Pending");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookingId");
+
+                    b.ToTable("Refunds");
+                });
+
             modelBuilder.Entity("CleanService.Src.Models.RoomPricing", b =>
                 {
                     b.Property<Guid>("Id")
@@ -405,7 +514,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 10, 30, 10, 12, 34, 945, DateTimeKind.Local).AddTicks(1452));
+                        .HasDefaultValue(new DateTime(2024, 11, 10, 12, 25, 22, 724, DateTimeKind.Local).AddTicks(4158));
 
                     b.Property<int>("RoomCount")
                         .HasColumnType("int")
@@ -435,7 +544,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 10, 30, 10, 12, 34, 944, DateTimeKind.Local).AddTicks(6572));
+                        .HasDefaultValue(new DateTime(2024, 11, 10, 12, 25, 22, 723, DateTimeKind.Local).AddTicks(9564));
 
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
@@ -473,7 +582,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 10, 30, 10, 12, 34, 944, DateTimeKind.Local).AddTicks(9161));
+                        .HasDefaultValue(new DateTime(2024, 11, 10, 12, 25, 22, 724, DateTimeKind.Local).AddTicks(1964));
 
                     b.Property<string>("Description")
                         .HasColumnType("longtext");
@@ -512,7 +621,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 10, 30, 10, 12, 34, 943, DateTimeKind.Local).AddTicks(1776));
+                        .HasDefaultValue(new DateTime(2024, 11, 10, 12, 25, 22, 722, DateTimeKind.Local).AddTicks(2158));
 
                     b.Property<DateTime?>("DateOfBirth")
                         .HasColumnType("datetime(6)");
@@ -536,6 +645,11 @@ namespace CleanService.Migrations
                     b.Property<string>("NotificationToken")
                         .HasColumnType("longtext");
 
+                    b.Property<int>("NumberOfViolation")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int")
+                        .HasDefaultValue(0);
+
                     b.Property<string>("PhoneNumber")
                         .HasMaxLength(20)
                         .HasColumnType("varchar(20)");
@@ -552,7 +666,7 @@ namespace CleanService.Migrations
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime(6)")
-                        .HasDefaultValue(new DateTime(2024, 10, 30, 10, 12, 34, 943, DateTimeKind.Local).AddTicks(3221));
+                        .HasDefaultValue(new DateTime(2024, 11, 10, 12, 25, 22, 722, DateTimeKind.Local).AddTicks(3433));
 
                     b.Property<string>("UserType")
                         .IsRequired()
@@ -585,6 +699,17 @@ namespace CleanService.Migrations
                     b.Navigation("User");
                 });
 
+            modelBuilder.Entity("CleanService.Src.Models.BookingContracts", b =>
+                {
+                    b.HasOne("CleanService.Src.Models.Bookings", "Booking")
+                        .WithOne("Contract")
+                        .HasForeignKey("CleanService.Src.Models.BookingContracts", "BookingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Booking");
+                });
+
             modelBuilder.Entity("CleanService.Src.Models.BookingDetails", b =>
                 {
                     b.HasOne("CleanService.Src.Models.Bookings", "Booking")
@@ -593,7 +718,13 @@ namespace CleanService.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("CleanService.Src.Models.DurationPrice", "DurationPrice")
+                        .WithMany("BookingDetails")
+                        .HasForeignKey("DurationPriceId");
+
                     b.Navigation("Booking");
+
+                    b.Navigation("DurationPrice");
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.Bookings", b =>
@@ -604,7 +735,7 @@ namespace CleanService.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CleanService.Src.Models.Users", "Helper")
+                    b.HasOne("CleanService.Src.Models.Helpers", "Helper")
                         .WithMany("HelperBookings")
                         .HasForeignKey("HelperId");
 
@@ -621,44 +752,6 @@ namespace CleanService.Migrations
                     b.Navigation("ServiceType");
                 });
 
-            modelBuilder.Entity("CleanService.Src.Models.Complaints", b =>
-                {
-                    b.HasOne("CleanService.Src.Models.Bookings", "Booking")
-                        .WithMany("Complaints")
-                        .HasForeignKey("BookingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CleanService.Src.Models.Users", "ReportedBy")
-                        .WithMany("CreatedComplaints")
-                        .HasForeignKey("ReportedById")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CleanService.Src.Models.Users", "ReportedUser")
-                        .WithMany("ReceivedComplaints")
-                        .HasForeignKey("ReportedUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Booking");
-
-                    b.Navigation("ReportedBy");
-
-                    b.Navigation("ReportedUser");
-                });
-
-            modelBuilder.Entity("CleanService.Src.Models.Contracts", b =>
-                {
-                    b.HasOne("CleanService.Src.Models.Bookings", "Booking")
-                        .WithOne("Contract")
-                        .HasForeignKey("CleanService.Src.Models.Contracts", "BookingId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Booking");
-                });
-
             modelBuilder.Entity("CleanService.Src.Models.DurationPrice", b =>
                 {
                     b.HasOne("CleanService.Src.Models.ServiceTypes", "ServiceType")
@@ -668,6 +761,34 @@ namespace CleanService.Migrations
                         .IsRequired();
 
                     b.Navigation("ServiceType");
+                });
+
+            modelBuilder.Entity("CleanService.Src.Models.Feedbacks", b =>
+                {
+                    b.HasOne("CleanService.Src.Models.Bookings", "Booking")
+                        .WithMany("Feedbacks")
+                        .HasForeignKey("BookingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Booking");
+                });
+
+            modelBuilder.Entity("CleanService.Src.Models.HelperAvailability", b =>
+                {
+                    b.HasOne("CleanService.Src.Models.Users", "UserApproved")
+                        .WithMany("ListApprovedAvailability")
+                        .HasForeignKey("ApprovedBy");
+
+                    b.HasOne("CleanService.Src.Models.Helpers", "Helper")
+                        .WithMany("ListHelperAvailability")
+                        .HasForeignKey("HelperId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Helper");
+
+                    b.Navigation("UserApproved");
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.Helpers", b =>
@@ -690,6 +811,17 @@ namespace CleanService.Migrations
                         .IsRequired();
 
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("CleanService.Src.Models.Refunds", b =>
+                {
+                    b.HasOne("CleanService.Src.Models.Bookings", "Booking")
+                        .WithMany("Refunds")
+                        .HasForeignKey("BookingId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Booking");
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.RoomPricing", b =>
@@ -719,10 +851,24 @@ namespace CleanService.Migrations
                     b.Navigation("BookingDetails")
                         .IsRequired();
 
-                    b.Navigation("Complaints");
-
                     b.Navigation("Contract")
                         .IsRequired();
+
+                    b.Navigation("Feedbacks");
+
+                    b.Navigation("Refunds");
+                });
+
+            modelBuilder.Entity("CleanService.Src.Models.DurationPrice", b =>
+                {
+                    b.Navigation("BookingDetails");
+                });
+
+            modelBuilder.Entity("CleanService.Src.Models.Helpers", b =>
+                {
+                    b.Navigation("HelperBookings");
+
+                    b.Navigation("ListHelperAvailability");
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.ServiceCategories", b =>
@@ -745,17 +891,13 @@ namespace CleanService.Migrations
 
                     b.Navigation("BlacklistedUsers");
 
-                    b.Navigation("CreatedComplaints");
-
                     b.Navigation("CustomerBookings");
 
                     b.Navigation("Helper");
 
-                    b.Navigation("HelperBookings");
+                    b.Navigation("ListApprovedAvailability");
 
                     b.Navigation("Notifications");
-
-                    b.Navigation("ReceivedComplaints");
                 });
 #pragma warning restore 612, 618
         }

@@ -21,15 +21,18 @@ public class BookingController : Controller
     [HttpPost("create")]
     public async Task<ActionResult> CreateBooking([FromBody] CreateBookingRequestDto createBooking)
     {
-        await _bookingService.CreateBooking(createBooking);
-        
+        var paymentLink = await _bookingService.CreateBooking(createBooking);
         return CreatedAtAction("CreateBooking", new SuccessResponse()
         {
             StatusCode = HttpStatusCode.Created,
-            Message = "Create booking successfully"
+            Message = "Create booking successfully",
+            Data = new Dictionary<string, object>()
+            {
+                { "paymentLink", paymentLink }
+            }
         });
     }
-    
+
     [HttpPatch("update/{id}")]
     public async Task<ActionResult> UpdateBooking(Guid id, [FromBody] UpdateBookingRequestDto updateBooking)
     {
@@ -40,7 +43,7 @@ public class BookingController : Controller
             Message = "Update booking successfully"
         });
     }
-    
+
     [HttpGet("all")]
     public async Task<ActionResult<Pagination<BookingResponseDto>>> GetAllBookings(int? page, int? limit)
     {
@@ -62,52 +65,6 @@ public class BookingController : Controller
             StatusCode = HttpStatusCode.OK,
             Message = "Get booking successfully",
             Data = booking
-        });
-    }
-    
-    
-    
-    // Complaint API
-    [HttpPost("complaint/create")]
-    public async Task<ActionResult> CreateComplaint([FromBody] CreateComplaintDto createComplaint)
-    {
-        try
-        {
-            await _bookingService.CreateComplaint(createComplaint);
-            return CreatedAtAction("CreateComplaint", new SuccessResponse()
-            {
-                StatusCode = HttpStatusCode.Created,
-                Message = "Create complaint successfully"
-            });
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine( e.Message);
-            throw;
-        }
-        
-    }
-    
-    [HttpPatch("complaint/{id}")]
-    public async Task<ActionResult> UpdateComplaint(Guid id, [FromBody] UpdateComplaintDto updateComplaints)
-    {
-        await _bookingService.UpdateComplaint(id, updateComplaints);
-        return Ok(new SuccessResponse
-        {
-            StatusCode = HttpStatusCode.OK,
-            Message = "Update complaint successfully"
-        });
-    }
-
-    [HttpGet("complaint/{customerId}")]
-    public async Task<ActionResult<Pagination<ComplaintResponseDto>>> GetComplaintByCustomerId(string customerId, int? page, int? limit)
-    {
-        var result = await _bookingService.GetComplaintByCustomerId(customerId, page, limit);
-        return Ok(new SuccessResponse
-        {
-            StatusCode = HttpStatusCode.OK,
-            Message = "Get complaints successfully",
-            Data = result
         });
     }
 }

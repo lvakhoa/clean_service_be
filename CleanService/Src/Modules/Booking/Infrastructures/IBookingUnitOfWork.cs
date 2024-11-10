@@ -1,6 +1,6 @@
 
 using CleanService.Src.Repositories.Booking;
-using CleanService.Src.Repositories.Complaint;
+using CleanService.Src.Repositories.BookingContract;
 using CleanService.Src.Repositories.Contract;
 using CleanService.Src.Repositories.DurationPrices;
 using CleanService.Src.Repositories.RoomPricings;
@@ -21,9 +21,7 @@ public interface IBookingUnitOfWork
     
     IRoomPricingRepository RoomPricingRepository { get; }
     
-    IContractRepository ContractRepository { get; }
-    
-    IComplaintRepository ComplaintRepository { get; }
+    IBookingContractRepository BookingContractRepository { get; }
     
     Task SaveChangesAsync();
 }

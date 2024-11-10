@@ -8,8 +8,8 @@ public class CreateContractRequestProfile : Profile
 {
     public CreateContractRequestProfile()
     {
-        CreateMap<CreateContractRequestDto, Contracts>()
-            .ConstructUsing(dto => new Contracts
+        CreateMap<CreateContractRequestDto, BookingContracts>()
+            .ConstructUsing(dto => new BookingContracts
             {
                 BookingId = dto.BookingId,
                 Content = dto.Content

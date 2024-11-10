@@ -16,9 +16,10 @@ public class Repository<TEntity, TPartialEntity> : IRepository<TEntity, TPartial
         _dbSet = dbContext.Set<TEntity>();
     }
 
-    public async Task AddAsync(TEntity entity)
+    public async Task<TEntity> AddAsync(TEntity entity)
     {
-        await _dbSet.AddAsync(entity);
+        var result = await _dbSet.AddAsync(entity);
+        return result.Entity;
     }
 
     public async Task AddManyAsync(IEnumerable<TEntity> entities)

@@ -4,10 +4,13 @@ using Microsoft.EntityFrameworkCore;
 
 namespace CleanService.Src.Models;
 
+[Index(nameof(OrderId), IsUnique = true)]
 public class Bookings
 {
     [Key] 
     public Guid Id { get; set; }
+
+    public int OrderId { get; set; }
 
     [ForeignKey(nameof(Customer))]
     [Required]
@@ -21,7 +24,8 @@ public class Bookings
     [Required]
     public Guid ServiceTypeId { get; set; }
 
-    public string? Location { get; set; }
+    [Required]
+    public string Location { get; set; } = null!;
 
     [Required] 
     public DateTime ScheduledStartTime { get; set; }
@@ -49,25 +53,23 @@ public class Bookings
     [Precision(2, 1)]
     public decimal? HelperRating { get; set; }
 
-    public string? CustomerFeedback { get; set; }
-
-    public string? HelperFeedback { get; set; }
-    
     public DateTime CreatedAt { get; set; }
     
     public DateTime UpdatedAt { get; set; }
 
     public virtual Users Customer { get; set; } = null!;
     
-    public virtual Users? Helper { get; set; }
+    public virtual Helpers? Helper { get; set; }
 
     public virtual ServiceTypes ServiceType { get; set; } = null!;
     
-    public virtual Contracts Contract { get; set; } = null!;
+    public virtual BookingContracts Contract { get; set; } = null!;
     
     public virtual BookingDetails BookingDetails { get; set; } = null!;
     
-    public virtual ICollection<Complaints> Complaints { get; set; } = new List<Complaints>();
+    public virtual ICollection<Feedbacks> Feedbacks { get; set; } = new List<Feedbacks>();
+    
+    public virtual ICollection<Refunds> Refunds { get; set; } = new List<Refunds>();
 }
 
 public enum BookingStatus
@@ -102,6 +104,7 @@ public class PartialBookings
 
     public DateTime? ScheduledEndTime { get; set; }
 
+    [Column(TypeName = "varchar(24)")]
     public BookingStatus? Status { get; set; }
 
     public string? CancellationReason { get; set; }
@@ -109,6 +112,7 @@ public class PartialBookings
     [Precision(10, 2)]
     public decimal? TotalPrice { get; set; }
     
+    [Column(TypeName = "varchar(24)")]
     public PaymentStatus? PaymentStatus { get; set; }
 
     [MaxLength(50)]
