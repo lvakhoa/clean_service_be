@@ -2,6 +2,7 @@ using AutoMapper;
 using CleanService.Src.Models;
 using CleanService.Src.Modules.Booking.Infrastructures;
 using CleanService.Src.Modules.Booking.Mapping.DTOs;
+using CleanService.Src.Modules.Payment.Services;
 using CleanService.Src.Repositories;
 using Pagination.EntityFrameworkCore.Extensions;
 
@@ -10,15 +11,17 @@ namespace CleanService.Src.Modules.Booking.Services;
 public class BookingService : IBookingService
 {
     private readonly IBookingUnitOfWork _bookingUnitOfWork;
+    private readonly IPaymentService _paymentService;
     private readonly IMapper _mapper;
 
-    public BookingService(IBookingUnitOfWork bookingUnitOfWork, IMapper mapper)
+    public BookingService(IBookingUnitOfWork bookingUnitOfWork, IPaymentService paymentService, IMapper mapper)
     {
         _bookingUnitOfWork = bookingUnitOfWork;
+        _paymentService = paymentService;
         _mapper = mapper;
     }
 
-    public async Task CreateBooking(CreateBookingRequestDto createBookingDto)
+    public async Task<string> CreateBooking(CreateBookingRequestDto createBookingDto)
     {
         var booking = _mapper.Map<Bookings>(createBookingDto);
         
@@ -61,13 +64,18 @@ public class BookingService : IBookingService
                          basePrice * durationPricing;
         booking.TotalPrice = totalPrice;
 
+        var totalBookings = await _bookingUnitOfWork.BookingRepository.CountAsync();
+        booking.OrderId = totalBookings + 1000;
+
         await _bookingUnitOfWork.BookingRepository.AddAsync(booking);
 
-        await _bookingUnitOfWork.ContractRepository.AddAsync(new Contracts()
+        await _bookingUnitOfWork.BookingContractRepository.AddAsync(new BookingContracts()
         {
             BookingId = booking.Id,
-            Content = "Clean at " + booking.Location
+            Content = createBookingDto.ContractContent
         });
+
+        var paymentLink = await _paymentService.CreatePaymentLink(booking);
 
         booking.HelperId = await AssignHelperToBooking(booking);
         
@@ -83,6 +91,7 @@ public class BookingService : IBookingService
         
         await _bookingUnitOfWork.SaveChangesAsync();
         
+        return paymentLink;
     }
 
     public async Task UpdateBooking(Guid id, UpdateBookingRequestDto updateBookingDto)

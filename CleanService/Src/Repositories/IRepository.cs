@@ -12,7 +12,7 @@ public interface IRepository<TEntity, in TPartialEntity> where TEntity : class w
         Expression<Func<TEntity, object>>? order = null,bool isDescending = false, int? page = null, int? limit = null,
         FindOptions? findOptions = null);
 
-    Task AddAsync(TEntity entity);
+    Task<TEntity> AddAsync(TEntity entity);
 
     Task AddManyAsync(IEnumerable<TEntity> entities);
 

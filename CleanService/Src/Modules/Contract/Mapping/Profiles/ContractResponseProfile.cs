@@ -8,7 +8,7 @@ public class ContractResponseProfile : Profile
 {
     public ContractResponseProfile()
     {
-        CreateMap<Contracts, ContractResponseDto>()
+        CreateMap<BookingContracts, ContractResponseDto>()
             .ConstructUsing(entity => new ContractResponseDto
             {
                 Id = entity.Id,
