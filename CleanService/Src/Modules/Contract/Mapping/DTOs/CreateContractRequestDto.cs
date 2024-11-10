@@ -4,5 +4,5 @@ public class CreateContractRequestDto
 {
     public Guid BookingId { get; set; }
     
-    public string? Content { get; set; }
+    public string Content { get; set; } = null!;
 }

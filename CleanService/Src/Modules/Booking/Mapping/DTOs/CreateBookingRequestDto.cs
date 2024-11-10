@@ -10,7 +10,7 @@ public class CreateBookingRequestDto
     [Required]
     public string ServiceTypeId { get; set; } = null!;
 
-    public string? Location { get; set; }
+    public string Location { get; set; } = null!;
 
     [Required] 
     public DateTime ScheduledStartTime { get; set; }
@@ -22,6 +22,8 @@ public class CreateBookingRequestDto
     public string? PaymentMethod { get; set; }
     
     public CreateBookingDetails BookingDetails { get; set; } = null!;
+    
+    public string ContractContent { get; set; } = null!;
 }
 
 public class CreateBookingDetails

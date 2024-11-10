@@ -1,5 +1,6 @@
 using CleanService.Src.Models;
 using CleanService.Src.Repositories.Booking;
+using CleanService.Src.Repositories.BookingContract;
 using CleanService.Src.Repositories.Contract;
 using CleanService.Src.Repositories.DurationPrices;
 using CleanService.Src.Repositories.RoomPricings;
@@ -22,11 +23,11 @@ public class BookingUnitOfWork : IBookingUnitOfWork
 
     public IRoomPricingRepository RoomPricingRepository { get; }
 
-    public IContractRepository ContractRepository { get; }
+    public IBookingContractRepository BookingContractRepository { get; }
 
     public BookingUnitOfWork(CleanServiceContext dbContext, IBookingRepository bookingRepository, IUserRepository userRepository, IServiceTypeRepository serviceTypeRepository,
         IDurationPriceRepository durationPriceRepository, IRoomPricingRepository roomPricingRepository,
-        IContractRepository contractRepository)
+        IBookingContractRepository bookingContractRepository)
     {
         _dbContext = dbContext;
         BookingRepository = bookingRepository;
@@ -34,7 +35,7 @@ public class BookingUnitOfWork : IBookingUnitOfWork
         ServiceTypeRepository = serviceTypeRepository;
         DurationPriceRepository = durationPriceRepository;
         RoomPricingRepository = roomPricingRepository;
-        ContractRepository = contractRepository;
+        BookingContractRepository = bookingContractRepository;
     }
 
     public async Task SaveChangesAsync()
