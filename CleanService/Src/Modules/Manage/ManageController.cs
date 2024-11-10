@@ -58,8 +58,8 @@ public class ManageController : Controller
         });
     }
     
-    [HttpGet("complaints")]
-    public async Task<ActionResult<Pagination<ComplaintResponseDto>>> GetComplaints(ComplaintStatus? status ,int? page, int? limit)
+    [HttpGet("refunds")]
+    public async Task<ActionResult<Pagination<RefundResponseDto>>> GetRefunds(RefundStatus? status ,int? page, int? limit)
     {
         if (page < 1 || limit < 1)
         {
@@ -67,38 +67,38 @@ public class ManageController : Controller
                 ExceptionConvention.ValidationFailed);
         }
         
-        var complaints = await _manageService.GetComplaints(status,page, limit);
+        var complaints = await _manageService.GetRefunds(status,page, limit);
         
         return Ok(new SuccessResponse
         {
             StatusCode = HttpStatusCode.OK,
-            Message = "Get complaints successfully",
+            Message = "Get refunds successfully",
             Data = complaints
         });
     }
     
-    [HttpPatch("complaints/{id}")]
+    [HttpPatch("refunds/{id}")]
     [ModelValidation]
-    public async Task<IActionResult> UpdateComplaint(Guid id,[FromBody] UpdateComplaintRequestDto updateComplaintRequestDto)
+    public async Task<IActionResult> UpdateRefund(Guid id,[FromBody] UpdateRefundRequestDto updateRefundRequestDto)
     {
-        await _manageService.UpdateComplaint(id, updateComplaintRequestDto);
+        await _manageService.UpdateRefund(id, updateRefundRequestDto);
         
         return Ok(new SuccessResponse
         {
             StatusCode = HttpStatusCode.OK,
-            Message = "Update complaint successfully"
+            Message = "Update refund successfully"
         });
     }
     
-    [HttpDelete("complaints/{id}")]
-    public async Task<IActionResult> DeleteComplaint(Guid id)
+    [HttpDelete("refunds/{id}")]
+    public async Task<IActionResult> DeleteRefund(Guid id)
     {
-        await _manageService.DeleteComplaint(id);
+        await _manageService.DeleteRefund(id);
         
         return Ok(new SuccessResponse
         {
             StatusCode = HttpStatusCode.OK,
-            Message = "Delete complaint successfully"
+            Message = "Delete refund successfully"
         });
     }
     

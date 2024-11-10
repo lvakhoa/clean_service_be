@@ -30,7 +30,7 @@ public class DurationPrice
 
 public class PartialDurationPrice
 {
-    public Guid? Id { get; set; }
+    //public Guid? Id { get; set; }
     
     public Guid? ServiceTypeId { get; set; }
     

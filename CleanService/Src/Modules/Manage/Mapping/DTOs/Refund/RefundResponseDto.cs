@@ -1,15 +1,15 @@
 namespace CleanService.Src.Modules.Manage.Mapping.DTOs;
 
-public class ComplaintResponseDto
+public class RefundResponseDto
 {
     public string Id { get; set; } = null!;
     
-    public string ReportedUserId { get; set; } = null!;
-    public string ReportedUserName { get; set; } = null!;
+    public string? HelperId { get; set; } 
+    public string? HelperName { get; set; } 
     
-    public string ReporterId { get; set; } = null!;
+    public string CustomerId { get; set; } = null!;
     
-    public string ReporterUserName { get; set; } = null!;
+    public string CustomerName { get; set; } = null!;
     public string Reason { get; set; } = null!;
     
     public string Status { get; set; } = null!;

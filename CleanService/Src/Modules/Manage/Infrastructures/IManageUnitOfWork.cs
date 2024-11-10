@@ -1,9 +1,9 @@
 
 using CleanService.Src.Repositories.Booking;
-using CleanService.Src.Repositories.Complaint;
 using CleanService.Src.Repositories.Contract;
 using CleanService.Src.Repositories.DurationPrices;
 using CleanService.Src.Repositories.Helper;
+using CleanService.Src.Repositories.Refund;
 using CleanService.Src.Repositories.RoomPricings;
 using CleanService.Src.Repositories.ServiceType;
 using CleanService.Src.Repositories.User;
@@ -18,7 +18,7 @@ public interface IManageUnitOfWork
     
     IHelperRepository HelperRepository { get; }
     
-    IComplaintRepository ComplaintRepository { get; }
+    IRefundRepository RefundRepository { get; }
     
     IServiceTypeRepository ServiceTypeRepository { get; }
     

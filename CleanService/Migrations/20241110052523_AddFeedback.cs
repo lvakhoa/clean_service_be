@@ -6,12 +6,28 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CleanService.Migrations
 {
     /// <inheritdoc />
-    public partial class ExpandDatabase : Migration
+    public partial class AddFeedback : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.AlterDatabase()
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "Contracts",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Description = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 11, 10, 12, 25, 22, 726, DateTimeKind.Local).AddTicks(5731)),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 11, 10, 12, 25, 22, 726, DateTimeKind.Local).AddTicks(6687))
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Contracts", x => x.Id);
+                })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
@@ -23,7 +39,7 @@ namespace CleanService.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Description = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 10, 30, 1, 34, 24, 433, DateTimeKind.Local).AddTicks(8896)),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 11, 10, 12, 25, 22, 723, DateTimeKind.Local).AddTicks(9564)),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: true)
                 },
                 constraints: table =>
@@ -46,19 +62,20 @@ namespace CleanService.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     FullName = table.Column<string>(type: "varchar(150)", maxLength: 150, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    DateOfBirth = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    DateOfBirth = table.Column<DateTime>(type: "datetime(6)", nullable: true),
                     IdentityCard = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Address = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    PhoneNumber = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
+                    PhoneNumber = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Email = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 10, 30, 1, 34, 24, 433, DateTimeKind.Local).AddTicks(2906)),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 10, 30, 1, 34, 24, 433, DateTimeKind.Local).AddTicks(3579)),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 11, 10, 12, 25, 22, 722, DateTimeKind.Local).AddTicks(2158)),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 11, 10, 12, 25, 22, 722, DateTimeKind.Local).AddTicks(3433)),
                     Status = table.Column<string>(type: "varchar(24)", nullable: false, defaultValue: "Active")
                         .Annotation("MySql:CharSet", "utf8mb4"),
+                    NumberOfViolation = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     NotificationToken = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
@@ -79,7 +96,7 @@ namespace CleanService.Migrations
                     Description = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     BasePrice = table.Column<decimal>(type: "decimal(65,30)", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 10, 30, 1, 34, 24, 433, DateTimeKind.Local).AddTicks(9897)),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 11, 10, 12, 25, 22, 724, DateTimeKind.Local).AddTicks(1964)),
                     IsActive = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: true)
                 },
                 constraints: table =>
@@ -103,7 +120,7 @@ namespace CleanService.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Reason = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    BlacklistedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 10, 30, 1, 34, 24, 435, DateTimeKind.Local).AddTicks(1825)),
+                    BlacklistedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 11, 10, 12, 25, 22, 727, DateTimeKind.Local).AddTicks(1853)),
                     BlacklistedBy = table.Column<string>(type: "varchar(255)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     IsPermanent = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false),
@@ -143,8 +160,8 @@ namespace CleanService.Migrations
                     AverageRating = table.Column<decimal>(type: "decimal(2,1)", precision: 2, scale: 1, nullable: false, defaultValue: 0m),
                     CompletedJobs = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     CancelledJobs = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 10, 30, 1, 34, 24, 433, DateTimeKind.Local).AddTicks(6441)),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 10, 30, 1, 34, 24, 433, DateTimeKind.Local).AddTicks(7070))
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 11, 10, 12, 25, 22, 723, DateTimeKind.Local).AddTicks(287)),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 11, 10, 12, 25, 22, 723, DateTimeKind.Local).AddTicks(1576))
                 },
                 constraints: table =>
                 {
@@ -172,7 +189,7 @@ namespace CleanService.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Type = table.Column<string>(type: "varchar(24)", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 10, 30, 1, 34, 24, 435, DateTimeKind.Local).AddTicks(3017)),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 11, 10, 12, 25, 22, 727, DateTimeKind.Local).AddTicks(4368)),
                     ReferenceId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
                     IsRead = table.Column<bool>(type: "tinyint(1)", nullable: false, defaultValue: false)
                 },
@@ -189,60 +206,6 @@ namespace CleanService.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Bookings",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    CustomerId = table.Column<string>(type: "varchar(255)", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    HelperId = table.Column<string>(type: "varchar(255)", nullable: true, comment: "Can be NULL if not assigned yet")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ServiceTypeId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    Location = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    ScheduledStartTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    ScheduledEndTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
-                    Status = table.Column<string>(type: "varchar(24)", nullable: false, defaultValue: "Pending")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CancellationReason = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    TotalPrice = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
-                    PaymentStatus = table.Column<string>(type: "varchar(24)", nullable: false, defaultValue: "Pending")
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    PaymentMethod = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    HelperRating = table.Column<decimal>(type: "decimal(2,1)", precision: 2, scale: 1, nullable: true),
-                    CustomerFeedback = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    HelperFeedback = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 10, 30, 1, 34, 24, 434, DateTimeKind.Local).AddTicks(4734)),
-                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 10, 30, 1, 34, 24, 434, DateTimeKind.Local).AddTicks(5455))
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Bookings", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Bookings_ServiceTypes_ServiceTypeId",
-                        column: x => x.ServiceTypeId,
-                        principalTable: "ServiceTypes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Bookings_Users_CustomerId",
-                        column: x => x.CustomerId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Bookings_Users_HelperId",
-                        column: x => x.HelperId,
-                        principalTable: "Users",
-                        principalColumn: "Id");
-                })
-                .Annotation("MySql:CharSet", "utf8mb4");
-
-            migrationBuilder.CreateTable(
                 name: "DurationPrice",
                 columns: table => new
                 {
@@ -250,7 +213,7 @@ namespace CleanService.Migrations
                     ServiceTypeId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     DurationHours = table.Column<int>(type: "int", nullable: false),
                     PriceMultiplier = table.Column<decimal>(type: "decimal(3,2)", precision: 3, scale: 2, nullable: false, defaultValue: 1m),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 10, 30, 1, 34, 24, 434, DateTimeKind.Local).AddTicks(2146))
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 11, 10, 12, 25, 22, 724, DateTimeKind.Local).AddTicks(6456))
                 },
                 constraints: table =>
                 {
@@ -274,7 +237,7 @@ namespace CleanService.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     RoomCount = table.Column<int>(type: "int", nullable: false, comment: "0 represents studio"),
                     AdditionalPrice = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false, defaultValue: 0m),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 10, 30, 1, 34, 24, 434, DateTimeKind.Local).AddTicks(994))
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 11, 10, 12, 25, 22, 724, DateTimeKind.Local).AddTicks(4158))
                 },
                 constraints: table =>
                 {
@@ -289,18 +252,131 @@ namespace CleanService.Migrations
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
+                name: "Bookings",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    OrderId = table.Column<int>(type: "int", nullable: false),
+                    CustomerId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    HelperId = table.Column<string>(type: "varchar(255)", nullable: true, comment: "Can be NULL if not assigned yet")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ServiceTypeId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Location = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ScheduledStartTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    ScheduledEndTime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Status = table.Column<string>(type: "varchar(24)", nullable: false, defaultValue: "Pending")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CancellationReason = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    TotalPrice = table.Column<decimal>(type: "decimal(10,2)", precision: 10, scale: 2, nullable: false),
+                    PaymentStatus = table.Column<string>(type: "varchar(24)", nullable: false, defaultValue: "Pending")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    PaymentMethod = table.Column<string>(type: "varchar(50)", maxLength: 50, nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    HelperRating = table.Column<decimal>(type: "decimal(2,1)", precision: 2, scale: 1, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 11, 10, 12, 25, 22, 725, DateTimeKind.Local).AddTicks(2999)),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 11, 10, 12, 25, 22, 725, DateTimeKind.Local).AddTicks(4320))
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Bookings", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Bookings_Helpers_HelperId",
+                        column: x => x.HelperId,
+                        principalTable: "Helpers",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Bookings_ServiceTypes_ServiceTypeId",
+                        column: x => x.ServiceTypeId,
+                        principalTable: "ServiceTypes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_Bookings_Users_CustomerId",
+                        column: x => x.CustomerId,
+                        principalTable: "Users",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "HelperAvailability",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    HelperId = table.Column<string>(type: "varchar(255)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    StartDatetime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    EndDatetime = table.Column<DateTime>(type: "datetime(6)", nullable: false),
+                    Type = table.Column<string>(type: "varchar(24)", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    Status = table.Column<string>(type: "varchar(24)", nullable: false, defaultValue: "Pending")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    RequestReason = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    RejectionReason = table.Column<string>(type: "longtext", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    ApprovedBy = table.Column<string>(type: "varchar(255)", nullable: true)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 11, 10, 12, 25, 22, 723, DateTimeKind.Local).AddTicks(6885)),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 11, 10, 12, 25, 22, 723, DateTimeKind.Local).AddTicks(8113))
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_HelperAvailability", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_HelperAvailability_Helpers_HelperId",
+                        column: x => x.HelperId,
+                        principalTable: "Helpers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_HelperAvailability_Users_ApprovedBy",
+                        column: x => x.ApprovedBy,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
+                name: "BookingContracts",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    BookingId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    Content = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 11, 10, 12, 25, 22, 726, DateTimeKind.Local).AddTicks(4413))
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BookingContracts", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_BookingContracts_Bookings_BookingId",
+                        column: x => x.BookingId,
+                        principalTable: "Bookings",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                })
+                .Annotation("MySql:CharSet", "utf8mb4");
+
+            migrationBuilder.CreateTable(
                 name: "BookingDetails",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     BookingId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
+                    DurationPriceId = table.Column<Guid>(type: "char(36)", nullable: true, collation: "ascii_general_ci"),
                     BedroomCount = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     BathroomCount = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     KitchenCount = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     LivingRoomCount = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
                     SpecialRequirements = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 10, 30, 1, 34, 24, 434, DateTimeKind.Local).AddTicks(8147))
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 11, 10, 12, 25, 22, 726, DateTimeKind.Local).AddTicks(466))
                 },
                 constraints: table =>
                 {
@@ -311,66 +387,57 @@ namespace CleanService.Migrations
                         principalTable: "Bookings",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BookingDetails_DurationPrice_DurationPriceId",
+                        column: x => x.DurationPriceId,
+                        principalTable: "DurationPrice",
+                        principalColumn: "Id");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Complaints",
+                name: "Feedbacks",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     BookingId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    ReportedById = table.Column<string>(type: "varchar(255)", nullable: false)
+                    Title = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    ReportedUserId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    Description = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Reason = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    Status = table.Column<int>(type: "int", nullable: false, defaultValue: 0),
-                    Resolution = table.Column<string>(type: "longtext", nullable: true)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 10, 30, 1, 34, 24, 435, DateTimeKind.Local).AddTicks(1151)),
-                    ResolvedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 11, 10, 12, 25, 22, 726, DateTimeKind.Local).AddTicks(7635)),
+                    UpdatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 11, 10, 12, 25, 22, 726, DateTimeKind.Local).AddTicks(8687))
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Complaints", x => x.Id);
+                    table.PrimaryKey("PK_Feedbacks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Complaints_Bookings_BookingId",
+                        name: "FK_Feedbacks_Bookings_BookingId",
                         column: x => x.BookingId,
                         principalTable: "Bookings",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Complaints_Users_ReportedById",
-                        column: x => x.ReportedById,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Complaints_Users_ReportedUserId",
-                        column: x => x.ReportedUserId,
-                        principalTable: "Users",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
             migrationBuilder.CreateTable(
-                name: "Contracts",
+                name: "Refunds",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
                     BookingId = table.Column<Guid>(type: "char(36)", nullable: false, collation: "ascii_general_ci"),
-                    Content = table.Column<string>(type: "longtext", nullable: true)
+                    Reason = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 10, 30, 1, 34, 24, 434, DateTimeKind.Local).AddTicks(9801))
+                    Status = table.Column<string>(type: "varchar(24)", nullable: false, defaultValue: "Pending")
+                        .Annotation("MySql:CharSet", "utf8mb4"),
+                    CreatedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false, defaultValue: new DateTime(2024, 11, 10, 12, 25, 22, 726, DateTimeKind.Local).AddTicks(9740)),
+                    ResolvedAt = table.Column<DateTime>(type: "datetime(6)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Contracts", x => x.Id);
+                    table.PrimaryKey("PK_Refunds", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Contracts_Bookings_BookingId",
+                        name: "FK_Refunds_Bookings_BookingId",
                         column: x => x.BookingId,
                         principalTable: "Bookings",
                         principalColumn: "Id",
@@ -390,10 +457,21 @@ namespace CleanService.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_BookingContracts_BookingId",
+                table: "BookingContracts",
+                column: "BookingId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_BookingDetails_BookingId",
                 table: "BookingDetails",
                 column: "BookingId",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BookingDetails_DurationPriceId",
+                table: "BookingDetails",
+                column: "DurationPriceId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Bookings_CustomerId",
@@ -406,30 +484,15 @@ namespace CleanService.Migrations
                 column: "HelperId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Bookings_OrderId",
+                table: "Bookings",
+                column: "OrderId",
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Bookings_ServiceTypeId",
                 table: "Bookings",
                 column: "ServiceTypeId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Complaints_BookingId",
-                table: "Complaints",
-                column: "BookingId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Complaints_ReportedById",
-                table: "Complaints",
-                column: "ReportedById");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Complaints_ReportedUserId",
-                table: "Complaints",
-                column: "ReportedUserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Contracts_BookingId",
-                table: "Contracts",
-                column: "BookingId",
-                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_DurationPrice_ServiceTypeId_DurationHours",
@@ -438,9 +501,34 @@ namespace CleanService.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
+                name: "IX_Feedbacks_BookingId",
+                table: "Feedbacks",
+                column: "BookingId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_HelperAvailability_ApprovedBy",
+                table: "HelperAvailability",
+                column: "ApprovedBy");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_HelperAvailability_HelperId_StartDatetime_EndDatetime",
+                table: "HelperAvailability",
+                columns: new[] { "HelperId", "StartDatetime", "EndDatetime" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_HelperAvailability_Status",
+                table: "HelperAvailability",
+                column: "Status");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Notifications_UserId",
                 table: "Notifications",
                 column: "UserId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Refunds_BookingId",
+                table: "Refunds",
+                column: "BookingId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_RoomPricing_ServiceTypeId_RoomType_RoomCount",
@@ -479,28 +567,37 @@ namespace CleanService.Migrations
                 name: "BlacklistedUsers");
 
             migrationBuilder.DropTable(
-                name: "BookingDetails");
+                name: "BookingContracts");
 
             migrationBuilder.DropTable(
-                name: "Complaints");
+                name: "BookingDetails");
 
             migrationBuilder.DropTable(
                 name: "Contracts");
 
             migrationBuilder.DropTable(
-                name: "DurationPrice");
+                name: "Feedbacks");
 
             migrationBuilder.DropTable(
-                name: "Helpers");
+                name: "HelperAvailability");
 
             migrationBuilder.DropTable(
                 name: "Notifications");
 
             migrationBuilder.DropTable(
+                name: "Refunds");
+
+            migrationBuilder.DropTable(
                 name: "RoomPricing");
 
             migrationBuilder.DropTable(
+                name: "DurationPrice");
+
+            migrationBuilder.DropTable(
                 name: "Bookings");
+
+            migrationBuilder.DropTable(
+                name: "Helpers");
 
             migrationBuilder.DropTable(
                 name: "ServiceTypes");

@@ -41,7 +41,7 @@ public class ServiceTypes
 
 public class PartialServiceTypes
 {
-    public Guid? Id { get; set; }
+    //public Guid? Id { get; set; }
     
     public Guid? CategoryId { get; set; }
     

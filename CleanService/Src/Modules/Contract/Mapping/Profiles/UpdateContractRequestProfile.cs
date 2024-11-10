@@ -8,10 +8,10 @@ public class UpdateContractRequestProfile : Profile
 {
     public UpdateContractRequestProfile()
     {
-        CreateMap<UpdateContractRequestDto, PartialContracts>()
-            .ConstructUsing(dto => new PartialContracts
+        CreateMap<UpdateContractRequestDto, PartialBookingContracts>()
+            .ConstructUsing(dto => new PartialBookingContracts
             {
-                Id = Guid.Parse(dto.Id),
+                //Id = Guid.Parse(dto.Id),
                 BookingId = dto.BookingId != null ? Guid.Parse(dto.BookingId) : null,
                 Content = dto.Content
             });

@@ -24,8 +24,6 @@ public class BookingResponseProfile : Profile
                     PaymentStatus = entity.PaymentStatus.ToString(),
                     PaymentMethod = entity.PaymentMethod,
                     HelperRating = entity.HelperRating,
-                    CustomerFeedback = entity.CustomerFeedback,
-                    HelperFeedback = entity.HelperFeedback,
                     CreatedAt = entity.CreatedAt,
                     UpdatedAt = entity.UpdatedAt,
                 }
@@ -42,6 +40,17 @@ public class BookingResponseProfile : Profile
                 Email = entity.Email,
                 CreatedAt = entity.CreatedAt,
                 UpdatedAt = entity.UpdatedAt
+            });
+        CreateMap<Helpers, HelperBookingResponse>()
+            .ConstructUsing(entity => new HelperBookingResponse
+            {
+                Id = entity.Id,
+                ExperienceDescription = entity.ExperienceDescription,
+                ServicesOffered = entity.ServicesOffered != null
+                    ? entity.ServicesOffered.Select(s => s.ToString()).ToArray()
+                    : null,
+                HourlyRate = entity.HourlyRate,
+                AverageRating = entity.AverageRating
             });
         CreateMap<ServiceTypes, ServiceTypeBookingResponse>()
             .ConstructUsing(entity => new ServiceTypeBookingResponse
@@ -65,6 +74,26 @@ public class BookingResponseProfile : Profile
                 LivingRoomCount = entity.LivingRoomCount,
                 SpecialRequirements = entity.SpecialRequirements,
                 CreatedAt = entity.CreatedAt
+            });
+        CreateMap<Feedbacks, FeedbackResponse>()
+            .ConstructUsing(entity => new FeedbackResponse
+            {
+                Id = entity.Id.ToString(),
+                BookingId = entity.BookingId.ToString(),
+                Title = entity.Title,
+                Description = entity.Description,
+                CreatedAt = entity.CreatedAt,
+                UpdatedAt = entity.UpdatedAt
+            });
+        CreateMap<Refunds, RefundResponse>()
+            .ConstructUsing(entity => new RefundResponse
+            {
+                Id = entity.Id.ToString(),
+                BookingId = entity.BookingId.ToString(),
+                Reason = entity.Reason,
+                Status = entity.Status.ToString(),
+                CreatedAt = entity.CreatedAt,
+                ResolvedAt = entity.ResolvedAt
             });
     }
 }

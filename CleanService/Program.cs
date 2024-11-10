@@ -1,5 +1,6 @@
 using System.Net;
 using System.Security.Claims;
+using System.Text.Json.Serialization;
 using CleanService.Src.Constant;
 using CleanService.Src.Filters;
 using CleanService.Src.Middlewares;
@@ -61,7 +62,10 @@ builder.Services
     .AddAppDependency(builder.Configuration);
 
 builder.Services
-    .AddControllers();
+    .AddControllers()
+    .AddJsonOptions(x =>
+        x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+;
 builder.Services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });
 
 var app = builder.Build();

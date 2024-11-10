@@ -27,7 +27,7 @@ public class ManageService : IManageService
         Expression<Func<Helpers, bool>> predicate = entity => entity.User.Status == userStatus;
         
         var helpers = _manageUnitOfWork.HelperRepository.Find(predicate,
-            order: entity => entity.User.FullName, page, limit,
+            order: entity => entity.User.FullName,false, page, limit,
             new FindOptions
             {
                 IsAsNoTracking = true
@@ -49,54 +49,54 @@ public class ManageService : IManageService
         throw new NotImplementedException();
     }
 
-    public Task<Pagination<ComplaintResponseDto>> GetComplaints(ComplaintStatus? status,int? page, int? limit)
+    public Task<Pagination<RefundResponseDto>> GetRefunds(RefundStatus? status,int? page, int? limit)
     {
-        Expression<Func<Complaints, bool>> predicate = status != null? entity => entity.Status == status : entity => true;
+        Expression<Func<Refunds, bool>> predicate = status != null? entity => entity.Status == status : entity => true;
         
-        var complaints = _manageUnitOfWork.ComplaintRepository.Find(predicate,
-            order: entity => entity.CreatedAt,null, null,
+        var refunds = _manageUnitOfWork.RefundRepository.Find(predicate,
+            order: entity => entity.CreatedAt,false,null, null,
             new FindOptions
             {
                 IsAsNoTracking = true
             });
         
-        var totalComplaints = complaints.ToList().Count;
-        var complaintDto = _mapper.Map<ComplaintResponseDto[]>(complaints.ToList());
+        var totalRefunds = refunds.ToList().Count;
+        var refundDto = _mapper.Map<RefundResponseDto[]>(refunds.ToList());
         
         var currentPage = page ?? 1;
-        var currentLimit = limit ?? totalComplaints;
+        var currentLimit = limit ?? totalRefunds;
         
-        return Task.FromResult(new Pagination<ComplaintResponseDto>(complaintDto, totalComplaints, currentPage, currentLimit));
+        return Task.FromResult(new Pagination<RefundResponseDto>(refundDto, totalRefunds, currentPage, currentLimit));
     }
 
-    public async Task UpdateComplaint(Guid id, UpdateComplaintRequestDto updateComplaintRequestDto)
+    public async Task UpdateRefund(Guid id, UpdateRefundRequestDto updateRefundRequestDto)
     {
-        var complaint = await _manageUnitOfWork.ComplaintRepository.FindOneAsync(entity => entity.Id == id, new FindOptions
+        var refund = await _manageUnitOfWork.RefundRepository.FindOneAsync(entity => entity.Id == id, new FindOptions
         {
             IsAsNoTracking = true,
             IsIgnoreAutoIncludes = true
         });
-        if (complaint == null)
-            throw new KeyNotFoundException("Complaint not found");
-        _manageUnitOfWork.ComplaintRepository.Detach(complaint);
+        if (refund == null)
+            throw new KeyNotFoundException("Refund not found");
+        _manageUnitOfWork.RefundRepository.Detach(refund);
         
-        var complaintEntity = _mapper.Map<PartialComplaints>(updateComplaintRequestDto);
+        var refundEntity = _mapper.Map<PartialRefunds>(updateRefundRequestDto);
         
-        _manageUnitOfWork.ComplaintRepository.Update(complaintEntity, complaint);
+        _manageUnitOfWork.RefundRepository.Update(refundEntity, refund);
         
         await _manageUnitOfWork.SaveChangesAsync();
     }
 
-    public async Task DeleteComplaint(Guid id)
+    public async Task DeleteRefund(Guid id)
     {
-        var complaint = await _manageUnitOfWork.ComplaintRepository.FindOneAsync(entity => entity.Id == id);
+        var refund = await _manageUnitOfWork.RefundRepository.FindOneAsync(entity => entity.Id == id);
 
-        if (complaint == null)
+        if (refund == null)
         {
-            throw new KeyNotFoundException("Complaint not found");
+            throw new KeyNotFoundException("Refund not found");
         }
         
-        _manageUnitOfWork.ComplaintRepository.Delete(complaint);
+        _manageUnitOfWork.RefundRepository.Delete(refund);
         
         await _manageUnitOfWork.SaveChangesAsync();
     }
@@ -110,16 +110,12 @@ public class ManageService : IManageService
     {
         var roomPricings = _manageUnitOfWork.RoomPricingRepository.Find(
             entity => true,
-            entity => entity.CreatedAt,
+            entity => entity.CreatedAt,false,
             null,
             null,
             new FindOptions
             {
                 IsAsNoTracking = true,
-                Includes = new Expression<Func<RoomPricing, object>>[]
-                {
-                    x => x.ServiceType
-                }
             });
     
         var totalRoomPricings = roomPricings.ToList().Count;

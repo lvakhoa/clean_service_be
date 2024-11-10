@@ -36,11 +36,17 @@ public class Helpers
     public DateTime UpdatedAt { get; set; }
     
     public virtual Users User { get; set; } = null!;
+
+    public virtual ICollection<HelperAvailability> ListHelperAvailability { get; set; } =
+        new List<HelperAvailability>();
+    
+    [InverseProperty("Helper")]
+    public virtual ICollection<Bookings> HelperBookings { get; set; } = new List<Bookings>();
 }
 
 public class PartialHelper
 {
-    public string? Id { get; set; }
+    //public string? Id { get; set; }
     
     public string? ExperienceDescription { get; set; }
     

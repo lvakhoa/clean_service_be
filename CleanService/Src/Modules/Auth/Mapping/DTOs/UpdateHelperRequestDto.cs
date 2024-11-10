@@ -5,7 +5,7 @@ namespace CleanService.Src.Modules.Auth.Mapping.DTOs;
 
 public class UpdateHelperRequestDto
 {
-    public string Id { get; set; } = null!;
+    //public string Id { get; set; } = null!;
     
     public string? ExperienceDescription { get; set; }
 

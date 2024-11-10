@@ -42,29 +42,25 @@ public class Users
     [Column(TypeName = "varchar(24)")]
     public UserStatus Status { get; set; }
 
+    public int NumberOfViolation { get; set; }
+
     public string? NotificationToken { get; set; }
 
     public virtual Helpers? Helper { get; set; }
 
     [InverseProperty("Customer")]
     public virtual ICollection<Bookings> CustomerBookings { get; set; } = new List<Bookings>();
-
-    [InverseProperty("Helper")]
-    public virtual ICollection<Bookings> HelperBookings { get; set; } = new List<Bookings>();
-
+    
     public virtual ICollection<Notifications> Notifications { get; set; } = new List<Notifications>();
-
-    [InverseProperty("ReportedBy")]
-    public virtual ICollection<Complaints> CreatedComplaints { get; set; } = new List<Complaints>();
-
-    [InverseProperty("ReportedUser")]
-    public virtual ICollection<Complaints> ReceivedComplaints { get; set; } = new List<Complaints>();
 
     [InverseProperty("User")]
     public virtual ICollection<BlacklistedUsers> BlacklistedUsers { get; set; } = new List<BlacklistedUsers>();
 
     [InverseProperty("BlacklistedByUser")]
     public virtual ICollection<BlacklistedUsers> BlacklistedByUsers { get; set; } = new List<BlacklistedUsers>();
+
+    public virtual ICollection<HelperAvailability> ListApprovedAvailability { get; set; } =
+        new List<HelperAvailability>();
 }
 
 public enum UserType
@@ -90,7 +86,7 @@ public enum Gender
 
 public class PartialUsers
 {
-    public string? Id { get; set; }
+    //public string? Id { get; set; }
 
     public UserType? UserType { get; set; }
 
@@ -107,9 +103,9 @@ public class PartialUsers
     public string? Address { get; set; }
 
     // [RegularExpression("/(84|0[3|5|7|8|9])+([0-9]{8})\b/g", ErrorMessage = "Invalid phone number")]
-    public string? PhoneNumber { get; set; } 
+    public string? PhoneNumber { get; set; }
 
-    [EmailAddress] public string? Email { get; set; } 
+    [EmailAddress] public string? Email { get; set; }
 
     public DateTime? CreatedAt { get; set; }
 

@@ -16,9 +16,10 @@ public class Repository<TEntity, TPartialEntity> : IRepository<TEntity, TPartial
         _dbSet = dbContext.Set<TEntity>();
     }
 
-    public async Task AddAsync(TEntity entity)
+    public async Task<TEntity> AddAsync(TEntity entity)
     {
-        await _dbSet.AddAsync(entity);
+        var result = await _dbSet.AddAsync(entity);
+        return result.Entity;
     }
 
     public async Task AddManyAsync(IEnumerable<TEntity> entities)
@@ -43,13 +44,15 @@ public class Repository<TEntity, TPartialEntity> : IRepository<TEntity, TPartial
     }
 
     public IQueryable<TEntity> Find(Expression<Func<TEntity, bool>> predicate,
-        Expression<Func<TEntity, object>>? order = null, int? page = null, int? limit = null,
+        Expression<Func<TEntity, object>>? order = null,
+        bool isDescending = false, 
+        int? page = null, int? limit = null,
         FindOptions? findOptions = null)
     {
         var entity = Get(findOptions).Where(predicate);
         if (order is not null)
         {
-            entity = entity.OrderBy(order);
+            entity = isDescending ? entity.OrderByDescending(order) : entity.OrderBy(order);
         }
 
         if (page is not null && limit is not null)

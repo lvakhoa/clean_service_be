@@ -2,6 +2,7 @@ using AutoMapper;
 using CleanService.Src.Models;
 using CleanService.Src.Modules.Booking.Infrastructures;
 using CleanService.Src.Modules.Booking.Mapping.DTOs;
+using CleanService.Src.Modules.Payment.Services;
 using CleanService.Src.Repositories;
 using Pagination.EntityFrameworkCore.Extensions;
 
@@ -10,15 +11,17 @@ namespace CleanService.Src.Modules.Booking.Services;
 public class BookingService : IBookingService
 {
     private readonly IBookingUnitOfWork _bookingUnitOfWork;
+    private readonly IPaymentService _paymentService;
     private readonly IMapper _mapper;
 
-    public BookingService(IBookingUnitOfWork bookingUnitOfWork, IMapper mapper)
+    public BookingService(IBookingUnitOfWork bookingUnitOfWork, IPaymentService paymentService, IMapper mapper)
     {
         _bookingUnitOfWork = bookingUnitOfWork;
+        _paymentService = paymentService;
         _mapper = mapper;
     }
 
-    public async Task CreateBooking(CreateBookingRequestDto createBookingDto)
+    public async Task<string> CreateBooking(CreateBookingRequestDto createBookingDto)
     {
         var booking = _mapper.Map<Bookings>(createBookingDto);
         
@@ -61,13 +64,18 @@ public class BookingService : IBookingService
                          basePrice * durationPricing;
         booking.TotalPrice = totalPrice;
 
+        var totalBookings = await _bookingUnitOfWork.BookingRepository.CountAsync();
+        booking.OrderId = totalBookings + 1000;
+
         await _bookingUnitOfWork.BookingRepository.AddAsync(booking);
 
-        await _bookingUnitOfWork.ContractRepository.AddAsync(new Contracts()
+        await _bookingUnitOfWork.BookingContractRepository.AddAsync(new BookingContracts()
         {
             BookingId = booking.Id,
-            Content = "Clean at " + booking.Location
+            Content = createBookingDto.ContractContent
         });
+
+        var paymentLink = await _paymentService.CreatePaymentLink(booking);
 
         booking.HelperId = await AssignHelperToBooking(booking);
         
@@ -83,6 +91,7 @@ public class BookingService : IBookingService
         
         await _bookingUnitOfWork.SaveChangesAsync();
         
+        return paymentLink;
     }
 
     public async Task UpdateBooking(Guid id, UpdateBookingRequestDto updateBookingDto)
@@ -147,18 +156,25 @@ public class BookingService : IBookingService
         {
             // Get the list of bookings for the current helper
             var helperBookings = await _bookingUnitOfWork.BookingRepository.GetBookingByUserId(relevantStatuses, helper.Id, UserType.Helper);
-            var jobCount = helperBookings.Count(x => x.Status == BookingStatus.Completed || x.Status == BookingStatus.Confirmed || x.Status == BookingStatus.InProgress);
+            var jobCount = helperBookings.Count(x => x.Status is BookingStatus.Completed or BookingStatus.Confirmed or BookingStatus.InProgress);
 
             // Check if the helper is available during the requested time
-            bool isAvailable = helperBookings.All(x =>
-                x.Status != BookingStatus.Confirmed ||
+            var isAvailable = helperBookings.All(x =>
+                !relevantStatuses.Contains(x.Status) ||
                 x.ScheduledEndTime <= booking.ScheduledStartTime ||
                 x.ScheduledStartTime >= booking.ScheduledEndTime
             );
-
-            if (isAvailable)
+            
+            // Check the helper with the least job taken this month
+            if (!isAvailable) continue;
+            if (minJobTaken == null || jobCount < minJobTaken)
             {
-                minJobTaken = minJobTaken == null ? jobCount : Math.Min(minJobTaken.Value, jobCount);
+                minJobTaken = jobCount;
+                availableHelpers.Clear();
+                availableHelpers.Add(helper);
+            }
+            else if (jobCount == minJobTaken)
+            {
                 availableHelpers.Add(helper);
             }
         }
@@ -168,27 +184,16 @@ public class BookingService : IBookingService
 
         // Filter out helpers who do not offer the required service
         availableHelpers = availableHelpers
-            .Where(x => x.Helper.ServicesOffered != null && x.Helper.ServicesOffered.Contains(booking.ServiceTypeId))
+            .Where(x => x.Helper?.ServicesOffered != null && x.Helper.ServicesOffered.Contains(booking.ServiceTypeId))
             .ToList();
 
         if (!availableHelpers.Any()) return null;
 
         // Find the most suitable helpers with the least number of jobs taken
-        var mostSuitableHelpers = new List<Users>();
-        foreach (var helper in availableHelpers)
-        {
-            var helperBookings = await _bookingUnitOfWork.BookingRepository.GetBookingByUserId(relevantStatuses, helper.Id, UserType.Helper);
-            var jobCount = helperBookings.Count(x => x.Status == BookingStatus.Completed || x.Status == BookingStatus.Confirmed || x.Status == BookingStatus.InProgress);
-
-            if (jobCount == minJobTaken)
-            {
-                mostSuitableHelpers.Add(helper);
-            }
-        }
 
         // Randomly choose a helper from the most suitable helpers
         var random = new Random();
-        var selectedHelper = mostSuitableHelpers[random.Next(mostSuitableHelpers.Count)];
+        var selectedHelper = availableHelpers[random.Next(availableHelpers.Count)];
 
         return selectedHelper.Id;
     }

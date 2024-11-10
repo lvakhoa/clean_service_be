@@ -11,7 +11,7 @@ public class UpdateServiceTypeRequestProfile : Profile
         CreateMap<UpdateServiceTypeRequestDto, PartialServiceTypes>()
             .ConstructUsing((dto) => new PartialServiceTypes
             {
-                Id = Guid.Parse(dto.Id),
+                //Id = Guid.Parse(dto.Id),
                 CategoryId = dto.CategoryId != null ? Guid.Parse(dto.CategoryId) : null,
                 Name = dto.Name,
                 Description = dto.Description,

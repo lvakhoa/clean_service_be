@@ -43,7 +43,7 @@ public enum RoomType
 
 public class PartialRoomPricing
 {
-    public Guid? Id { get; set; }
+    //public Guid? Id { get; set; }
 
     public Guid? ServiceTypeId { get; set; }
 

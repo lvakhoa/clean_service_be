@@ -9,10 +9,10 @@ public interface IRepository<TEntity, in TPartialEntity> where TEntity : class w
     Task<TEntity?> FindOneAsync(Expression<Func<TEntity, bool>> predicate, FindOptions? findOptions = null);
 
     IQueryable<TEntity> Find(Expression<Func<TEntity, bool>> predicate,
-        Expression<Func<TEntity, object>>? order = null, int? page = null, int? limit = null,
+        Expression<Func<TEntity, object>>? order = null,bool isDescending = false, int? page = null, int? limit = null,
         FindOptions? findOptions = null);
 
-    Task AddAsync(TEntity entity);
+    Task<TEntity> AddAsync(TEntity entity);
 
     Task AddManyAsync(IEnumerable<TEntity> entities);
 

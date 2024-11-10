@@ -11,7 +11,7 @@ public class UpdateUserRequestProfile : Profile
         CreateMap<UpdateUserRequestDto, PartialUsers>()
             .ConstructUsing(dto => new PartialUsers
             {
-                Id = dto.Id,
+                //Id = dto.Id,
                 FullName = dto.FullName,
                 Gender = dto.Gender != null ? Enum.Parse<Gender>(dto.Gender) : null,
                 ProfilePicture = dto.ProfilePicture,

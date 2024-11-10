@@ -6,27 +6,18 @@ namespace CleanService.Src.Models;
 
 public class Contracts
 {
-    [Key]
-    public Guid Id { get; set; }
-    
-    [ForeignKey(nameof(Booking))]
-    [Required]
-    public Guid BookingId { get; set; }
-    
-    public string? Content { get; set; }
-    
+    [Key] public Guid Id { get; set; }
+
+    public string Description { get; set; } = null!;
+
     public DateTime CreatedAt { get; set; }
-    
-    public virtual Bookings Booking { get; set; } = null!;
+
+    public DateTime UpdatedAt { get; set; }
 }
 
 public class PartialContracts
 {
     public Guid? Id { get; set; }
-    
-    public Guid? BookingId { get; set; }
-    
-    public string? Content { get; set; }
-    
-    public DateTime? CreatedAt { get; set; }
+
+    public string? Description { get; set; }
 }

@@ -26,7 +26,7 @@ public class ServiceCategories
 
 public class PartialServiceCategories
 {
-    public Guid? Id { get; set; }
+    //public Guid? Id { get; set; }
     
     [MaxLength(50)]
     public string? Name { get; set; } = null!;

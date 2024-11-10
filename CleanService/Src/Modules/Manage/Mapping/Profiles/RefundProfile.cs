@@ -4,19 +4,19 @@ using CleanService.Src.Modules.Manage.Mapping.DTOs;
 
 namespace CleanService.Src.Modules.Manage.Mapping.Profiles;
 
-public class ComplaintProfile: Profile
+public class RefundProfile: Profile
 {
-    public ComplaintProfile()
+    public RefundProfile()
     {
         //For Response
-        CreateMap<Complaints, ComplaintResponseDto>()
-            .ConstructUsing(entity => new ComplaintResponseDto
+        CreateMap<Refunds, RefundResponseDto>()
+            .ConstructUsing(entity => new RefundResponseDto
             {
                 Id = entity.Id.ToString(),
-                ReportedUserId = entity.ReportedUser.Id,
-                ReportedUserName = entity.ReportedUser.FullName,
-                ReporterId = entity.ReportedBy.Id,
-                ReporterUserName = entity.ReportedBy.FullName,
+                HelperId = entity.Booking.HelperId,
+                HelperName = entity.Booking.Helper!.User.FullName,
+                CustomerId = entity.Booking.CustomerId,
+                CustomerName = entity.Booking.Customer.FullName,
                 Reason = entity.Reason,
                 Status = entity.Status.ToString(),
                 CreatedAt = entity.CreatedAt,
@@ -24,12 +24,12 @@ public class ComplaintProfile: Profile
             });
         
         //For Update
-        CreateMap<UpdateComplaintRequestDto, PartialComplaints>()
-            .ConstructUsing(entity => new PartialComplaints
+        CreateMap<UpdateRefundRequestDto, PartialRefunds>()
+            .ConstructUsing(entity => new PartialRefunds
             {
+                BookingId = Guid.Parse(entity.BookingId),
                 Status = entity.Status,
                 Reason = entity.Reason,
-                Resolution = entity.Resolution
             });
     }
 }
