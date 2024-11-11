@@ -221,6 +221,8 @@ public class BookingService : IBookingService
         return selectedHelper.Id;
     }
 
+    
+    //Refund service
     public async Task CreateRefund(CreateRefundRequestDto createRefundRequestDto)
     {
         if (createRefundRequestDto == null)
@@ -277,13 +279,18 @@ public class BookingService : IBookingService
     }
     
     
+    
+    //Feeback service
     public async Task CreateFeedback(CreateFeedbackDto createFeedbackDto)
     {
         if (createFeedbackDto == null)
         {
             throw new ArgumentNullException(nameof(createFeedbackDto), "Feedback data cannot be null.");
         }
-        var booking = await _bookingUnitOfWork.BookingRepository.FindOneAsync(entity => entity.Id == createFeedbackDto.BookingId);
+        var booking = await _bookingUnitOfWork.BookingRepository.FindOneAsync(entity => entity.Id == createFeedbackDto.BookingId, new FindOptions()
+        {
+            IsIgnoreAutoIncludes = true
+        });
         if(booking == null)
             throw new KeyNotFoundException("Booking not found");
         if(booking.Status != BookingStatus.Completed)
@@ -291,7 +298,17 @@ public class BookingService : IBookingService
         
         var feedback = _mapper.Map<Feedbacks>(createFeedbackDto);
         await _bookingUnitOfWork.FeedbackRepository.AddAsync(feedback);
+        await _bookingUnitOfWork.SaveChangesAsync();
         
+        //update booking rating
+        _bookingUnitOfWork.BookingRepository.Detach(booking);
+
+        var updateBooking = new PartialBookings()
+        {
+            HelperRating = createFeedbackDto.Rating,
+        };
+        _bookingUnitOfWork.BookingRepository.Update(updateBooking, booking);
+
         await _bookingUnitOfWork.SaveChangesAsync();
     }
     

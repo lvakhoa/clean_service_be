@@ -7,4 +7,6 @@ public class CreateFeedbackDto
     public string Title { get; set; } = null!;
     
     public string Description { get; set; } = null!;
+    
+    public int Rating { get; set; }
 }
