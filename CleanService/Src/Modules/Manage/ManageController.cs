@@ -50,7 +50,7 @@ public class ManageController : Controller
                 ExceptionConvention.ValidationFailed);
         }
         
-        var helpers = await _manageService.GetDetailHelper(page, limit);
+        var helpers = await _manageService.GetHelper(page, limit);
         
         return Ok(new SuccessResponse
         {

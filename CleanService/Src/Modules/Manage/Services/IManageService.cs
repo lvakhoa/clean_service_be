@@ -11,7 +11,7 @@ namespace  CleanService.Src.Modules.Manage.Services;
 
 public interface IManageService
 {
-    public Task<Pagination<HelperDetailResponseDto>> GetDetailHelper(int? page, int? limit, UserStatus? userStatus = UserStatus.Active);
+    public Task<Pagination<HelperDetailResponseDto>> GetHelper(int? page, int? limit, UserStatus? userStatus = UserStatus.Active);
     public Task<Pagination<FeedbackResponseDto>> GetFeedbacks(int? page, int? limit);
     public Task<Pagination<RefundResponseDto>> GetRefunds(RefundStatus? status,int? page, int? limit);
     public Task UpdateRefund(Guid id, UpdateRefundRequestDto updateRefundRequestDto);

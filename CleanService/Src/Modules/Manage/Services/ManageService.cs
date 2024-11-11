@@ -27,7 +27,7 @@ public class ManageService : IManageService
         _mapper = mapper;
     }
 
-    public Task<Pagination<HelperDetailResponseDto>> GetDetailHelper(int? page, int? limit, UserStatus? userStatus = UserStatus.Active)
+    public Task<Pagination<HelperDetailResponseDto>> GetHelper(int? page, int? limit, UserStatus? userStatus = UserStatus.Active)
     {
         Expression<Func<Helpers, bool>> predicate = entity => entity.User.Status == userStatus;
         
@@ -80,7 +80,7 @@ public class ManageService : IManageService
             });
         
         var totalRefunds = refunds.ToList().Count;
-        var refundDto = _mapper.Map<RefundResponseDto[]>(refunds.ToList());
+        var refundDto = _mapper.Map<RefundResponseDto[]>(refunds);
         
         var currentPage = page ?? 1;
         var currentLimit = limit ?? totalRefunds;

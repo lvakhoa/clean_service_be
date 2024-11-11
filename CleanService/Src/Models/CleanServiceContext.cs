@@ -86,6 +86,10 @@ public class CleanServiceContext : DbContext
             .HasOne(h => h.User)
             .WithOne(u => u.Helper)
             .HasForeignKey<Helpers>(h => h.Id);
+        
+        modelBuilder.Entity<Helpers>()
+            .Navigation(h => h.User)
+            .AutoInclude();
 
         // Helper Availability entity config
         modelBuilder.Entity<HelperAvailability>()
@@ -240,10 +244,10 @@ public class CleanServiceContext : DbContext
         modelBuilder.Entity<Refunds>()
             .Property(r => r.Status)
             .HasDefaultValue(RefundStatus.Pending);
-        
         modelBuilder.Entity<Refunds>()
             .Navigation(b => b.Booking)
             .AutoInclude();
+        
 
         // BlacklistedUsers entity config
         modelBuilder.Entity<BlacklistedUsers>()
