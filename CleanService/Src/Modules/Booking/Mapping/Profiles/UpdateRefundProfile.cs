@@ -4,19 +4,16 @@ using CleanService.Src.Modules.Booking.Mapping.DTOs;
 
 namespace CleanService.Src.Modules.Booking.Mapping.Profiles;
 
-public class UpdateComplaintProfile : Profile
+public class UpdateRefundProfile : Profile
 {
-    public UpdateComplaintProfile()
+    public UpdateRefundProfile()
     {
-        CreateMap<UpdateComplaintDto, PartialComplaints>()
-            .ConstructUsing(dto => new PartialComplaints
+        CreateMap<UpdateRefundRequestDto, PartialRefunds>()
+            .ConstructUsing(dto => new PartialRefunds()
             {
                 BookingId = dto.BookingId,
-                ReportedById = dto.ReportedById,
-                ReportedUserId = dto.ReportedUserId,
                 Reason = dto.Reason,
                 Status = dto.Status,
-                Resolution = dto.Resolution,
                 ResolvedAt = dto.ResolvedAt,
             });
     }

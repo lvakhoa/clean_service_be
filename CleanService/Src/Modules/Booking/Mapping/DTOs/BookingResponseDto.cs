@@ -145,5 +145,5 @@ public class RefundResponse
     
     public DateTime CreatedAt { get; set; }
     
-    public DateTime ResolvedAt { get; set; }
+    public DateTime? ResolvedAt { get; set; }
 }

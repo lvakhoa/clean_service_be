@@ -226,6 +226,10 @@ public class CleanServiceContext : DbContext
         
         // Refunds entity config
         modelBuilder.Entity<Refunds>()
+            .Navigation(b => b.Booking)
+            .AutoInclude();
+        
+        modelBuilder.Entity<Refunds>()
             .Property(r => r.CreatedAt)
             .HasDefaultValue(DateTime.Now);
         modelBuilder.Entity<Refunds>()

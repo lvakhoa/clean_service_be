@@ -129,21 +129,21 @@ public class BookingService : IBookingService
             currentLimit);
     }
 
-    public async Task<Pagination<ComplaintResponseDto>> GetAllComplaints(int? page, int? limit)
+    public async Task<Pagination<RefundResponseDto>> GetAllComplaints(int? page, int? limit)
     {
-        var complaints = _bookingUnitOfWork.ComplaintRepository.GetAll(page, limit,
+        var complaints = _bookingUnitOfWork.RefundRepository.GetAll(page, limit,
             new FindOptions()
             {
                 IsAsNoTracking = true
             });
-        var totalComplaints = await _bookingUnitOfWork.ComplaintRepository.CountAsync();
+        var totalComplaints = await _bookingUnitOfWork.RefundRepository.CountAsync();
         
-        var complaintDtos = _mapper.Map<ComplaintResponseDto[]>(complaints);
+        var complaintDtos = _mapper.Map<RefundResponseDto[]>(complaints);
         
         var currentPage = page ?? 1;
         var currentLimit = limit ?? totalComplaints;
         
-        return new Pagination<ComplaintResponseDto>(
+        return new Pagination<RefundResponseDto>(
             complaintDtos,
             totalComplaints,
             currentPage,
@@ -219,65 +219,59 @@ public class BookingService : IBookingService
         return selectedHelper.Id;
     }
 
-    public async Task CreateComplaint(CreateComplaintDto createComplaintDto)
+    public async Task CreateRefund(CreateRefundRequestDto createRefundRequestDto)
     {
-        if (createComplaintDto == null)
+        if (createRefundRequestDto == null)
         {
-            throw new ArgumentNullException(nameof(createComplaintDto), "Complaint data cannot be null.");
+            throw new ArgumentNullException(nameof(createRefundRequestDto), "Complaint data cannot be null.");
         }
-        var complaint = _mapper.Map<Complaints>(createComplaintDto);
+        var complaint = _mapper.Map<Refunds>(createRefundRequestDto);
         
-        var booking = await _bookingUnitOfWork.BookingRepository.FindOneAsync(entity => entity.Id == createComplaintDto.BookingId);
+        var booking = await _bookingUnitOfWork.BookingRepository.FindOneAsync(entity => entity.Id == createRefundRequestDto.BookingId);
         if(booking == null)
             throw new KeyNotFoundException("Booking not found");
-        var reportedBy = await _bookingUnitOfWork.UserRepository.FindOneAsync(entity => entity.Id == createComplaintDto.ReportedById);
-        if (reportedBy == null)
-            throw new KeyNotFoundException("Reported by not found");
-        var reportedUser = await _bookingUnitOfWork.UserRepository.FindOneAsync(entity => entity.Id == createComplaintDto.ReportedById);
-        if (reportedUser == null)
-            throw new KeyNotFoundException("Reported user not found");
         
-        await _bookingUnitOfWork.ComplaintRepository.AddAsync(complaint);
+        await _bookingUnitOfWork.RefundRepository.AddAsync(complaint);
             
         await _bookingUnitOfWork.SaveChangesAsync();
             
     }
     
-    public async Task UpdateComplaint(Guid id, UpdateComplaintDto updateComplaintDto)
+    public async Task UpdateRefund(Guid id, UpdateRefundRequestDto updateRefundRequestDto)
     {
-        var complaint = await _bookingUnitOfWork.ComplaintRepository.FindOneAsync(entity => entity.Id == id, new FindOptions
+        var complaint = await _bookingUnitOfWork.RefundRepository.FindOneAsync(entity => entity.Id == id, new FindOptions
         {
             IsIgnoreAutoIncludes = true
         });
         if(complaint == null)
-            throw new KeyNotFoundException("Complaint not found");
-        _bookingUnitOfWork.ComplaintRepository.Detach(complaint);
+            throw new KeyNotFoundException("Refund request not found");
+        _bookingUnitOfWork.RefundRepository.Detach(complaint);
         
-        var updateComplaint = _mapper.Map<PartialComplaints>(updateComplaintDto);
-        _bookingUnitOfWork.ComplaintRepository.Update(updateComplaint, complaint);
+        var updateComplaint = _mapper.Map<PartialRefunds>(updateRefundRequestDto);
+        _bookingUnitOfWork.RefundRepository.Update(updateComplaint, complaint);
         
         await _bookingUnitOfWork.SaveChangesAsync();
     }
 
-    public async Task<Pagination<ComplaintResponseDto>> GetComplaintByCustomerId(string id, int? page, int? limit)
+    public async Task<Pagination<RefundResponseDto>> GetComplaintByCustomerId(string id, int? page, int? limit)
     {
-        var complaints = _bookingUnitOfWork.ComplaintRepository.Find(
-            entity => id == entity.ReportedById,
-            x => x.CreatedAt,
-            true,
-            page,
-            limit,
+        var complaints = _bookingUnitOfWork.RefundRepository.Find(
+            entity => entity.Booking.CustomerId == id, 
+            x => x.CreatedAt,  
+            true,             
+            page,              
+            limit,             
             new FindOptions()
             {
-                IsIgnoreAutoIncludes = true
+                IsIgnoreAutoIncludes = true 
             });
         var totalCount = complaints.Count();
-        var complaintDtos = _mapper.Map<ComplaintResponseDto[]>(complaints);
+        var complaintDtos = _mapper.Map<RefundResponseDto[]>(complaints);
         
         var currentPage = page ?? 1;
         var currentLimit = limit ?? totalCount;
         
-        return new Pagination<ComplaintResponseDto>(complaintDtos,totalCount, currentPage, currentLimit);
+        return new Pagination<RefundResponseDto>(complaintDtos,totalCount, currentPage, currentLimit);
     }
     
 }

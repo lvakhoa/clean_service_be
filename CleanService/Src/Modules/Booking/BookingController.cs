@@ -56,6 +56,18 @@ public class BookingController : Controller
         });
     }
 
+    [HttpGet("refund/{customerId}")]
+    public async Task<ActionResult<Pagination<BookingResponseDto>>> GetAllBookings(string customerId,int? page, int? limit)
+    {
+        var refunds = await _bookingService.GetComplaintByCustomerId(customerId, page, limit);
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Get refund by customerId successfully",
+            Data = refunds
+        });
+    }
+
     [HttpGet("{id}")]
     public async Task<ActionResult<BookingResponseDto?>> GetBookingById(Guid id)
     {
@@ -65,6 +77,28 @@ public class BookingController : Controller
             StatusCode = HttpStatusCode.OK,
             Message = "Get booking successfully",
             Data = booking
+        });
+    }
+    
+    [HttpPost("refund")]
+    public async Task<ActionResult> CreateRefund([FromBody] CreateRefundRequestDto createRefund)
+    {
+        await _bookingService.CreateRefund(createRefund);
+        return CreatedAtAction("CreateRefund", new SuccessResponse()
+        {
+            StatusCode = HttpStatusCode.Created,
+            Message = "Create refund successfully"
+        });
+    }
+    
+    [HttpPatch("refund/{id}")]
+    public async Task<ActionResult> UpdateRefund(Guid id, [FromBody] UpdateRefundRequestDto updateRefund)
+    {
+        await _bookingService.UpdateRefund(id, updateRefund);
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Update refund successfully"
         });
     }
 }

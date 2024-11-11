@@ -16,12 +16,12 @@ public interface IBookingService
     
     Task<string?> AssignHelperToBooking(Bookings booking);
     
-    Task CreateComplaint(CreateComplaintDto createComplaintDto);
+    Task CreateRefund(CreateRefundRequestDto createRefundRequestDto);
     
-    Task UpdateComplaint(Guid id, UpdateComplaintDto updateComplaintDto);
+    Task UpdateRefund(Guid id, UpdateRefundRequestDto updateRefundRequestDto);
     
-    Task<Pagination<ComplaintResponseDto>> GetAllComplaints(int? page, int? limit);
+    Task<Pagination<RefundResponseDto>> GetAllComplaints(int? page, int? limit);
     
-    Task<Pagination<ComplaintResponseDto>> GetComplaintByCustomerId(string id,int? page, int? limit);
+    Task<Pagination<RefundResponseDto>> GetComplaintByCustomerId(string id,int? page, int? limit);
 }
 

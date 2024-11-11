@@ -8,30 +8,14 @@ public class ComplaintResponseProfile : Profile
 {
     public ComplaintResponseProfile()
     {
-        CreateMap<Complaints, ComplaintResponseDto>()
-            .ConstructUsing(entity => new ComplaintResponseDto()
+        CreateMap<Refunds, RefundResponseDto>()
+            .ConstructUsing(entity => new RefundResponseDto()
             {
                 Id = entity.Id.ToString(),
                 BookingId = entity.BookingId.ToString(),
-                ReportedById = entity.ReportedById,
-                ReportedUserId = entity.ReportedUserId,
                 Reason = entity.Reason,
-                Resolution = entity.Resolution,
                 CreatedAt = entity.CreatedAt,
                 ResolvedAt = entity.ResolvedAt,
-            });
-        CreateMap<Users, UserReportedResponse>()
-            .ConstructUsing(entity => new UserReportedResponse()
-            {
-                Id = entity.Id,
-                Gender = entity.Gender.ToString(),
-                FullName = entity.FullName,
-                IdentityCard = entity.IdentityCard,
-                Address = entity.Address,
-                PhoneNumber = entity.PhoneNumber,
-                Email = entity.Email,
-                CreatedAt = entity.CreatedAt,
-                UpdatedAt = entity.UpdatedAt
             });
         CreateMap<Bookings, BookingResponse>()
             .ConstructUsing(entity => new BookingResponse()
@@ -49,10 +33,8 @@ public class ComplaintResponseProfile : Profile
                 PaymentStatus = entity.PaymentStatus.ToString(),
                 PaymentMethod = entity.PaymentMethod,
                 HelperRating = entity.HelperRating,
-                CustomerFeedback = entity.CustomerFeedback,
-                HelperFeedback = entity.HelperFeedback,
                 CreatedAt = entity.CreatedAt,
-                UpdatedAt = entity.UpdatedAt
+                UpdatedAt = entity.UpdatedAt,
             });
     }
 }

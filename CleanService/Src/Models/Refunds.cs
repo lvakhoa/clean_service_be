@@ -19,7 +19,7 @@ public class Refunds
 
     public DateTime CreatedAt { get; set; }
 
-    public DateTime ResolvedAt { get; set; }
+    public DateTime? ResolvedAt { get; set; }
 
     public virtual Bookings Booking { get; set; } = null!;
 }
@@ -38,4 +38,6 @@ public class PartialRefunds
     public string? Reason { get; set; }
 
     public RefundStatus? Status { get; set; }
+    
+    public DateTime? ResolvedAt { get; set; }
 }
