@@ -22,6 +22,11 @@ public interface IBookingService
     
     Task<Pagination<RefundResponseDto>> GetAllComplaints(int? page, int? limit);
     
-    Task<Pagination<RefundResponseDto>> GetComplaintByCustomerId(string id,int? page, int? limit);
+    Task<Pagination<RefundResponseDto>> GetComplaintByCustomerId(string? id,int? page, int? limit);
+    
+    Task CreateFeedback(CreateFeedbackDto createFeedbackDto);
+    
+    Task<Pagination<FeedbackResponseDto>> GetFeedbackByCustomerId(string? id,int? page, int? limit);
+
 }
 

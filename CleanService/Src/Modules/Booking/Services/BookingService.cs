@@ -5,8 +5,10 @@ using CleanService.Src.Modules.Booking.Mapping.DTOs;
 using CleanService.Src.Modules.Payment.Services;
 using CleanService.Src.Repositories;
 using Pagination.EntityFrameworkCore.Extensions;
+using System.Web;
 
 namespace CleanService.Src.Modules.Booking.Services;
+
 
 public class BookingService : IBookingService
 {
@@ -253,7 +255,7 @@ public class BookingService : IBookingService
         await _bookingUnitOfWork.SaveChangesAsync();
     }
 
-    public async Task<Pagination<RefundResponseDto>> GetComplaintByCustomerId(string id, int? page, int? limit)
+    public async Task<Pagination<RefundResponseDto>> GetComplaintByCustomerId(string? id, int? page, int? limit)
     {
         var complaints = _bookingUnitOfWork.RefundRepository.Find(
             entity => entity.Booking.CustomerId == id, 
@@ -263,7 +265,7 @@ public class BookingService : IBookingService
             limit,             
             new FindOptions()
             {
-                IsIgnoreAutoIncludes = true 
+                IsAsNoTracking = true 
             });
         var totalCount = complaints.Count();
         var complaintDtos = _mapper.Map<RefundResponseDto[]>(complaints);
@@ -274,4 +276,43 @@ public class BookingService : IBookingService
         return new Pagination<RefundResponseDto>(complaintDtos,totalCount, currentPage, currentLimit);
     }
     
+    
+    public async Task CreateFeedback(CreateFeedbackDto createFeedbackDto)
+    {
+        if (createFeedbackDto == null)
+        {
+            throw new ArgumentNullException(nameof(createFeedbackDto), "Feedback data cannot be null.");
+        }
+        var booking = await _bookingUnitOfWork.BookingRepository.FindOneAsync(entity => entity.Id == createFeedbackDto.BookingId);
+        if(booking == null)
+            throw new KeyNotFoundException("Booking not found");
+        if(booking.Status != BookingStatus.Completed)
+            throw new InvalidOperationException("Cannot create feedback if booking status is not completed.");
+        
+        var feedback = _mapper.Map<Feedbacks>(createFeedbackDto);
+        await _bookingUnitOfWork.FeedbackRepository.AddAsync(feedback);
+        
+        await _bookingUnitOfWork.SaveChangesAsync();
+    }
+    
+    public async Task<Pagination<FeedbackResponseDto>> GetFeedbackByCustomerId(string? id, int? page, int? limit)
+    {
+        var feedbacks = _bookingUnitOfWork.FeedbackRepository.Find(
+            entity => entity.Booking.CustomerId == id, 
+            x => x.CreatedAt,  
+            true,             
+            page,              
+            limit,             
+            new FindOptions()
+            {
+                IsAsNoTracking = true 
+            });
+        var totalCount = feedbacks.Count();
+        var feedbackDtos = _mapper.Map<FeedbackResponseDto[]>(feedbacks);
+        
+        var currentPage = page ?? 1;
+        var currentLimit = limit ?? totalCount;
+        
+        return new Pagination<FeedbackResponseDto>(feedbackDtos,totalCount, currentPage, currentLimit);
+    }
 }

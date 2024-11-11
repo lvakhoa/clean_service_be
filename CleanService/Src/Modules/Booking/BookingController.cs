@@ -56,14 +56,26 @@ public class BookingController : Controller
         });
     }
 
-    [HttpGet("refund/{customerId}")]
-    public async Task<ActionResult<Pagination<BookingResponseDto>>> GetAllBookings(string customerId,int? page, int? limit)
+    [HttpGet("refund")]
+    public async Task<ActionResult<Pagination<BookingResponseDto>>> GetRefundByCustomerId(string? customerId,int? page, int? limit)
     {
         var refunds = await _bookingService.GetComplaintByCustomerId(customerId, page, limit);
         return Ok(new SuccessResponse
         {
             StatusCode = HttpStatusCode.OK,
             Message = "Get refund by customerId successfully",
+            Data = refunds
+        });
+    }
+    
+    [HttpGet("feedback")]
+    public async Task<ActionResult<Pagination<BookingResponseDto>>> GetFeedbackByCustomerId(string? customerId,int? page, int? limit)
+    {
+        var refunds = await _bookingService.GetFeedbackByCustomerId(customerId, page, limit);
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Get feedback by customerId successfully",
             Data = refunds
         });
     }
@@ -100,5 +112,44 @@ public class BookingController : Controller
             StatusCode = HttpStatusCode.OK,
             Message = "Update refund successfully"
         });
+    }
+    
+    
+    [HttpPost("feedback")]
+    public async Task<ActionResult> CreateFeedback([FromBody] CreateFeedbackDto createFeedback)
+    {
+        // await _bookingService.CreateFeedback(createFeedback);
+        //     
+        // return CreatedAtAction("CreateFeedback", new SuccessResponse()
+        // {
+        //     StatusCode = HttpStatusCode.Created,
+        //     Message = "Create feedback successfully"
+        // });
+        
+        try
+        {
+            await _bookingService.CreateFeedback(createFeedback);
+        
+            return CreatedAtAction("CreateFeedback", new SuccessResponse()
+            {
+                StatusCode = HttpStatusCode.Created,
+                Message = "Create feedback successfully"
+            });
+        } catch (ArgumentNullException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (KeyNotFoundException ex)
+        {
+            return NotFound(new { message = ex.Message });
+        }
+        catch (InvalidOperationException ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            return StatusCode(500, new { message = "An unexpected error occurred", details = ex.Message });
+        }
     }
 }

@@ -4,9 +4,9 @@ using CleanService.Src.Modules.Booking.Mapping.DTOs;
 
 namespace CleanService.Src.Modules.Booking.Mapping.Profiles;
 
-public class ComplaintResponseProfile : Profile
+public class RefundResponseProfile : Profile
 {
-    public ComplaintResponseProfile()
+    public RefundResponseProfile()
     {
         CreateMap<Refunds, RefundResponseDto>()
             .ConstructUsing(entity => new RefundResponseDto()

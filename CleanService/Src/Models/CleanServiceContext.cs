@@ -218,6 +218,10 @@ public class CleanServiceContext : DbContext
         
         // Feedback entity config
         modelBuilder.Entity<Feedbacks>()
+            .Navigation(b => b.Booking)
+            .AutoInclude();
+        
+        modelBuilder.Entity<Feedbacks>()
             .Property(f => f.CreatedAt)
             .HasDefaultValue(DateTime.Now);
         modelBuilder.Entity<Feedbacks>()
