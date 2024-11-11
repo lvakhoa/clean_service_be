@@ -240,6 +240,10 @@ public class CleanServiceContext : DbContext
         modelBuilder.Entity<Refunds>()
             .Property(r => r.Status)
             .HasDefaultValue(RefundStatus.Pending);
+        
+        modelBuilder.Entity<Refunds>()
+            .Navigation(b => b.Booking)
+            .AutoInclude();
 
         // BlacklistedUsers entity config
         modelBuilder.Entity<BlacklistedUsers>()

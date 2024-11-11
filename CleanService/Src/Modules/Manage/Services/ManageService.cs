@@ -6,6 +6,7 @@ using CleanService.Src.Models;
 using CleanService.Src.Modules.Booking.Mapping.DTOs;
 using CleanService.Src.Modules.Manage.Infrastructures;
 using CleanService.Src.Modules.Manage.Mapping.DTOs;
+using CleanService.Src.Modules.Manage.Mapping.DTOs.BlackListed;
 using CleanService.Src.Modules.Manage.Mapping.DTOs.DurationPrice;
 using CleanService.Src.Modules.Manage.Mapping.DTOs.Refund;
 using CleanService.Src.Modules.Manage.Mapping.DTOs.RoomPricing;
@@ -105,6 +106,50 @@ public class ManageService : IManageService
         await _manageUnitOfWork.SaveChangesAsync();
     }
 
+    public async Task HandleRefund(Guid id, RefundStatus? status)
+    {
+        var refund = await _manageUnitOfWork.RefundRepository.FindOneAsync(entity => entity.Id == id, new FindOptions
+        {
+            IsAsNoTracking = true
+        });
+        if (refund == null)
+            throw new KeyNotFoundException("Refund not found");
+        _manageUnitOfWork.RefundRepository.Detach(refund);
+
+        var updateRefund = new PartialRefunds()
+        {
+            Status = status,
+            ResolvedAt = DateTime.Now
+        };
+        
+        if (status == RefundStatus.Refunded)
+        {
+            
+            var helper = await _manageUnitOfWork.UserRepository.FindOneAsync(entity => entity.Id == refund.Booking.HelperId, new FindOptions
+            {
+                IsAsNoTracking = true,
+                IsIgnoreAutoIncludes = true
+            });
+            _manageUnitOfWork.UserRepository.Detach(helper);
+            _manageUnitOfWork.UserRepository.Update(new PartialUsers
+            {
+                NumberOfViolation = helper.NumberOfViolation + 1
+            }, helper);
+
+            // await CreateBlackListedDto(new CreateBlackListedDto()
+            // {
+            //     UserId = refund.Booking.HelperId,
+            //     Reason = "Bad service",
+            //     BlacklistedBy = refund.Booking.CustomerId,
+            //     IsPermanent = false
+            // });
+        }
+        
+        _manageUnitOfWork.RefundRepository.Update(updateRefund, refund);
+        
+        await _manageUnitOfWork.SaveChangesAsync();
+    }
+
     public async Task DeleteRefund(Guid id)
     {
         var refund = await _manageUnitOfWork.RefundRepository.FindOneAsync(entity => entity.Id == id);
@@ -157,6 +202,14 @@ public class ManageService : IManageService
         
         await _manageUnitOfWork.RoomPricingRepository.AddAsync(roomPricing);
         
+        await _manageUnitOfWork.SaveChangesAsync();
+    }
+
+    public async Task CreateBlackListedDto(CreateBlackListedDto createBlackListedDto)
+    {
+        var blacklisted = _mapper.Map<BlacklistedUsers>(createBlackListedDto);
+        
+        await _manageUnitOfWork.BlacklistedUserRepository.AddAsync(blacklisted);
         await _manageUnitOfWork.SaveChangesAsync();
     }
 

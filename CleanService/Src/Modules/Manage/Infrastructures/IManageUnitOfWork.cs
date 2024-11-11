@@ -1,4 +1,5 @@
 
+using CleanService.Src.Repositories.BlacklistedUser;
 using CleanService.Src.Repositories.Booking;
 using CleanService.Src.Repositories.Contract;
 using CleanService.Src.Repositories.DurationPrices;
@@ -30,6 +31,8 @@ public interface IManageUnitOfWork
     IFeedbackRepository FeedbackRepository { get; }
     
     IContractRepository ContractRepository { get; }
+    
+    IBlacklistedUserRepository BlacklistedUserRepository { get; }
     
     Task SaveChangesAsync();
 }

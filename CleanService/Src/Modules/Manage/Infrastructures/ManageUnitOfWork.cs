@@ -1,4 +1,5 @@
 using CleanService.Src.Models;
+using CleanService.Src.Repositories.BlacklistedUser;
 using CleanService.Src.Repositories.Booking;
 using CleanService.Src.Repositories.Contract;
 using CleanService.Src.Repositories.DurationPrices;
@@ -32,10 +33,13 @@ public class ManageUnitOfWork : IManageUnitOfWork
     public IContractRepository ContractRepository { get; }
     
     public IFeedbackRepository FeedbackRepository { get; }
+    
+    public IBlacklistedUserRepository BlacklistedUserRepository { get; }
 
     public ManageUnitOfWork(CleanServiceContext dbContext, IBookingRepository bookingRepository, IUserRepository userRepository, IServiceTypeRepository serviceTypeRepository,
         IDurationPriceRepository durationPriceRepository, IRoomPricingRepository roomPricingRepository,
-        IContractRepository contractRepository, IHelperRepository helperRepository, IRefundRepository refundRepository, IFeedbackRepository feedbackRepository)
+        IContractRepository contractRepository, IHelperRepository helperRepository, IRefundRepository refundRepository, IFeedbackRepository feedbackRepository,
+        IBlacklistedUserRepository blacklistedUserRepository)
     {
         _dbContext = dbContext;
         BookingRepository = bookingRepository;
@@ -47,6 +51,7 @@ public class ManageUnitOfWork : IManageUnitOfWork
         HelperRepository = helperRepository;
         RefundRepository = refundRepository;
         FeedbackRepository = feedbackRepository;
+        BlacklistedUserRepository = blacklistedUserRepository;
     }
 
     public async Task SaveChangesAsync()

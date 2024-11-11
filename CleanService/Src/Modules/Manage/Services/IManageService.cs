@@ -24,8 +24,7 @@ public interface IManageService
     public Task CreateDurationPrice(CreateDurationPriceRequestDto createDurationPriceRequestDto);
     public Task UpdateDurationPrice(Guid id, UpdateDurationPriceRequestDto updateDurationPriceRequestDto);
     public Task DeleteDurationPrice(Guid id);
-    
-    
+    public Task HandleRefund(Guid id, RefundStatus? status);
 }
 
 

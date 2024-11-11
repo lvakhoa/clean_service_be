@@ -31,6 +31,7 @@ public class RefundProfile: Profile
                 BookingId = Guid.Parse(entity.BookingId),
                 Status = entity.Status,
                 Reason = entity.Reason,
+                ResolvedAt = entity.ResolvedAt
             });
     }
 }

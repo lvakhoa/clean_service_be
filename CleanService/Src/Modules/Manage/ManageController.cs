@@ -91,6 +91,21 @@ public class ManageController : Controller
             Message = "Update refund successfully"
         });
     }
+
+    [HttpPatch("refunds/handle/{id}")]
+    public async Task<IActionResult> HandleRefund(Guid id, [FromBody] UpdateRefundRequestDto updateRefund)
+    {
+        if (updateRefund.Status == null)
+            return BadRequest();
+        var status = updateRefund.Status;
+        await _manageService.HandleRefund(id, status);
+
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Hande refund successfully"
+        });
+    }
     
     [HttpDelete("refunds/{id}")]
     public async Task<IActionResult> DeleteRefund(Guid id)

@@ -8,5 +8,6 @@ public class UpdateRefundRequestDto
     public RefundStatus? Status { get; set; }
     public string? Reason { get; set; }
     
+    public DateTime? ResolvedAt { get; set; }
 }
 
