@@ -88,6 +88,19 @@ public class ManageService : IManageService
         return Task.FromResult(new Pagination<RefundResponseDto>(refundDto, totalRefunds, currentPage, currentLimit));
     }
 
+    public async Task<RefundResponseDto> GetRefundById(Guid id)
+    {
+        var refund = await _manageUnitOfWork.RefundRepository.FindOneAsync(entity => entity.Id == id, new FindOptions
+        {
+            IsAsNoTracking = true
+        });
+        
+        if (refund == null)
+            throw new KeyNotFoundException("Refund not found");
+        
+        return _mapper.Map<RefundResponseDto>(refund);
+    }
+
     public async Task UpdateRefund(Guid id, UpdateRefundRequestDto updateRefundRequestDto)
     {
         var refund = await _manageUnitOfWork.RefundRepository.FindOneAsync(entity => entity.Id == id, new FindOptions
@@ -150,6 +163,42 @@ public class ManageService : IManageService
         await _manageUnitOfWork.SaveChangesAsync();
     }
 
+    public async Task UpdateUserInfo(string id, AdminUpdateUserRequestDto adminUpdateUserRequestDto)
+    {
+        var user = await _manageUnitOfWork.UserRepository.FindOneAsync(entity => entity.Id == id, new FindOptions
+        {
+            IsAsNoTracking = true,
+            IsIgnoreAutoIncludes = true
+        });
+        if (user == null)
+            throw new KeyNotFoundException("User not found");
+        _manageUnitOfWork.UserRepository.Detach(user);
+        
+        var userEntity = _mapper.Map<PartialUsers>(adminUpdateUserRequestDto);
+        
+        _manageUnitOfWork.UserRepository.Update(userEntity, user);
+        
+        await _manageUnitOfWork.SaveChangesAsync();
+    }
+
+    public async Task UpdateHelperInfo(string id, AdminUpdateHelperRequestDto adminUpdateHelperRequestDto)
+    {
+        var helper = await _manageUnitOfWork.HelperRepository.FindOneAsync(entity => entity.Id == id, new FindOptions
+        {
+            IsAsNoTracking = true,
+            IsIgnoreAutoIncludes = true
+        });
+        if (helper == null)
+            throw new KeyNotFoundException("Helper not found");
+        _manageUnitOfWork.HelperRepository.Detach(helper);
+        
+        var helperEntity = _mapper.Map<PartialHelper>(adminUpdateHelperRequestDto);
+        
+        _manageUnitOfWork.HelperRepository.Update(helperEntity, helper);
+        
+        await _manageUnitOfWork.SaveChangesAsync();
+    }
+
     public async Task DeleteRefund(Guid id)
     {
         var refund = await _manageUnitOfWork.RefundRepository.FindOneAsync(entity => entity.Id == id);
@@ -193,19 +242,12 @@ public class ManageService : IManageService
         if(serviceType == null)
             throw new KeyNotFoundException("Service Type not found");
         
-        if(Enum.IsDefined(typeof(RoomType), roomPricing.RoomType) == false)
-            throw new KeyNotFoundException("Room Type not found");
-        
-        if(roomPricing.RoomCount is < 0 or > 5 )
-            throw new ExceptionResponse(HttpStatusCode.BadRequest, "Room Count must be in [0,5] range",
-                ExceptionConvention.ValidationFailed);
-        
         await _manageUnitOfWork.RoomPricingRepository.AddAsync(roomPricing);
         
         await _manageUnitOfWork.SaveChangesAsync();
     }
 
-    public async Task CreateBlackListedDto(CreateBlackListedDto createBlackListedDto)
+    public async Task CreateBlackListed(CreateBlackListedDto createBlackListedDto)
     {
         var blacklisted = _mapper.Map<BlacklistedUsers>(createBlackListedDto);
         
@@ -223,11 +265,6 @@ public class ManageService : IManageService
         
         if (roomPricing == null)
             throw new KeyNotFoundException("Room Pricing not found");
-        if(updateRoomPricingRequestDto.RoomType != null && Enum.IsDefined(typeof(RoomType), updateRoomPricingRequestDto.RoomType) == false)
-            throw new KeyNotFoundException("Room Type not found");
-        if(updateRoomPricingRequestDto.RoomCount != null && updateRoomPricingRequestDto.RoomCount is < 0 or > 5 )
-            throw new ExceptionResponse(HttpStatusCode.BadRequest, "Room Count must be in [0,5] range",
-            ExceptionConvention.ValidationFailed);
         
         var serviceType = await _manageUnitOfWork.ServiceTypeRepository.FindOneAsync(entity => entity.Id == updateRoomPricingRequestDto.ServiceTypeId);
         if(serviceType == null && updateRoomPricingRequestDto.ServiceTypeId != null)

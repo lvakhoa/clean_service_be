@@ -14,6 +14,7 @@ public interface IManageService
     public Task<Pagination<HelperDetailResponseDto>> GetHelper(int? page, int? limit, UserStatus? userStatus = UserStatus.Active);
     public Task<Pagination<FeedbackResponseDto>> GetFeedbacks(int? page, int? limit);
     public Task<Pagination<RefundResponseDto>> GetRefunds(RefundStatus? status,int? page, int? limit);
+    public Task<RefundResponseDto> GetRefundById(Guid id);
     public Task UpdateRefund(Guid id, UpdateRefundRequestDto updateRefundRequestDto);
     public Task DeleteRefund(Guid id);
     public Task<Pagination<RoomPricingResponseDto>> GetRoomPricing(int? page, int? limit);
@@ -25,6 +26,8 @@ public interface IManageService
     public Task UpdateDurationPrice(Guid id, UpdateDurationPriceRequestDto updateDurationPriceRequestDto);
     public Task DeleteDurationPrice(Guid id);
     public Task HandleRefund(Guid id, RefundStatus? status);
+    public Task UpdateUserInfo(string id, AdminUpdateUserRequestDto  updateUserRequestDto);
+    public Task UpdateHelperInfo(string id, AdminUpdateHelperRequestDto updateHelperRequestDto);
 }
 
 

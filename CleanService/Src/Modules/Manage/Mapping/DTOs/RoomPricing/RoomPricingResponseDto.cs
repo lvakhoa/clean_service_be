@@ -1,4 +1,4 @@
-namespace CleanService.Src.Modules.Manage.Mapping.DTOs;
+namespace CleanService.Src.Modules.Manage.Mapping.DTOs.RoomPricing;
 
 public class RoomPricingResponseDto
 {

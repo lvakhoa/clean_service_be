@@ -234,7 +234,6 @@ public class ManageController : Controller
         });
     }
     
-    //get feedback
     [HttpGet("feedbacks")]
     public async Task<ActionResult<Pagination<FeedbackResponseDto>>> GetFeedbacks(int? page, int? limit)
     {
@@ -253,4 +252,31 @@ public class ManageController : Controller
             Data = feedbacks
         });
     }
+    
+    [HttpPatch("users/{id}")]
+    [ModelValidation]
+    public async Task<IActionResult> UpdateUser(string id,[FromBody] AdminUpdateUserRequestDto adminUpdateUserRequestDto)
+    {
+        await _manageService.UpdateUserInfo(id, adminUpdateUserRequestDto);
+        
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Update user successfully"
+        });
+    }
+    
+    [HttpPatch("helpers/{id}")]
+    [ModelValidation]
+    public async Task<IActionResult> UpdateHelper(string id,[FromBody] AdminUpdateHelperRequestDto adminUpdateHelperRequestDto)
+    {
+        await _manageService.UpdateHelperInfo(id, adminUpdateHelperRequestDto);
+        
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Update helper successfully"
+        });
+    }
+    
 }
