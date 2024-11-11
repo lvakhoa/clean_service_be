@@ -2,6 +2,7 @@
 using CleanService.Src.Repositories.Booking;
 using CleanService.Src.Repositories.Contract;
 using CleanService.Src.Repositories.DurationPrices;
+using CleanService.Src.Repositories.Feedback;
 using CleanService.Src.Repositories.Helper;
 using CleanService.Src.Repositories.Refund;
 using CleanService.Src.Repositories.RoomPricings;
@@ -25,6 +26,8 @@ public interface IManageUnitOfWork
     IDurationPriceRepository DurationPriceRepository { get; }
     
     IRoomPricingRepository RoomPricingRepository { get; }
+    
+    IFeedbackRepository FeedbackRepository { get; }
     
     IContractRepository ContractRepository { get; }
     

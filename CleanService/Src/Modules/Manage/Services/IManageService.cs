@@ -2,6 +2,8 @@ using CleanService.Src.Models;
 using CleanService.Src.Modules.Auth.Mapping.DTOs;
 using CleanService.Src.Modules.Booking.Mapping.DTOs;
 using CleanService.Src.Modules.Manage.Mapping.DTOs;
+using CleanService.Src.Modules.Manage.Mapping.DTOs.DurationPrice;
+using CleanService.Src.Modules.Manage.Mapping.DTOs.Refund;
 using CleanService.Src.Modules.Manage.Mapping.DTOs.RoomPricing;
 using Pagination.EntityFrameworkCore.Extensions;
 
@@ -14,7 +16,6 @@ public interface IManageService
     public Task<Pagination<RefundResponseDto>> GetRefunds(RefundStatus? status,int? page, int? limit);
     public Task UpdateRefund(Guid id, UpdateRefundRequestDto updateRefundRequestDto);
     public Task DeleteRefund(Guid id);
-    public Task<Pagination<BookingResponseDto>> GetBookings(int? page, int? limit);
     public Task<Pagination<RoomPricingResponseDto>> GetRoomPricing(int? page, int? limit);
     public Task CreateRoomPricing(CreateRoomPricingRequestDto createRoomPricingRequestDto);
     public Task UpdateRoomPricing(Guid id,UpdateRoomPricingRequestDto updateRoomPricingRequestDto);

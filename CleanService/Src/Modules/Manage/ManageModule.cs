@@ -26,9 +26,8 @@ public static class ManageModule
         services
             .AddAutoMapper(typeof(HelperDetailResponseProfile))
             .AddAutoMapper(typeof(RefundProfile))
-            .AddAutoMapper(typeof(RoomPricingProfile));
-            
-        
+            .AddAutoMapper(typeof(RoomPricingProfile))
+            .AddAutoMapper(typeof(DurationPriceProfile));
         return services;
     }
     

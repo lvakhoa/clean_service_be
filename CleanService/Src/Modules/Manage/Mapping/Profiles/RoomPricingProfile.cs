@@ -22,13 +22,15 @@ public class RoomPricingProfile: Profile
                 CreatedAt = entity.CreatedAt,
             });
         
-        // //For Update
-        // CreateMap<UpdateRoomPricingRequestDto, PartialRoomPricing>()
-        //     .ConstructUsing(entity => new PartialRoomPricing
-        //     {
-        //         RoomCount = entity.RoomCount,
-        //         AdditionalPrice = entity.AdditionalPrice
-        //     });
+        //For Update
+        CreateMap<UpdateRoomPricingRequestDto, PartialRoomPricing>()
+            .ConstructUsing(entity => new PartialRoomPricing
+            {
+                RoomCount = entity.RoomCount,
+                AdditionalPrice = entity.AdditionalPrice,
+                ServiceTypeId = entity.ServiceTypeId,
+                RoomType = entity.RoomType
+            });
         
         //For Create
         CreateMap<CreateRoomPricingRequestDto, RoomPricing>()
@@ -36,8 +38,8 @@ public class RoomPricingProfile: Profile
             {
                 Id = Guid.NewGuid(),
                 ServiceTypeId = Guid.Parse(dto.ServiceTypeId),
-                RoomType = dto.RoomType,
-                RoomCount = dto.RoomCount,
+                RoomType = dto.RoomType ?? RoomType.Bedroom,
+                RoomCount = dto.RoomCount ?? 0,
                 AdditionalPrice = dto.AdditionalPrice,
                 CreatedAt = DateTime.Now
             });

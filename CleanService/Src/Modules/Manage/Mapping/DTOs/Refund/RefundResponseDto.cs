@@ -1,4 +1,4 @@
-namespace CleanService.Src.Modules.Manage.Mapping.DTOs;
+namespace CleanService.Src.Modules.Manage.Mapping.DTOs.Refund;
 
 public class RefundResponseDto
 {

@@ -7,6 +7,8 @@ using CleanService.Src.Modules.Auth.Services;
 using CleanService.Src.Modules.Booking.Mapping.DTOs;
 using CleanService.Src.Modules.Booking.Services;
 using CleanService.Src.Modules.Manage.Mapping.DTOs;
+using CleanService.Src.Modules.Manage.Mapping.DTOs.DurationPrice;
+using CleanService.Src.Modules.Manage.Mapping.DTOs.Refund;
 using CleanService.Src.Modules.Manage.Mapping.DTOs.RoomPricing;
 using CleanService.Src.Modules.Manage.Services;
 using CleanService.Src.Utils;
@@ -123,7 +125,7 @@ public class ManageController : Controller
     
     [HttpPost("room-pricing")]
     [ModelValidation]
-    public async Task<IActionResult> CreateRoomPricing([FromBody] CreateRoomPricingRequestDto createRoomPricingRequestDto)
+    public async Task<IActionResult> CreateRoomPricing([FromBody]CreateRoomPricingRequestDto createRoomPricingRequestDto)
     {
         await _manageService.CreateRoomPricing(createRoomPricingRequestDto);
         
@@ -131,6 +133,109 @@ public class ManageController : Controller
         {
             StatusCode = HttpStatusCode.OK,
             Message = "Create room pricing successfully"
+        });
+    }
+    
+    [HttpPatch("room-pricing/{id:guid}")]
+    [ModelValidation]
+    public async Task<IActionResult> UpdateRoomPricing(Guid id,[FromBody] UpdateRoomPricingRequestDto updateRoomPricingRequestDto)
+    {
+        
+        await _manageService.UpdateRoomPricing(id, updateRoomPricingRequestDto);
+        
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Update room pricing successfully"
+        });
+    }
+    
+    [HttpDelete("room-pricing/{id:guid}")]
+    public async Task<IActionResult> DeleteRoomPricing(Guid id)
+    {
+        await _manageService.DeleteRoomPricing(id);
+        
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Delete room pricing successfully"
+        });
+    }
+    
+    [HttpPost("duration-price")]
+    [ModelValidation]
+    public async Task<IActionResult> CreateDurationPrice([FromBody] CreateDurationPriceRequestDto createDurationPriceRequestDto)
+    {
+        await _manageService.CreateDurationPrice(createDurationPriceRequestDto);
+        
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Create duration price successfully"
+        });
+    }
+    
+    [HttpGet("duration-price")]
+    public async Task<ActionResult<Pagination<DurationPricingResponseDto>>> GetDurationPrices(int? page, int? limit)
+    {
+        if (page < 1 || limit < 1)
+        {
+            throw new ExceptionResponse(HttpStatusCode.BadRequest, "Page or limit param is negative",
+                ExceptionConvention.ValidationFailed);
+        }
+        
+        var durationPrices = await _manageService.GetDurationPrices(page, limit);
+        
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Get duration prices successfully",
+            Data = durationPrices
+        });
+    }
+    
+    [HttpPatch("duration-price/{id:guid}")]
+    [ModelValidation]
+    public async Task<IActionResult> UpdateDurationPrice(Guid id,[FromBody] UpdateDurationPriceRequestDto updateDurationPriceRequestDto)
+    {
+        await _manageService.UpdateDurationPrice(id, updateDurationPriceRequestDto);
+        
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Update duration price successfully"
+        });
+    }
+    
+    [HttpDelete("duration-price/{id:guid}")]
+    public async Task<IActionResult> DeleteDurationPrice(Guid id)
+    {
+        await _manageService.DeleteDurationPrice(id);
+        
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Delete duration price successfully"
+        });
+    }
+    
+    //get feedback
+    [HttpGet("feedbacks")]
+    public async Task<ActionResult<Pagination<FeedbackResponseDto>>> GetFeedbacks(int? page, int? limit)
+    {
+        if (page < 1 || limit < 1)
+        {
+            throw new ExceptionResponse(HttpStatusCode.BadRequest, "Page or limit param is negative",
+                ExceptionConvention.ValidationFailed);
+        }
+        
+        var feedbacks = await _manageService.GetFeedbacks(page, limit);
+        
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Get feedbacks successfully",
+            Data = feedbacks
         });
     }
 }
