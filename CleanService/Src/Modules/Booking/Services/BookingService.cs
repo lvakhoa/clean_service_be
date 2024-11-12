@@ -1,5 +1,6 @@
 using System.Net;
 using AutoMapper;
+using CleanService.Src.Constant;
 using CleanService.Src.Models;
 using CleanService.Src.Modules.Booking.Infrastructures;
 using CleanService.Src.Modules.Booking.Mapping.DTOs;
@@ -294,17 +295,17 @@ public class BookingService : IBookingService
             IsIgnoreAutoIncludes = true
         });
         if (booking == null)
-            throw new ExceptionResponse(
-                HttpStatusCode.NotFound,
-                "Booking not found",
-                "BOOKING_NOT_FOUND",
-                new string[] { "The booking with the given ID does not exist." });
-            //throw new KeyNotFoundException("Booking not found");
+            // throw new ExceptionResponse(
+            //     HttpStatusCode.NotFound,
+            //     "Booking not found",
+            //     "BOOKING_NOT_FOUND",
+            //     new string[] { "The booking with the given ID does not exist." });
+            throw new KeyNotFoundException("Booking not found");
         if (booking.Status != BookingStatus.Completed)
             throw new ExceptionResponse(
                 HttpStatusCode.BadRequest,
                 "Cannot create feedback if booking status is not completed.",
-                "BOOKING_STATUS_INVALID",
+                ExceptionConvention.BookingStatusNotCompleted,
                 new string[] { "Feedback can only be created for bookings with 'Completed' status." });
             //throw new InvalidOperationException("Cannot create feedback if booking status is not completed.");
         

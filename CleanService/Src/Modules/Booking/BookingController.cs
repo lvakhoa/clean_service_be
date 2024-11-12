@@ -118,16 +118,6 @@ public class BookingController : Controller
     [HttpPost("feedback")]
     public async Task<ActionResult> CreateFeedback([FromBody] CreateFeedbackDto createFeedback)
     {
-        // await _bookingService.CreateFeedback(createFeedback);
-        //     
-        // return CreatedAtAction("CreateFeedback", new SuccessResponse()
-        // {
-        //     StatusCode = HttpStatusCode.Created,
-        //     Message = "Create feedback successfully"
-        // });
-        
-        try
-        {
             await _bookingService.CreateFeedback(createFeedback);
 
             return CreatedAtAction("CreateFeedback", new SuccessResponse()
@@ -135,24 +125,5 @@ public class BookingController : Controller
                 StatusCode = HttpStatusCode.Created,
                 Message = "Create feedback successfully"
             });
-        }
-        catch (ExceptionResponse ex)
-        {
-            return StatusCode((int)ex.StatusCode, new 
-            {
-                Message = ex.Message,
-                Code = ex.ExceptionCode,
-                Errors = ex.Errors
-            }); // Trả về mã lỗi cụ thể (400, 404, v.v.)
-        }
-        catch (Exception ex)
-        {
-            return StatusCode(500, new ExceptionResponse(
-                HttpStatusCode.InternalServerError,
-                "An unexpected error occurred.",
-                "INTERNAL_SERVER_ERROR",
-                new string[] { ex.Message }
-            ));
-        } 
     }
 }
