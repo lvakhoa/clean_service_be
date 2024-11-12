@@ -110,6 +110,13 @@ public class ManageService : IManageService
         });
         if (refund == null)
             throw new KeyNotFoundException("Refund not found");
+        var booking = await _manageUnitOfWork.BookingRepository.FindOneAsync(entity => entity.Id == refund.BookingId, new FindOptions
+        {
+            IsAsNoTracking = true,
+            IsIgnoreAutoIncludes = true
+        });
+        if (booking == null)
+            throw new KeyNotFoundException("Booking not found");
         _manageUnitOfWork.RefundRepository.Detach(refund);
         
         var refundEntity = _mapper.Map<PartialRefunds>(updateRefundRequestDto);
@@ -251,6 +258,17 @@ public class ManageService : IManageService
     {
         var blacklisted = _mapper.Map<BlacklistedUsers>(createBlackListedDto);
         
+        var user = await _manageUnitOfWork.UserRepository.FindOneAsync(entity => entity.Id == blacklisted.UserId);
+        if(user == null)
+            throw new KeyNotFoundException("User not found");
+        var blacklistedBy = await _manageUnitOfWork.UserRepository.FindOneAsync(entity => entity.Id == blacklisted.BlacklistedBy);
+        if(blacklistedBy == null)
+            throw new KeyNotFoundException("Blacklisted By not found");
+        
+        var checkIfExistBlacklisted = await _manageUnitOfWork.BlacklistedUserRepository.FindOneAsync(entity => entity.UserId == blacklisted.UserId && entity.BlacklistedBy == blacklisted.BlacklistedBy);
+        if(checkIfExistBlacklisted != null)
+            throw new ExceptionResponse(HttpStatusCode.Conflict, "User already blacklisted",
+                ExceptionConvention.ItemAlreadyExist);
         await _manageUnitOfWork.BlacklistedUserRepository.AddAsync(blacklisted);
         await _manageUnitOfWork.SaveChangesAsync();
     }
