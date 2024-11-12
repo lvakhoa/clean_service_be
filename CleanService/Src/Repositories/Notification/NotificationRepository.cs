@@ -1,5 +1,4 @@
 using CleanService.Src.Models;
-using CleanService.Src.Modules.Notification.DTOs;
 using Microsoft.EntityFrameworkCore;
 
 namespace CleanService.Src.Repositories.Notification;

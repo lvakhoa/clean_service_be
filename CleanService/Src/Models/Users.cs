@@ -112,6 +112,8 @@ public class PartialUsers
     public DateTime? UpdatedAt { get; set; }
 
     public UserStatus? Status { get; set; }
+    
+    public int NumberOfViolation { get; set; } 
 
     public string? NotificationToken { get; set; }
 }

@@ -38,4 +38,6 @@ public class PartialRefunds
     public string? Reason { get; set; }
 
     public RefundStatus? Status { get; set; }
+    
+    public DateTime? ResolvedAt { get; set; }
 }

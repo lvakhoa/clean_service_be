@@ -1,8 +1,8 @@
 using AutoMapper;
 using CleanService.Src.Constant;
 using CleanService.Src.Models;
-using CleanService.Src.Modules.Notification.DTOs;
 using CleanService.Src.Modules.Notification.Infrastructures;
+using CleanService.Src.Modules.Notification.Mapping.DTOs;
 using CleanService.Src.Repositories;
 using FirebaseAdmin;
 using FirebaseAdmin.Messaging;

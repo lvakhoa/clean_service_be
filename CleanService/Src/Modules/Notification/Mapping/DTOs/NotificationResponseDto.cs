@@ -1,6 +1,4 @@
-using CleanService.Src.Models;
-
-namespace CleanService.Src.Modules.Notification.DTOs;
+namespace CleanService.Src.Modules.Notification.Mapping.DTOs;
 
 public class NotificationResponseDto
 {

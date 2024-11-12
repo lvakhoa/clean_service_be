@@ -2,6 +2,7 @@ using CleanService.Src.Modules.Auth;
 using CleanService.Src.Modules.Booking;
 using CleanService.Src.Modules.Contract;
 using CleanService.Src.Modules.Mail;
+using CleanService.Src.Modules.Manage;
 using CleanService.Src.Modules.Notification;
 using CleanService.Src.Modules.Payment;
 using CleanService.Src.Modules.Scheduler;
@@ -74,6 +75,10 @@ public static class AppModule
         // Inject Scheduler Module
         services
             .AddSchedulerModule();
+        
+        // Inject Manage Module
+        services
+            .AddManageModule();
         
         return services;
     }
