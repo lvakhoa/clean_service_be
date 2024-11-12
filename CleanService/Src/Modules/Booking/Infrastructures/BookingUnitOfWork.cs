@@ -3,6 +3,8 @@ using CleanService.Src.Repositories.Booking;
 using CleanService.Src.Repositories.BookingContract;
 using CleanService.Src.Repositories.Contract;
 using CleanService.Src.Repositories.DurationPrices;
+using CleanService.Src.Repositories.Feedback;
+using CleanService.Src.Repositories.Refund;
 using CleanService.Src.Repositories.RoomPricings;
 using CleanService.Src.Repositories.ServiceType;
 using CleanService.Src.Repositories.User;
@@ -24,10 +26,21 @@ public class BookingUnitOfWork : IBookingUnitOfWork
     public IRoomPricingRepository RoomPricingRepository { get; }
 
     public IBookingContractRepository BookingContractRepository { get; }
+    
+    public IRefundRepository RefundRepository { get; }
+    
+    public IFeedbackRepository FeedbackRepository { get; }
 
-    public BookingUnitOfWork(CleanServiceContext dbContext, IBookingRepository bookingRepository, IUserRepository userRepository, IServiceTypeRepository serviceTypeRepository,
-        IDurationPriceRepository durationPriceRepository, IRoomPricingRepository roomPricingRepository,
-        IBookingContractRepository bookingContractRepository)
+    public BookingUnitOfWork(
+        CleanServiceContext dbContext, 
+        IBookingRepository bookingRepository, 
+        IUserRepository userRepository, 
+        IServiceTypeRepository serviceTypeRepository,
+        IDurationPriceRepository durationPriceRepository, 
+        IRoomPricingRepository roomPricingRepository,
+        IBookingContractRepository bookingContractRepository,
+        IRefundRepository refundRepository,
+        IFeedbackRepository feedbackRepository)
     {
         _dbContext = dbContext;
         BookingRepository = bookingRepository;
@@ -36,6 +49,8 @@ public class BookingUnitOfWork : IBookingUnitOfWork
         DurationPriceRepository = durationPriceRepository;
         RoomPricingRepository = roomPricingRepository;
         BookingContractRepository = bookingContractRepository;
+        RefundRepository = refundRepository;
+        FeedbackRepository = feedbackRepository;
     }
 
     public async Task SaveChangesAsync()
