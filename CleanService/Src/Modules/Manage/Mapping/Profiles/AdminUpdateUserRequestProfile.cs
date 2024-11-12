@@ -22,7 +22,8 @@ public class AdminUpdateUserRequestProfile:Profile
                 UserType  = dto.UserType,
                 NumberOfViolation = dto.NumberOfViolation ?? 0,
                 NotificationToken = dto.NotificationToken,
-                Email = dto.Email
+                Email = dto.Email,
+                UpdatedAt = DateTime.UtcNow
             });
     }
 }

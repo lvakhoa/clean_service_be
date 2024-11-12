@@ -11,11 +11,11 @@ public class AdminUpdateHelperRequestDto
 
     public string[]? ServicesOffered { get; set; }
 
-    public decimal HourlyRate { get; set; }
+    public decimal? HourlyRate { get; set; }
     
-    public decimal AverageRating { get; set; }
+    public decimal? AverageRating { get; set; }
     
-    public int CompletedJobs { get; set; }
+    public int? CompletedJobs { get; set; }
     
-    public int CancelledJobs { get; set; }
+    public int? CancelledJobs { get; set; }
 }

@@ -27,7 +27,9 @@ public static class ManageModule
             .AddAutoMapper(typeof(HelperDetailResponseProfile))
             .AddAutoMapper(typeof(RefundProfile))
             .AddAutoMapper(typeof(RoomPricingProfile))
-            .AddAutoMapper(typeof(DurationPriceProfile));
+            .AddAutoMapper(typeof(DurationPriceProfile))
+            .AddAutoMapper(typeof(AdminUpdateUserRequestDto))
+            .AddAutoMapper(typeof(AdminUpdateHelperRequestProfile));
         return services;
     }
     

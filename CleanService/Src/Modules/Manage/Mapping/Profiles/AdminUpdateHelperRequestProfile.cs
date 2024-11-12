@@ -9,6 +9,10 @@ public class AdminUpdateHelperRequestProfile: Profile
     public AdminUpdateHelperRequestProfile()
     {
         CreateMap<AdminUpdateHelperRequestDto, PartialHelper>()
+            .ForMember(dest => dest.ServicesOffered,
+                opt 
+                    => opt.Condition((src, dest, member) 
+                        => src.ServicesOffered != null))
             .ConstructUsing(dto => new PartialHelper()
             {
                 ExperienceDescription = dto.ExperienceDescription,
@@ -20,6 +24,7 @@ public class AdminUpdateHelperRequestProfile: Profile
                 AverageRating = dto.AverageRating,
                 CompletedJobs = dto.CompletedJobs,
                 CancelledJobs = dto.CancelledJobs,
+                UpdatedAt = DateTime.UtcNow
             });
     }
 }
