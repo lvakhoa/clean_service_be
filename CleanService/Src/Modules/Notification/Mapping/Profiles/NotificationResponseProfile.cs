@@ -1,6 +1,6 @@
 using AutoMapper;
 using CleanService.Src.Models;
-using CleanService.Src.Modules.Notification.DTOs;
+using CleanService.Src.Modules.Notification.Mapping.DTOs;
 
 namespace CleanService.Src.Modules.Notification.Mapping.Profiles;
 

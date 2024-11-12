@@ -64,7 +64,10 @@ builder.Services
 builder.Services
     .AddControllers()
     .AddJsonOptions(x =>
-        x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles);
+    {
+        x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 ;
 builder.Services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });
 

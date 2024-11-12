@@ -1,5 +1,5 @@
 using CleanService.Src.Constant;
-using CleanService.Src.Modules.Notification.DTOs;
+using CleanService.Src.Modules.Notification.Mapping.DTOs;
 using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Modules.Notification.Services;

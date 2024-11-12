@@ -86,6 +86,10 @@ public class CleanServiceContext : DbContext
             .HasOne(h => h.User)
             .WithOne(u => u.Helper)
             .HasForeignKey<Helpers>(h => h.Id);
+        
+        modelBuilder.Entity<Helpers>()
+            .Navigation(h => h.User)
+            .AutoInclude();
 
         // Helper Availability entity config
         modelBuilder.Entity<HelperAvailability>()
@@ -132,6 +136,9 @@ public class CleanServiceContext : DbContext
         modelBuilder.Entity<RoomPricing>()
             .Property(r => r.AdditionalPrice)
             .HasDefaultValue(0);
+        modelBuilder.Entity<RoomPricing>()
+            .Navigation(s => s.ServiceType)
+            .AutoInclude();
 
         // Duration Price entity config
         modelBuilder.Entity<DurationPrice>()
@@ -140,6 +147,9 @@ public class CleanServiceContext : DbContext
         modelBuilder.Entity<DurationPrice>()
             .Property(d => d.PriceMultiplier)
             .HasDefaultValue(1.00);
+        modelBuilder.Entity<DurationPrice>()
+            .Navigation(d => d.ServiceType)
+            .AutoInclude();
 
         // Bookings entity config
         modelBuilder.Entity<Bookings>()
@@ -227,6 +237,9 @@ public class CleanServiceContext : DbContext
         modelBuilder.Entity<Feedbacks>()
             .Property(f => f.UpdatedAt)
             .HasDefaultValue(DateTime.Now);
+        modelBuilder.Entity<Feedbacks>()
+            .Navigation(b => b.Booking)
+            .AutoInclude();
         
         // Refunds entity config
         modelBuilder.Entity<Refunds>()
@@ -239,6 +252,10 @@ public class CleanServiceContext : DbContext
         modelBuilder.Entity<Refunds>()
             .Property(r => r.Status)
             .HasDefaultValue(RefundStatus.Pending);
+        modelBuilder.Entity<Refunds>()
+            .Navigation(b => b.Booking)
+            .AutoInclude();
+        
 
         // BlacklistedUsers entity config
         modelBuilder.Entity<BlacklistedUsers>()
