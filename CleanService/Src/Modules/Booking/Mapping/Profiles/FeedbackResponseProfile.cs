@@ -8,8 +8,8 @@ public class FeedbackResponseProfile : Profile
 {
     public FeedbackResponseProfile()
     {
-        CreateMap<Feedbacks, FeedbackResponseDto>()
-            .ConstructUsing(entity => new FeedbackResponseDto()
+        CreateMap<Feedbacks, CusFeedbackResponseDto>()
+            .ConstructUsing(entity => new CusFeedbackResponseDto()
             {
                 Id = entity.Id,
                 BookingId = entity.BookingId,

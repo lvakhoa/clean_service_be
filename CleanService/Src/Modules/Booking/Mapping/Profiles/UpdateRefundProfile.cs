@@ -8,7 +8,7 @@ public class UpdateRefundProfile : Profile
 {
     public UpdateRefundProfile()
     {
-        CreateMap<UpdateRefundRequestDto, PartialRefunds>()
+        CreateMap<CusUpdateRefundRequestDto, PartialRefunds>()
             .ConstructUsing(dto => new PartialRefunds()
             {
                 BookingId = dto.BookingId,

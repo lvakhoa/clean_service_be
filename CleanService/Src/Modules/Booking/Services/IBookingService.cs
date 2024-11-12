@@ -19,15 +19,15 @@ public interface IBookingService
     
     Task CreateRefund(CreateRefundRequestDto createRefundRequestDto);
     
-    Task UpdateRefund(Guid id, UpdateRefundRequestDto updateRefundRequestDto);
+    Task UpdateRefund(Guid id, CusUpdateRefundRequestDto cusUpdateRefundRequestDto);
     
-    Task<Pagination<RefundResponseDto>> GetAllComplaints(int? page, int? limit);
+    Task<Pagination<CusRefundResponseDto>> GetAllComplaints(int? page, int? limit);
     
-    Task<Pagination<RefundResponseDto>> GetComplaintByCustomerId(string? id,int? page, int? limit);
+    Task<Pagination<CusRefundResponseDto>> GetComplaintByCustomerId(string? id,int? page, int? limit);
     
     Task CreateFeedback(CreateFeedbackDto createFeedbackDto);
     
-    Task<Pagination<FeedbackResponseDto>> GetFeedbackByCustomerId(string? id,int? page, int? limit);
+    Task<Pagination<CusFeedbackResponseDto>> GetFeedbackByCustomerId(string? id,int? page, int? limit);
 
 }
 

@@ -2,7 +2,7 @@ using CleanService.Src.Models;
 
 namespace CleanService.Src.Modules.Booking.Mapping.DTOs;
 
-public class FeedbackResponseDto
+public class CusFeedbackResponseDto
 {
     public Guid Id { get; set; }
     

@@ -104,9 +104,9 @@ public class BookingController : Controller
     }
     
     [HttpPatch("refund/{id}")]
-    public async Task<ActionResult> UpdateRefund(Guid id, [FromBody] UpdateRefundRequestDto updateRefund)
+    public async Task<ActionResult> UpdateRefund(Guid id, [FromBody] CusUpdateRefundRequestDto cusUpdateRefund)
     {
-        await _bookingService.UpdateRefund(id, updateRefund);
+        await _bookingService.UpdateRefund(id, cusUpdateRefund);
         return Ok(new SuccessResponse
         {
             StatusCode = HttpStatusCode.OK,

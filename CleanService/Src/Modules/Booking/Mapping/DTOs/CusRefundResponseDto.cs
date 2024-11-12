@@ -1,6 +1,6 @@
 namespace CleanService.Src.Modules.Booking.Mapping.DTOs;
 
-public class RefundResponseDto
+public class CusRefundResponseDto
 {
     public string Id { get; set; } = null!;
     

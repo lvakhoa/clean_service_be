@@ -2,7 +2,7 @@ using CleanService.Src.Models;
 
 namespace CleanService.Src.Modules.Booking.Mapping.DTOs;
 
-public class UpdateRefundRequestDto
+public class CusUpdateRefundRequestDto
 {
     public Guid? BookingId { get; set; }
     

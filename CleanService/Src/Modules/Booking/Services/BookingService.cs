@@ -134,7 +134,7 @@ public class BookingService : IBookingService
             currentLimit);
     }
 
-    public async Task<Pagination<RefundResponseDto>> GetAllComplaints(int? page, int? limit)
+    public async Task<Pagination<CusRefundResponseDto>> GetAllComplaints(int? page, int? limit)
     {
         var complaints = _bookingUnitOfWork.RefundRepository.GetAll(page, limit,
             new FindOptions()
@@ -143,12 +143,12 @@ public class BookingService : IBookingService
             });
         var totalComplaints = await _bookingUnitOfWork.RefundRepository.CountAsync();
         
-        var complaintDtos = _mapper.Map<RefundResponseDto[]>(complaints);
+        var complaintDtos = _mapper.Map<CusRefundResponseDto[]>(complaints);
         
         var currentPage = page ?? 1;
         var currentLimit = limit ?? totalComplaints;
         
-        return new Pagination<RefundResponseDto>(
+        return new Pagination<CusRefundResponseDto>(
             complaintDtos,
             totalComplaints,
             currentPage,
@@ -244,7 +244,7 @@ public class BookingService : IBookingService
             
     }
     
-    public async Task UpdateRefund(Guid id, UpdateRefundRequestDto updateRefundRequestDto)
+    public async Task UpdateRefund(Guid id, CusUpdateRefundRequestDto cusUpdateRefundRequestDto)
     {
         var refund = await _bookingUnitOfWork.RefundRepository.FindOneAsync(entity => entity.Id == id, new FindOptions
         {
@@ -252,18 +252,18 @@ public class BookingService : IBookingService
         });
         if(refund == null)
             throw new KeyNotFoundException("Refund request not found");
-        if(refund.BookingId != updateRefundRequestDto.BookingId)
+        if(refund.BookingId != cusUpdateRefundRequestDto.BookingId)
             throw new KeyNotFoundException("Booking ID does not exist in database");
         
         _bookingUnitOfWork.RefundRepository.Detach(refund);
         
-        var updateRefund = _mapper.Map<PartialRefunds>(updateRefundRequestDto);
+        var updateRefund = _mapper.Map<PartialRefunds>(cusUpdateRefundRequestDto);
         _bookingUnitOfWork.RefundRepository.Update(updateRefund, refund);
         
         await _bookingUnitOfWork.SaveChangesAsync();
     }
 
-    public async Task<Pagination<RefundResponseDto>> GetComplaintByCustomerId(string? id, int? page, int? limit)
+    public async Task<Pagination<CusRefundResponseDto>> GetComplaintByCustomerId(string? id, int? page, int? limit)
     {
         var complaints = _bookingUnitOfWork.RefundRepository.Find(
             entity => entity.Booking.CustomerId == id, 
@@ -276,12 +276,12 @@ public class BookingService : IBookingService
                 IsAsNoTracking = true 
             });
         var totalCount =  await complaints.CountAsync();
-        var complaintDtos = _mapper.Map<RefundResponseDto[]>(complaints);
+        var complaintDtos = _mapper.Map<CusRefundResponseDto[]>(complaints);
         
         var currentPage = page ?? 1;
         var currentLimit = limit ?? totalCount;
         
-        return new Pagination<RefundResponseDto>(complaintDtos,totalCount, currentPage, currentLimit);
+        return new Pagination<CusRefundResponseDto>(complaintDtos,totalCount, currentPage, currentLimit);
     }
     
     
@@ -328,7 +328,7 @@ public class BookingService : IBookingService
         await _bookingUnitOfWork.SaveChangesAsync();
     }
     
-    public async Task<Pagination<FeedbackResponseDto>> GetFeedbackByCustomerId(string? id, int? page, int? limit)
+    public async Task<Pagination<CusFeedbackResponseDto>> GetFeedbackByCustomerId(string? id, int? page, int? limit)
     {
         var feedbacks = _bookingUnitOfWork.FeedbackRepository.Find(
             entity => entity.Booking.CustomerId == id, 
@@ -341,11 +341,11 @@ public class BookingService : IBookingService
                 IsAsNoTracking = true 
             });
         var totalCount = await feedbacks.CountAsync();
-        var feedbackDtos = _mapper.Map<FeedbackResponseDto[]>(feedbacks);
+        var feedbackDtos = _mapper.Map<CusFeedbackResponseDto[]>(feedbacks);
         
         var currentPage = page ?? 1;
         var currentLimit = limit ?? totalCount;
         
-        return new Pagination<FeedbackResponseDto>(feedbackDtos,totalCount, currentPage, currentLimit);
+        return new Pagination<CusFeedbackResponseDto>(feedbackDtos,totalCount, currentPage, currentLimit);
     }
 }

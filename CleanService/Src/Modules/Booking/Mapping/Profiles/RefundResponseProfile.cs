@@ -8,8 +8,8 @@ public class RefundResponseProfile : Profile
 {
     public RefundResponseProfile()
     {
-        CreateMap<Refunds, RefundResponseDto>()
-            .ConstructUsing(entity => new RefundResponseDto()
+        CreateMap<Refunds, CusRefundResponseDto>()
+            .ConstructUsing(entity => new CusRefundResponseDto()
             {
                 Id = entity.Id.ToString(),
                 BookingId = entity.BookingId.ToString(),
