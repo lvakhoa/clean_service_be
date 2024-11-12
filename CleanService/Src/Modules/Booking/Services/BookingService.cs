@@ -246,16 +246,19 @@ public class BookingService : IBookingService
     
     public async Task UpdateRefund(Guid id, UpdateRefundRequestDto updateRefundRequestDto)
     {
-        var complaint = await _bookingUnitOfWork.RefundRepository.FindOneAsync(entity => entity.Id == id, new FindOptions
+        var refund = await _bookingUnitOfWork.RefundRepository.FindOneAsync(entity => entity.Id == id, new FindOptions
         {
             IsIgnoreAutoIncludes = true
         });
-        if(complaint == null)
+        if(refund == null)
             throw new KeyNotFoundException("Refund request not found");
-        _bookingUnitOfWork.RefundRepository.Detach(complaint);
+        if(refund.BookingId != updateRefundRequestDto.BookingId)
+            throw new KeyNotFoundException("Booking ID does not exist in database");
         
-        var updateComplaint = _mapper.Map<PartialRefunds>(updateRefundRequestDto);
-        _bookingUnitOfWork.RefundRepository.Update(updateComplaint, complaint);
+        _bookingUnitOfWork.RefundRepository.Detach(refund);
+        
+        var updateRefund = _mapper.Map<PartialRefunds>(updateRefundRequestDto);
+        _bookingUnitOfWork.RefundRepository.Update(updateRefund, refund);
         
         await _bookingUnitOfWork.SaveChangesAsync();
     }
