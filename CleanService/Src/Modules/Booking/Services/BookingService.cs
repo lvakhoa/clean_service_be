@@ -1,3 +1,4 @@
+using System.Net;
 using AutoMapper;
 using CleanService.Src.Models;
 using CleanService.Src.Modules.Booking.Infrastructures;
@@ -5,7 +6,8 @@ using CleanService.Src.Modules.Booking.Mapping.DTOs;
 using CleanService.Src.Modules.Payment.Services;
 using CleanService.Src.Repositories;
 using Pagination.EntityFrameworkCore.Extensions;
-using System.Web;
+using CleanService.Src.Utils;
+using Microsoft.EntityFrameworkCore;
 
 namespace CleanService.Src.Modules.Booking.Services;
 
@@ -225,10 +227,10 @@ public class BookingService : IBookingService
     //Refund service
     public async Task CreateRefund(CreateRefundRequestDto createRefundRequestDto)
     {
-        if (createRefundRequestDto == null)
-        {
-            throw new ArgumentNullException(nameof(createRefundRequestDto), "Complaint data cannot be null.");
-        }
+        // if (createRefundRequestDto == null)
+        // {
+        //     throw new ArgumentNullException(nameof(createRefundRequestDto), "Complaint data cannot be null.");
+        // }
         var complaint = _mapper.Map<Refunds>(createRefundRequestDto);
         
         var booking = await _bookingUnitOfWork.BookingRepository.FindOneAsync(entity => entity.Id == createRefundRequestDto.BookingId);
@@ -269,7 +271,7 @@ public class BookingService : IBookingService
             {
                 IsAsNoTracking = true 
             });
-        var totalCount = complaints.Count();
+        var totalCount =  await complaints.CountAsync();
         var complaintDtos = _mapper.Map<RefundResponseDto[]>(complaints);
         
         var currentPage = page ?? 1;
@@ -283,18 +285,28 @@ public class BookingService : IBookingService
     //Feeback service
     public async Task CreateFeedback(CreateFeedbackDto createFeedbackDto)
     {
-        if (createFeedbackDto == null)
-        {
-            throw new ArgumentNullException(nameof(createFeedbackDto), "Feedback data cannot be null.");
-        }
+        // if (createFeedbackDto == null)
+        // {
+        //     throw new ArgumentNullException(nameof(createFeedbackDto), "Feedback data cannot be null.");
+        // }
         var booking = await _bookingUnitOfWork.BookingRepository.FindOneAsync(entity => entity.Id == createFeedbackDto.BookingId, new FindOptions()
         {
             IsIgnoreAutoIncludes = true
         });
-        if(booking == null)
-            throw new KeyNotFoundException("Booking not found");
-        if(booking.Status != BookingStatus.Completed)
-            throw new InvalidOperationException("Cannot create feedback if booking status is not completed.");
+        if (booking == null)
+            throw new ExceptionResponse(
+                HttpStatusCode.NotFound,
+                "Booking not found",
+                "BOOKING_NOT_FOUND",
+                new string[] { "The booking with the given ID does not exist." });
+            //throw new KeyNotFoundException("Booking not found");
+        if (booking.Status != BookingStatus.Completed)
+            throw new ExceptionResponse(
+                HttpStatusCode.BadRequest,
+                "Cannot create feedback if booking status is not completed.",
+                "BOOKING_STATUS_INVALID",
+                new string[] { "Feedback can only be created for bookings with 'Completed' status." });
+            //throw new InvalidOperationException("Cannot create feedback if booking status is not completed.");
         
         var feedback = _mapper.Map<Feedbacks>(createFeedbackDto);
         await _bookingUnitOfWork.FeedbackRepository.AddAsync(feedback);
@@ -324,7 +336,7 @@ public class BookingService : IBookingService
             {
                 IsAsNoTracking = true 
             });
-        var totalCount = feedbacks.Count();
+        var totalCount = await feedbacks.CountAsync();
         var feedbackDtos = _mapper.Map<FeedbackResponseDto[]>(feedbacks);
         
         var currentPage = page ?? 1;

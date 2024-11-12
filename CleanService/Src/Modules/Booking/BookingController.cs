@@ -129,27 +129,30 @@ public class BookingController : Controller
         try
         {
             await _bookingService.CreateFeedback(createFeedback);
-        
+
             return CreatedAtAction("CreateFeedback", new SuccessResponse()
             {
                 StatusCode = HttpStatusCode.Created,
                 Message = "Create feedback successfully"
             });
-        } catch (ArgumentNullException ex)
-        {
-            return BadRequest(new { message = ex.Message });
         }
-        catch (KeyNotFoundException ex)
+        catch (ExceptionResponse ex)
         {
-            return NotFound(new { message = ex.Message });
-        }
-        catch (InvalidOperationException ex)
-        {
-            return BadRequest(new { message = ex.Message });
+            return StatusCode((int)ex.StatusCode, new 
+            {
+                Message = ex.Message,
+                Code = ex.ExceptionCode,
+                Errors = ex.Errors
+            }); // Trả về mã lỗi cụ thể (400, 404, v.v.)
         }
         catch (Exception ex)
         {
-            return StatusCode(500, new { message = "An unexpected error occurred", details = ex.Message });
-        }
+            return StatusCode(500, new ExceptionResponse(
+                HttpStatusCode.InternalServerError,
+                "An unexpected error occurred.",
+                "INTERNAL_SERVER_ERROR",
+                new string[] { ex.Message }
+            ));
+        } 
     }
 }
