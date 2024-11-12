@@ -60,7 +60,7 @@ namespace CleanService.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("BlacklistedUsers");
+                    b.ToTable("BlacklistedUsers", (string)null);
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.BookingContracts", b =>
@@ -86,7 +86,7 @@ namespace CleanService.Migrations
                     b.HasIndex("BookingId")
                         .IsUnique();
 
-                    b.ToTable("BookingContracts");
+                    b.ToTable("BookingContracts", (string)null);
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.BookingDetails", b =>
@@ -136,7 +136,7 @@ namespace CleanService.Migrations
 
                     b.HasIndex("DurationPriceId");
 
-                    b.ToTable("BookingDetails");
+                    b.ToTable("BookingDetails", (string)null);
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.Bookings", b =>
@@ -217,7 +217,7 @@ namespace CleanService.Migrations
 
                     b.HasIndex("ServiceTypeId");
 
-                    b.ToTable("Bookings");
+                    b.ToTable("Bookings", (string)null);
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.Contracts", b =>
@@ -242,7 +242,7 @@ namespace CleanService.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Contracts");
+                    b.ToTable("Contracts", (string)null);
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.DurationPrice", b =>
@@ -273,7 +273,7 @@ namespace CleanService.Migrations
                     b.HasIndex("ServiceTypeId", "DurationHours")
                         .IsUnique();
 
-                    b.ToTable("DurationPrice");
+                    b.ToTable("DurationPrice", (string)null);
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.Feedbacks", b =>
@@ -307,7 +307,7 @@ namespace CleanService.Migrations
 
                     b.HasIndex("BookingId");
 
-                    b.ToTable("Feedbacks");
+                    b.ToTable("Feedbacks", (string)null);
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.HelperAvailability", b =>
@@ -363,7 +363,7 @@ namespace CleanService.Migrations
 
                     b.HasIndex("HelperId", "StartDatetime", "EndDatetime");
 
-                    b.ToTable("HelperAvailability");
+                    b.ToTable("HelperAvailability", (string)null);
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.Helpers", b =>
@@ -413,7 +413,7 @@ namespace CleanService.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Helpers", t =>
+                    b.ToTable("Helpers", null, t =>
                         {
                             t.HasComment("Additional information for users' type is helper");
                         });
@@ -458,7 +458,7 @@ namespace CleanService.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Notifications");
+                    b.ToTable("Notifications", (string)null);
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.Refunds", b =>
@@ -492,7 +492,7 @@ namespace CleanService.Migrations
 
                     b.HasIndex("BookingId");
 
-                    b.ToTable("Refunds");
+                    b.ToTable("Refunds", (string)null);
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.RoomPricing", b =>
@@ -528,7 +528,7 @@ namespace CleanService.Migrations
                     b.HasIndex("ServiceTypeId", "RoomType", "RoomCount")
                         .IsUnique();
 
-                    b.ToTable("RoomPricing");
+                    b.ToTable("RoomPricing", (string)null);
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.ServiceCategories", b =>
@@ -560,7 +560,7 @@ namespace CleanService.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("ServiceCategory");
+                    b.ToTable("ServiceCategory", (string)null);
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.ServiceTypes", b =>
@@ -601,7 +601,7 @@ namespace CleanService.Migrations
                     b.HasIndex("Name", "CategoryId")
                         .IsUnique();
 
-                    b.ToTable("ServiceTypes");
+                    b.ToTable("ServiceTypes", (string)null);
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.Users", b =>
@@ -673,7 +673,7 @@ namespace CleanService.Migrations
                     b.HasIndex("Email")
                         .IsUnique();
 
-                    b.ToTable("Users");
+                    b.ToTable("Users", (string)null);
                 });
 
             modelBuilder.Entity("CleanService.Src.Models.BlacklistedUsers", b =>
