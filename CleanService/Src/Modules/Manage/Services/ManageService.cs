@@ -320,12 +320,6 @@ public class ManageService : IManageService
         var serviceType = await _manageUnitOfWork.ServiceTypeRepository.FindOneAsync(entity => entity.Id == durationPrice.ServiceTypeId);
         if(serviceType == null)
             throw new KeyNotFoundException("Service Type not found");
-        if(createDurationPriceRequestDto.DurationHours < 1)
-            throw new ExceptionResponse(HttpStatusCode.BadRequest, "Duration Hours must be greater than 0",
-                ExceptionConvention.ValidationFailed);
-        if(createDurationPriceRequestDto.PriceMultiplier < 0)
-            throw new ExceptionResponse(HttpStatusCode.BadRequest, "Price Multiplier must be greater than 0",
-                ExceptionConvention.ValidationFailed);
         
         await _manageUnitOfWork.DurationPriceRepository.AddAsync(durationPrice);
         
