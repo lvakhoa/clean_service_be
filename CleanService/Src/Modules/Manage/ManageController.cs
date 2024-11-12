@@ -79,6 +79,19 @@ public class ManageController : Controller
         });
     }
     
+    [HttpGet("refunds/{id}")]
+    public async Task<ActionResult<RefundResponseDto>> GetRefundById(Guid id)
+    {
+        var refund = await _manageService.GetRefundById(id);
+        
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Get refund successfully",
+            Data = refund
+        });
+    }
+    
     [HttpPatch("refunds/{id}")]
     [ModelValidation]
     public async Task<IActionResult> UpdateRefund(Guid id,[FromBody] UpdateRefundRequestDto updateRefundRequestDto)
