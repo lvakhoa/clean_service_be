@@ -228,6 +228,10 @@ public class CleanServiceContext : DbContext
         
         // Feedback entity config
         modelBuilder.Entity<Feedbacks>()
+            .Navigation(b => b.Booking)
+            .AutoInclude();
+        
+        modelBuilder.Entity<Feedbacks>()
             .Property(f => f.CreatedAt)
             .HasDefaultValue(DateTime.Now);
         modelBuilder.Entity<Feedbacks>()
@@ -238,6 +242,10 @@ public class CleanServiceContext : DbContext
             .AutoInclude();
         
         // Refunds entity config
+        modelBuilder.Entity<Refunds>()
+            .Navigation(b => b.Booking)
+            .AutoInclude();
+        
         modelBuilder.Entity<Refunds>()
             .Property(r => r.CreatedAt)
             .HasDefaultValue(DateTime.Now);

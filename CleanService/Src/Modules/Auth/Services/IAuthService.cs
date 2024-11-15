@@ -9,6 +9,8 @@ public interface IAuthService
 {
     public Task RegisterUser(RegistrationRequestDto registrationRequestDto);
     
+    public Task LogoutUser(string id);
+    
     public Task<UserResponseDto?> GetUserById(string id);
     
     public Task UpdateInfo(string id, UpdateUserRequestDto updateUserRequestDto);
@@ -20,4 +22,10 @@ public interface IAuthService
     public Task ActivateUser(string id);
     
     public Task BlockUser(string id);
+
+    public Task<Tokens> ExchangeCodeForTokensAsync(string code);
+
+    public Task<UserInfo> GetUserInfoAsync(string accessToken);
+
+    public Task<bool> CheckUserExistsAsync(string email);
 }

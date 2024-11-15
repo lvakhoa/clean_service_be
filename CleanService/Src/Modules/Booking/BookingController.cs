@@ -56,6 +56,30 @@ public class BookingController : Controller
         });
     }
 
+    [HttpGet("refund")]
+    public async Task<ActionResult<Pagination<BookingResponseDto>>> GetRefundByCustomerId(string? customerId,int? page, int? limit)
+    {
+        var refunds = await _bookingService.GetComplaintByCustomerId(customerId, page, limit);
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Get refund by customerId successfully",
+            Data = refunds
+        });
+    }
+    
+    [HttpGet("feedback")]
+    public async Task<ActionResult<Pagination<BookingResponseDto>>> GetFeedbackByCustomerId(string? customerId,int? page, int? limit)
+    {
+        var refunds = await _bookingService.GetFeedbackByCustomerId(customerId, page, limit);
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Get feedback by customerId successfully",
+            Data = refunds
+        });
+    }
+
     [HttpGet("{id}")]
     public async Task<ActionResult<BookingResponseDto?>> GetBookingById(Guid id)
     {
@@ -66,5 +90,40 @@ public class BookingController : Controller
             Message = "Get booking successfully",
             Data = booking
         });
+    }
+    
+    [HttpPost("refund")]
+    public async Task<ActionResult> CreateRefund([FromBody] CreateRefundRequestDto createRefund)
+    {
+        await _bookingService.CreateRefund(createRefund);
+        return CreatedAtAction("CreateRefund", new SuccessResponse()
+        {
+            StatusCode = HttpStatusCode.Created,
+            Message = "Create refund successfully"
+        });
+    }
+    
+    [HttpPatch("refund/{id}")]
+    public async Task<ActionResult> UpdateRefund(Guid id, [FromBody] CusUpdateRefundRequestDto cusUpdateRefund)
+    {
+        await _bookingService.UpdateRefund(id, cusUpdateRefund);
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Update refund successfully"
+        });
+    }
+    
+    
+    [HttpPost("feedback")]
+    public async Task<ActionResult> CreateFeedback([FromBody] CreateFeedbackDto createFeedback)
+    {
+            await _bookingService.CreateFeedback(createFeedback);
+
+            return CreatedAtAction("CreateFeedback", new SuccessResponse()
+            {
+                StatusCode = HttpStatusCode.Created,
+                Message = "Create feedback successfully"
+            });
     }
 }

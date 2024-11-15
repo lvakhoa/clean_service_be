@@ -26,7 +26,8 @@ public static class BookingModule
         services
             .AddAutoMapper(typeof(CreateBookingRequestProfile))
             .AddAutoMapper(typeof(BookingResponseProfile))
-            .AddAutoMapper(typeof(UpdateBookingRequestProfile));
+            .AddAutoMapper(typeof(UpdateBookingRequestProfile))
+            .AddAutoMapper(typeof(CreateRefundProfile));
 
         return services;
     }
