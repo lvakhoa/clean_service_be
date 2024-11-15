@@ -25,6 +25,12 @@ public class UserRepository : Repository<Users, PartialUsers>, IUserRepository
             .Select(x => x.NotificationToken)
             .ToArrayAsync();
     }
-    
-    
+
+    public Task<UserType> GetUserType(string userId)
+    {
+        return _dbContext.Users
+            .Where(x => x.Id == userId)
+            .Select(x => x.UserType)
+            .FirstOrDefaultAsync();
+    }
 }

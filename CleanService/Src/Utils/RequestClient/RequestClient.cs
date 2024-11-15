@@ -37,6 +37,11 @@ public class RequestClient : IRequestClient
         }
 
         var response = await _requestClient.SendAsync(request);
+        if (!response.IsSuccessStatusCode)
+        {
+            throw new HttpRequestException(response.ReasonPhrase);
+        }
+        
         var responseString = await response.Content.ReadAsStringAsync();
         return JsonConvert.DeserializeObject<T>(responseString);
     }
@@ -47,14 +52,14 @@ public class RequestClient : IRequestClient
         return PostAsync<Dictionary<string, object>>(uri, content, contentType, headers);
     }
 
-    public Task<T> PostFormAsync<T>(string uri, Dictionary<string, string> data, string? contentType = "application/json",
+    public Task<T> PostFormAsync<T>(string uri, Dictionary<string, string> data, string? contentType = "application/x-www-form-urlencoded",
         Dictionary<string, object>? headers = null)
     {
         return PostAsync<T>(uri, new FormUrlEncodedContent(data), contentType, headers);
     }
 
     public Task<Dictionary<string, object>> PostFormAsync(string uri, Dictionary<string, string> data,
-        string? contentType = "application/json", Dictionary<string, object>? headers = null)
+        string? contentType = "application/x-www-form-urlencoded", Dictionary<string, object>? headers = null)
     {
         return PostFormAsync<Dictionary<string, object>>(uri, data, contentType, headers);
     }

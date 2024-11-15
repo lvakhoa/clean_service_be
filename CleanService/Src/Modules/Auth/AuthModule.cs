@@ -3,9 +3,12 @@ using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
 using CleanService.Src.Constant;
+using CleanService.Src.Models;
 using CleanService.Src.Modules.Auth.Infrastructures;
+using CleanService.Src.Modules.Auth.Mapping.DTOs;
 using CleanService.Src.Modules.Auth.Mapping.Profiles;
 using CleanService.Src.Modules.Auth.Services;
+using CleanService.Src.Repositories.User;
 using CleanService.Src.Utils;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -62,9 +65,14 @@ public static class AuthModule
             {
                 OnCreatingTicket = async context =>
                 {
-                    // var authRepository = context.HttpContext.RequestServices.GetRequiredService<IAuthRepository>();
-                    // var role = context.Principal?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-
+                    var authService = context.HttpContext.RequestServices.GetRequiredService<IAuthService>();
+                    
+                    // var queryString = context.Request.Query.ToList();
+                    // var code = queryString.FirstOrDefault(q => q.Key == "code").Value.ToString();
+                    // var state = queryString.FirstOrDefault(q => q.Key == "state").Value.ToString();
+                    //     var tokenResponse = await authService.ExchangeCodeForTokensAsync(code);
+                    
+                    // Send user's information to oauth provider
                     var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
                     request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                     request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", context.AccessToken);
@@ -76,7 +84,24 @@ public static class AuthModule
 
                     context.RunClaimActions(user);
 
-                    // var claim = context.Principal?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+                    // Register user to database
+                    if (context.Properties.Items.TryGetValue("role", out var role))
+                    {
+                        var id = context.Principal?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)
+                            ?.Value;
+                        var email = context.Principal?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value;
+                        var fullname = context.Principal?.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value;
+                        if (id != null && email != null && fullname != null && role != null)
+                        {
+                            await authService.RegisterUser(new RegistrationRequestDto
+                            {
+                                Id = id,
+                                Email = email,
+                                Fullname = fullname,
+                                UserType = Enum.Parse<UserType>(role)
+                            });
+                        }
+                    }
                 }
             };
         });

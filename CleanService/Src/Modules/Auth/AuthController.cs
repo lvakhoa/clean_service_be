@@ -7,15 +7,19 @@ using CleanService.Src.Modules.Auth.Mapping.DTOs;
 using CleanService.Src.Modules.Auth.Services;
 using CleanService.Src.Utils;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Options;
 using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Modules.Auth;
 
-// [Authorize]
+[Authorize]
+[ApiController]
 [Route("[controller]")]
-public class AuthController : Controller
+public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
 
@@ -24,52 +28,71 @@ public class AuthController : Controller
         _authService = authService;
     }
 
-    [HttpGet("create-customer")]
-    public async Task<IActionResult> CreateCustomer()
+    [AllowAnonymous]
+    [HttpGet("oauth/redirect")]
+    public IActionResult OAuthRedirect()
     {
-        await _authService.RegisterUser(new RegistrationRequestDto
-        {
-            Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value!,
-            Email = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value!,
-            Fullname = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value!,
-            UserType = UserType.Customer
-        });
+        var cookies = Request.Cookies;
 
+        cookies.ToList().ForEach(pair => Response.Cookies.Append(pair.Key, pair.Value));
         return Redirect("http://localhost:3000/");
     }
 
-    [HttpGet("create-helper")]
-    public async Task<IActionResult> CreateHelper()
+    [HttpGet("signup/customer")]
+    [AllowAnonymous]
+    public IActionResult SignUpCustomer()
     {
-        await _authService.RegisterUser(new RegistrationRequestDto
+        var properties = new AuthenticationProperties
         {
-            Id = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value!,
-            Email = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Email)?.Value!,
-            Fullname = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Name)?.Value!,
-            UserType = UserType.Helper
-        });
+            RedirectUri = Url.Action("OAuthRedirect", "Auth")
+        };
+        properties.Items["role"] = UserType.Customer.ToString();
 
-        return Redirect("http://localhost:3000/");
+        return Challenge(properties,
+            authenticationSchemes: new[] { AuthProvider.Provider });
     }
 
-    [HttpGet("login/customer")]
-    public IActionResult LoginCustomer()
+    [HttpGet("signup/helper")]
+    [AllowAnonymous]
+    public IActionResult SignUpHelper()
+    {
+        var properties = new AuthenticationProperties
+        {
+            RedirectUri = Url.Action("OAuthRedirect", "Auth")
+        };
+        properties.Items["role"] = UserType.Helper.ToString();
+
+        return Challenge(properties,
+            authenticationSchemes: new[] { AuthProvider.Provider });
+    }
+
+    [HttpGet("login")]
+    [AllowAnonymous]
+    public IActionResult LogIn()
     {
         return Challenge(new AuthenticationProperties()
             {
-                RedirectUri = "http://localhost:5011/api/v1/auth/create-customer"
+                RedirectUri = Url.Action("OAuthRedirect", "Auth")
             },
             authenticationSchemes: new[] { AuthProvider.Provider });
     }
 
-    [HttpGet("login/helper")]
-    public IActionResult LoginHelper()
+    [HttpDelete("logout")]
+    public async Task<IActionResult> LogOut()
     {
-        return Challenge(new AuthenticationProperties()
-            {
-                RedirectUri = "http://localhost:5011/api/v1/auth/create-helper"
-            },
-            authenticationSchemes: new[] { AuthProvider.Provider });
+        var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null)
+            throw new ExceptionResponse(HttpStatusCode.Unauthorized, "Unauthorized", ExceptionConvention.Unauthorized);
+        
+        await _authService.LogoutUser(userId);
+        if (Request.Cookies[".AspNetCore.Cookies"] != null)
+            Response.Cookies.Delete(".AspNetCore.Cookies");
+
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Logout successfully",
+        });
     }
 
     [HttpGet("user/{id}")]
@@ -104,7 +127,8 @@ public class AuthController : Controller
 
     [HttpPatch("helper/{id}")]
     // [ModelValidation]
-    public async Task<IActionResult> UpdateHelperInfo(string id, [FromBody] UpdateHelperRequestDto updateHelperRequestDto)
+    public async Task<IActionResult> UpdateHelperInfo(string id,
+        [FromBody] UpdateHelperRequestDto updateHelperRequestDto)
     {
         // var currentUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
         // if (currentUserId != id && !User.IsInRole(UserType.Admin.ToString()))
@@ -141,7 +165,7 @@ public class AuthController : Controller
         var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         if (userId == null)
             throw new ExceptionResponse(HttpStatusCode.Unauthorized, "Unauthorized", ExceptionConvention.Unauthorized);
-        
+
         var user = await _authService.GetUserById(userId);
         return Ok(new SuccessResponse
         {
@@ -172,6 +196,32 @@ public class AuthController : Controller
         {
             StatusCode = HttpStatusCode.OK,
             Message = "Activate user successfully"
+        });
+    }
+
+    [HttpPost("decode")]
+    public IActionResult DecodeCookie()
+    {
+        var claims = User.Claims.Select(pair =>
+        {
+            var type = pair.Type switch
+            {
+                ClaimTypes.NameIdentifier => "Id",
+                ClaimTypes.Email => "Email",
+                ClaimTypes.Name => "Fullname",
+                ClaimTypes.Role => "Role",
+                _ => "Unknown"
+            };
+            return new { type, pair.Value };
+        }).ToList();
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Decode cookie successfully",
+            Data = new
+            {
+                Claims = claims
+            }
         });
     }
 }
