@@ -1,21 +1,29 @@
 using System.Linq.Expressions;
+using System.Net.Http.Headers;
 using AutoMapper;
+using CleanService.Src.Constant;
 using CleanService.Src.Models;
 using CleanService.Src.Modules.Auth.Infrastructures;
 using CleanService.Src.Modules.Auth.Mapping.DTOs;
 using CleanService.Src.Repositories;
+using CleanService.Src.Utils.RequestClient;
+using Newtonsoft.Json;
 using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Modules.Auth.Services;
 
 public class AuthService : IAuthService
 {
+    private readonly IRequestClient _requestClient;
+    private readonly IConfiguration _configuration;
     private readonly IAuthUnitOfWork _authUnitOfWork;
-
     private readonly IMapper _mapper;
 
-    public AuthService(IAuthUnitOfWork authUnitOfWork, IMapper mapper)
+    public AuthService(IRequestClient requestClient, IConfiguration configuration, IAuthUnitOfWork authUnitOfWork,
+        IMapper mapper)
     {
+        _requestClient = requestClient;
+        _configuration = configuration;
         _authUnitOfWork = authUnitOfWork;
         _mapper = mapper;
     }
@@ -44,6 +52,17 @@ public class AuthService : IAuthService
             await _authUnitOfWork.SaveChangesAsync();
         }
     }
+
+    public async Task LogoutUser(string id)
+    {
+        // Get all user's sessions
+        var sessions = await _requestClient.GetJson<Session[]>($"{RemoteBaseUrl.ClerkBaseUrl}sessions?user_id={id}&status=active");
+        foreach (var s in sessions)
+        {
+            await _requestClient.PostFormAsync($"{RemoteBaseUrl.ClerkBaseUrl}sessions/{s.Id}/revoke", new Dictionary<string, string>());
+        }
+    }
+
 
     public async Task<UserResponseDto?> GetUserById(string id)
     {
@@ -139,5 +158,39 @@ public class AuthService : IAuthService
         user.Status = UserStatus.Blocked;
 
         await _authUnitOfWork.SaveChangesAsync();
+    }
+
+    public async Task<Tokens> ExchangeCodeForTokensAsync(string code)
+    {
+        var providerDomain = _configuration.GetValue<string>("OAuthProvider:Domain");
+
+        return await _requestClient.PostFormAsync<Tokens>(AuthProvider.TokenEndpoint(providerDomain!),
+            new Dictionary<string, string>
+            {
+                { "code", code },
+                { "client_id", _configuration.GetValue<string>("OAuthProvider:ClientId")! },
+                { "client_secret", _configuration.GetValue<string>("OAuthProvider:ClientSecret")! },
+                { "grant_type", "authorization_code" },
+                { "redirect_uri", "http://localhost:5011/api/v1/oauth/callback"}
+            });
+    }
+
+    public async Task<UserInfo> GetUserInfoAsync(string accessToken)
+    {
+        var providerDomain = _configuration.GetValue<string>("OAuthProvider:Domain");
+
+        return await _requestClient.GetJson<UserInfo>(AuthProvider.UserInformationEndpoint(providerDomain!),
+            new Dictionary<string, object>
+            {
+                { "Bearer", accessToken }
+            });
+    }
+
+    public async Task<bool> CheckUserExistsAsync(string email)
+    {
+        var response =
+            await _requestClient.GetJson<List<User>>($"{RemoteBaseUrl.ClerkBaseUrl}/users?email_address={email}");
+
+        return response.Any();
     }
 }
