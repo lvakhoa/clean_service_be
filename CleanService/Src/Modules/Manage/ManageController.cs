@@ -41,6 +41,36 @@ public class ManageController : Controller
         });
     }
     
+    [HttpGet("customers")]
+    public async Task<ActionResult<UserResponseDto>> GetCustomers(int? page, int? limit)
+    {
+        if (page < 1 || limit < 1)
+        {
+            throw new ExceptionResponse(HttpStatusCode.BadRequest, "Page or limit param is negative",
+                ExceptionConvention.ValidationFailed);
+        }
+        var customer = await _manageService.GetCustomer(page, limit);
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Get customer successfully",
+            Data = customer
+        });
+    }
+    
+    [HttpGet("customers/{id}")]
+    public async Task<ActionResult<UserResponseDto>> GetCustomerById(string id)
+    {
+        var customer = await _manageService.GetCustomerById(id);
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Get customer successfully",
+            Data = customer
+        });
+    }
+    
+    
     [HttpGet("helpers")]
     public async Task<ActionResult<Pagination<HelperDetailResponseDto>>> GetHelpers(int? page, int? limit)
     {

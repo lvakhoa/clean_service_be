@@ -21,7 +21,7 @@ public class AdminUpdateUserRequestDto
     public string? Address { get; set; } = null!;
     
     [MaxLength(20)]
-    [RegularExpression("/(84|0[3|5|7|8|9])+([0-9]{8})\b/g", ErrorMessage = "Invalid phone number")]
+    // [RegularExpression("/(84|0[3|5|7|8|9])+([0-9]{8})\b/g", ErrorMessage = "Invalid phone number")]
     public string? PhoneNumber { get; set; } = null!;
     
     [EnumDataType(typeof(UserStatus), ErrorMessage = "Invalid user status specified")]
