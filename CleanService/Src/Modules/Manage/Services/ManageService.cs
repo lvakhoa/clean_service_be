@@ -3,6 +3,7 @@ using System.Net;
 using AutoMapper;
 using CleanService.Src.Constant;
 using CleanService.Src.Models;
+using CleanService.Src.Modules.Auth.Mapping.DTOs;
 using CleanService.Src.Modules.Booking.Mapping.DTOs;
 using CleanService.Src.Modules.Manage.Infrastructures;
 using CleanService.Src.Modules.Manage.Mapping.DTOs;
@@ -47,6 +48,45 @@ public class ManageService : IManageService
         return Task.FromResult(new Pagination<HelperDetailResponseDto>(helperDto, totalHelpers,
             currentPage,
             currentLimit));
+    }
+
+    public Task<Pagination<UserResponseDto>> GetCustomer(int? page, int? limit, UserStatus? userStatus = UserStatus.Active)
+    {
+        Expression<Func<Users, bool>> predicate = entity => entity.Status == userStatus && entity.UserType == UserType.Customer;
+        
+        var customers = _manageUnitOfWork.UserRepository.Find(predicate,
+            order: entity => entity.FullName,false, page, limit,
+            new FindOptions
+            {
+                IsAsNoTracking = true
+            });
+        var totalCustomers = customers.ToList().Count;
+
+        var helperDto = _mapper.Map<UserResponseDto[]>(customers);
+
+        var currentPage = page ?? 1;
+        var currentLimit = limit ?? totalCustomers;
+
+        return Task.FromResult(new Pagination<UserResponseDto>(helperDto, totalCustomers,
+            currentPage,
+            currentLimit));
+    }
+    
+    public async Task<UserResponseDto> GetCustomerById(string id)
+    {
+        Expression<Func<Users, bool>> predicate = entity => entity.Id == id && entity.UserType == UserType.Customer;
+        
+        var customer = await _manageUnitOfWork.UserRepository.FindOneAsync(predicate,
+            new FindOptions
+            {
+                IsAsNoTracking = true
+            });
+        if (customer == null)
+            throw new KeyNotFoundException("Customer not found");
+
+        var customerDto = _mapper.Map<UserResponseDto>(customer);
+
+        return customerDto;
     }
 
     public Task<Pagination<FeedbackResponseDto>> GetFeedbacks(int? page, int? limit)
@@ -265,10 +305,6 @@ public class ManageService : IManageService
         if(blacklistedBy == null)
             throw new KeyNotFoundException("Blacklisted By not found");
         
-        var checkIfExistBlacklisted = await _manageUnitOfWork.BlacklistedUserRepository.FindOneAsync(entity => entity.UserId == blacklisted.UserId && entity.BlacklistedBy == blacklisted.BlacklistedBy);
-        if(checkIfExistBlacklisted != null)
-            throw new ExceptionResponse(HttpStatusCode.Conflict, "User already blacklisted",
-                ExceptionConvention.ItemAlreadyExist);
         await _manageUnitOfWork.BlacklistedUserRepository.AddAsync(blacklisted);
         await _manageUnitOfWork.SaveChangesAsync();
     }
