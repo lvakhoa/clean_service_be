@@ -48,7 +48,7 @@ public class SchedulerService : ISchedulerService
         return booking;
     }
 
-    public async Task<Pagination<BookingResponseDto>> QueryScheduledBooking(string? helperId,string? customerId, int? page, int? limit)
+    public async Task<Pagination<BookingResponseDto>> QueryScheduledBooking(string? customerId = null, string? helperId = null, int? page = null, int? limit = null)
     {
         
         var booking =  _bookingUnitOfWork.BookingRepository.Find(
