@@ -108,6 +108,34 @@ public class ManageService : IManageService
         return Task.FromResult(new Pagination<FeedbackResponseDto>(feedbackDto, totalFeedbacks, currentPage, currentLimit));
     }
 
+    public async Task<FeedbackResponseDto> GetFeedbackById(Guid id)
+    {
+        var feedback = await _manageUnitOfWork.FeedbackRepository.FindOneAsync(entity => entity.Id == id,
+            new FindOptions
+            {
+                IsAsNoTracking = true
+            });
+        
+        if (feedback == null)
+            throw new KeyNotFoundException("Feedback not found");
+        
+        return _mapper.Map<FeedbackResponseDto>(feedback);
+    }
+    
+    public async Task DeleteFeedback(Guid id)
+    {
+        var feedback = await _manageUnitOfWork.FeedbackRepository.FindOneAsync(entity => entity.Id == id);
+
+        if (feedback == null)
+        {
+            throw new KeyNotFoundException("Feedback not found");
+        }
+        
+        _manageUnitOfWork.FeedbackRepository.Delete(feedback);
+        
+        await _manageUnitOfWork.SaveChangesAsync();
+    }
+    
     public Task<Pagination<RefundResponseDto>> GetRefunds(RefundStatus? status,int? page, int? limit)
     {
         Expression<Func<Refunds, bool>> predicate = status != null? entity => entity.Status == status : entity => true;

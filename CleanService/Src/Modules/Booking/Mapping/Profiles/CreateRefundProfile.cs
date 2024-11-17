@@ -14,7 +14,7 @@ public class CreateRefundProfile : Profile
                 Id = Guid.NewGuid(),
                 BookingId = dto.BookingId,
                 Reason = dto.Reason,
-               // ResolvedAt = dto.ResolvedAt,
+                ResolvedAt = null,
             });
     }
 }
