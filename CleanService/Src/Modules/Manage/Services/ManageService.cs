@@ -3,8 +3,7 @@ using System.Net;
 using AutoMapper;
 using CleanService.Src.Constant;
 using CleanService.Src.Models;
-using CleanService.Src.Modules.Auth.Mapping.DTOs;
-using CleanService.Src.Modules.Booking.Mapping.DTOs;
+// using CleanService.Src.Modules.Auth.Mapping.DTOs;
 using CleanService.Src.Modules.Manage.Infrastructures;
 using CleanService.Src.Modules.Manage.Mapping.DTOs;
 using CleanService.Src.Modules.Manage.Mapping.DTOs.BlackListed;
@@ -14,6 +13,9 @@ using CleanService.Src.Modules.Manage.Mapping.DTOs.RoomPricing;
 using CleanService.Src.Repositories;
 using CleanService.Src.Utils;
 using Pagination.EntityFrameworkCore.Extensions;
+using System.Security.Claims;
+using CleanService.Src.Modules.Auth.Mapping.DTOs;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CleanService.Src.Modules.Manage.Services;
 
@@ -121,7 +123,49 @@ public class ManageService : IManageService
         
         return _mapper.Map<FeedbackResponseDto>(feedback);
     }
+
+    public Task<Pagination<FeedbackResponseDto>> GetFeedbacksOfCurrentCustomer( string userId,int? page, int? limit)
+    {
+        var feedbacks = _manageUnitOfWork.FeedbackRepository.Find(
+            entity => entity.Booking.CustomerId == userId,
+            order: entity => entity.CreatedAt,false,
+            null,
+            null,
+            new FindOptions
+            {
+                IsAsNoTracking = true
+            });
+        
+        var totalFeedbacks = feedbacks.ToList().Count;
+        var feedbackDto = _mapper.Map<FeedbackResponseDto[]>(feedbacks.ToList());
+        
+        var currentPage = page ?? 1;
+        var currentLimit = limit ?? totalFeedbacks;
+        
+        return Task.FromResult(new Pagination<FeedbackResponseDto>(feedbackDto, totalFeedbacks, currentPage, currentLimit));
+    }
     
+    public Task<Pagination<RefundResponseDto>> GetRefundsOfCurrentCustomer(string userId, int? page, int? limit)
+    {
+        var refunds = _manageUnitOfWork.RefundRepository.Find(
+            entity => entity.Booking.CustomerId == userId,
+            order: entity => entity.CreatedAt,false,
+            null,
+            null,
+            new FindOptions
+            {
+                IsAsNoTracking = true
+            });
+        
+        var totalRefunds = refunds.ToList().Count;
+        var refundDto = _mapper.Map<RefundResponseDto[]>(refunds.ToList());
+        
+        var currentPage = page ?? 1;
+        var currentLimit = limit ?? totalRefunds;
+        
+        return Task.FromResult(new Pagination<RefundResponseDto>(refundDto, totalRefunds, currentPage, currentLimit));
+    }
+
     public async Task DeleteFeedback(Guid id)
     {
         var feedback = await _manageUnitOfWork.FeedbackRepository.FindOneAsync(entity => entity.Id == id);
