@@ -16,7 +16,9 @@ public class FeedbackProfile: Profile
                 Title = entity.Title,
                 Description = entity.Description,
                 CreatedAt = entity.CreatedAt,
-                HelperRating = entity.Booking.HelperRating
+                HelperRating = entity.Booking.HelperRating,
+                CustomerAvatar = entity.Booking.Customer.ProfilePicture,
+                CustomerName = entity.Booking.Customer.FullName
             });
     }
 }

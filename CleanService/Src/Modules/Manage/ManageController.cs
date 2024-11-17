@@ -296,6 +296,31 @@ public class ManageController : Controller
         });
     }
     
+    [HttpGet("feedbacks/{id}")]
+    public async Task<ActionResult<FeedbackResponseDto>> GetFeedbackById(Guid id)
+    {
+        var feedback = await _manageService.GetFeedbackById(id);
+        
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Get feedback successfully",
+            Data = feedback
+        });
+    }
+    
+    [HttpDelete("feedbacks/{id}")]
+    public async Task<IActionResult> DeleteFeedback(Guid id)
+    {
+        await _manageService.DeleteFeedback(id);
+        
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Delete feedback successfully"
+        });
+    }
+    
     [HttpPatch("users/{id}")]
     [ModelValidation]
     public async Task<IActionResult> UpdateUser(string id,[FromBody] AdminUpdateUserRequestDto adminUpdateUserRequestDto)

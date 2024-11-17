@@ -15,6 +15,8 @@ public interface IManageService
     public Task<Pagination<UserResponseDto>> GetCustomer(int? page, int? limit, UserStatus? userStatus = UserStatus.Active);
     public Task<UserResponseDto> GetCustomerById(string id);
     public Task<Pagination<FeedbackResponseDto>> GetFeedbacks(int? page, int? limit);
+    public Task<FeedbackResponseDto> GetFeedbackById(Guid id);
+    public Task DeleteFeedback(Guid id);
     public Task<Pagination<RefundResponseDto>> GetRefunds(RefundStatus? status,int? page, int? limit);
     public Task<RefundResponseDto> GetRefundById(Guid id);
     public Task UpdateRefund(Guid id, UpdateRefundRequestDto updateRefundRequestDto);
