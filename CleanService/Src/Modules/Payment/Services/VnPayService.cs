@@ -1,4 +1,5 @@
 using CleanService.Src.Models;
+using CleanService.Src.Modules.Payment.Mapping.DTOs.PayOs;
 
 namespace CleanService.Src.Modules.Payment.Services;
 
@@ -27,7 +28,17 @@ public class VnPayService : IPaymentService
          throw new NotImplementedException();
     }
 
+    public bool CheckWebhookSignature(string signature, WebhookData body)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task ConfirmPayment(int orderCode)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task CancelPayment(int orderCode)
     {
         throw new NotImplementedException();
     }

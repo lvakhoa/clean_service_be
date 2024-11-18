@@ -4,6 +4,7 @@ using CleanService.Src.Repositories.BookingContract;
 using CleanService.Src.Repositories.Contract;
 using CleanService.Src.Repositories.DurationPrices;
 using CleanService.Src.Repositories.Feedback;
+using CleanService.Src.Repositories.Helper;
 using CleanService.Src.Repositories.Refund;
 using CleanService.Src.Repositories.RoomPricings;
 using CleanService.Src.Repositories.ServiceType;
@@ -16,6 +17,8 @@ public interface IBookingUnitOfWork
     IBookingRepository BookingRepository { get; }
     
     IUserRepository UserRepository { get; }
+    
+    IHelperRepository HelperRepository { get; }
     
     IServiceTypeRepository ServiceTypeRepository { get; }
     

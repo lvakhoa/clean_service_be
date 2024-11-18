@@ -2,14 +2,11 @@ using System.Net;
 using System.Security.Claims;
 using System.Text.Json.Serialization;
 using CleanService.Src.Constant;
-using CleanService.Src.Filters;
 using CleanService.Src.Middlewares;
 using CleanService.Src.Models;
 using CleanService.Src.Modules;
-using CleanService.Src.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,6 +53,22 @@ builder.Services.AddAuthorization(options =>
 
     options.AddPolicy(AuthPolicy.IsCustomer,
         policy => { policy.RequireClaim(ClaimTypes.Role, UserType.Customer.ToString()); });
+
+    options.AddPolicy(AuthPolicy.IsAdminOrHelper,
+        policy => { policy.RequireClaim(ClaimTypes.Role, UserType.Admin.ToString(), UserType.Helper.ToString()); });
+
+    options.AddPolicy(AuthPolicy.IsAdminOrCustomer,
+        policy => { policy.RequireClaim(ClaimTypes.Role, UserType.Admin.ToString(), UserType.Customer.ToString()); });
+
+    options.AddPolicy(AuthPolicy.IsHelperOrCustomer,
+        policy => { policy.RequireClaim(ClaimTypes.Role, UserType.Customer.ToString(), UserType.Helper.ToString()); });
+
+    options.AddPolicy(AuthPolicy.IsAdminOrHelperOrCustomer,
+        policy =>
+        {
+            policy.RequireClaim(ClaimTypes.Role, UserType.Admin.ToString(), UserType.Customer.ToString(),
+                UserType.Helper.ToString());
+        });
 });
 
 builder.Services
@@ -107,9 +120,9 @@ app.Use(async (context, next) =>
 app.UsePathBase(new PathString("/api/v1"));
 app.UseRouting();
 
-app.UseStatusCodePages(new StatusCodePagesOptions()
+app.UseStatusCodePages(new StatusCodePagesOptions
 {
-    HandleAsync = async (ctx) =>
+    HandleAsync = async ctx =>
     {
         if (ctx.HttpContext.Response.StatusCode == 404)
         {

@@ -23,7 +23,7 @@ public interface IManageService
     public Task<RefundResponseDto> GetRefundById(Guid id);
     public Task UpdateRefund(Guid id, UpdateRefundRequestDto updateRefundRequestDto);
     public Task DeleteRefund(Guid id);
-    public Task<Pagination<RoomPricingResponseDto>> GetRoomPricing(int? page, int? limit);
+    public Task<Pagination<RoomPricingResponseDto>> GetRoomPricing(int? page, int? limit, RoomType? roomType, Guid? serviceTypeId);
     public Task CreateRoomPricing(CreateRoomPricingRequestDto createRoomPricingRequestDto);
     public Task UpdateRoomPricing(Guid id,UpdateRoomPricingRequestDto updateRoomPricingRequestDto);
     public Task DeleteRoomPricing(Guid id);

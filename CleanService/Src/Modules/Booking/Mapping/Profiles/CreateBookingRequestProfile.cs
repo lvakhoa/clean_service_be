@@ -22,7 +22,7 @@ public class CreateBookingRequestProfile : Profile
         CreateMap<CreateBookingDetails, BookingDetails>()
             .ConstructUsing(dto => new BookingDetails
             {
-                DurationPriceId = Guid.Parse(dto.DurationPriceId),
+                DurationPriceId = dto.DurationPriceId != null ? Guid.Parse(dto.DurationPriceId) : null,
                 BedroomCount = dto.BedroomCount,
                 BathroomCount = dto.BathroomCount,
                 KitchenCount = dto.KitchenCount,

@@ -4,6 +4,7 @@ using CleanService.Src.Repositories.BookingContract;
 using CleanService.Src.Repositories.Contract;
 using CleanService.Src.Repositories.DurationPrices;
 using CleanService.Src.Repositories.Feedback;
+using CleanService.Src.Repositories.Helper;
 using CleanService.Src.Repositories.Refund;
 using CleanService.Src.Repositories.RoomPricings;
 using CleanService.Src.Repositories.ServiceType;
@@ -18,6 +19,8 @@ public class BookingUnitOfWork : IBookingUnitOfWork
     public IBookingRepository BookingRepository { get; }
     
     public IUserRepository UserRepository { get; }
+    
+    public IHelperRepository HelperRepository { get; }
 
     public IServiceTypeRepository ServiceTypeRepository { get; }
 
@@ -35,6 +38,7 @@ public class BookingUnitOfWork : IBookingUnitOfWork
         CleanServiceContext dbContext, 
         IBookingRepository bookingRepository, 
         IUserRepository userRepository, 
+        IHelperRepository helperRepository,
         IServiceTypeRepository serviceTypeRepository,
         IDurationPriceRepository durationPriceRepository, 
         IRoomPricingRepository roomPricingRepository,
@@ -45,6 +49,7 @@ public class BookingUnitOfWork : IBookingUnitOfWork
         _dbContext = dbContext;
         BookingRepository = bookingRepository;
         UserRepository = userRepository;
+        HelperRepository = helperRepository;
         ServiceTypeRepository = serviceTypeRepository;
         DurationPriceRepository = durationPriceRepository;
         RoomPricingRepository = roomPricingRepository;

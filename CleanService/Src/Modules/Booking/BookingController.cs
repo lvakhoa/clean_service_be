@@ -1,4 +1,5 @@
 using System.Net;
+using System.Security.Claims;
 using CleanService.Src.Modules.Booking.Mapping.DTOs;
 using CleanService.Src.Modules.Booking.Services;
 using CleanService.Src.Utils;
@@ -21,6 +22,12 @@ public class BookingController : Controller
     [HttpPost("create")]
     public async Task<ActionResult> CreateBooking([FromBody] CreateBookingRequestDto createBooking)
     {
+        var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+        if(userId == null)
+        {
+            throw new UnauthorizedAccessException("Unauthorized");
+        }
+        createBooking.CustomerId = userId;
         var paymentLink = await _bookingService.CreateBooking(createBooking);
         return CreatedAtAction("CreateBooking", new SuccessResponse()
         {

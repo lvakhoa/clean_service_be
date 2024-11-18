@@ -28,7 +28,7 @@ public class CreateBookingRequestDto
 
 public class CreateBookingDetails
 {
-    public string DurationPriceId { get; set; } = null!;
+    public string? DurationPriceId { get; set; } = null!;
     
     public int BedroomCount { get; set; }
     
