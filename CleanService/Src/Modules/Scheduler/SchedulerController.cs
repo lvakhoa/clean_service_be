@@ -1,4 +1,6 @@
 using System.Net;
+using System.Security.Claims;
+using CleanService.Src.Constant;
 using CleanService.Src.Models;
 using CleanService.Src.Modules.Booking.Mapping.DTOs;
 using CleanService.Src.Modules.Booking.Services;
@@ -29,11 +31,46 @@ public class SchedulerController : Controller
     //         Data = result
     //     });
     // }
-    
-    [HttpGet]
-    public async Task<ActionResult<BookingResponseDto[]>> GetScheduledBookingByHelperId(string? helperId,string? customerId, int? page, int? limit)
+
+    [HttpGet("current")]
+    public async Task<ActionResult<BookingResponseDto[]>> GetCurrentUserBookings()
     {
-        var result = await _schedulerService.QueryScheduledBooking(helperId, customerId, page, limit);
+        var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        var userType = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
+        if (userId == null)
+            throw new ExceptionResponse(HttpStatusCode.Unauthorized, "Unauthorized", ExceptionConvention.Unauthorized);
+        
+        if (userType == "Customer")
+        {
+            var result = await _schedulerService.QueryScheduledBooking(userId);
+            return Ok(new SuccessResponse
+            {
+                StatusCode = HttpStatusCode.OK,
+                Message = "Get current customer's bookings successfully",
+                Data = result
+            });
+        }
+        else if (userType == "Helper")
+        {
+            // Nếu là Helper, truy vấn booking của người giúp việc
+            var result = await _schedulerService.QueryScheduledBooking(null, userId);
+            return Ok(new SuccessResponse
+            {
+                StatusCode = HttpStatusCode.OK,
+                Message = "Get current helper's bookings successfully",
+                Data = result
+            });
+        }
+        else
+        {
+            throw new ExceptionResponse(HttpStatusCode.Forbidden, "Forbidden", ExceptionConvention.Forbidden);
+        }
+    }
+    
+    [HttpGet()]
+    public async Task<ActionResult<BookingResponseDto[]>> GetScheduledBookingByHelperId(string? helperId, string? customerId, int? page, int? limit)
+    {
+        var result = await _schedulerService.QueryScheduledBooking(customerId, helperId, page, limit);
         return Ok(new SuccessResponse
         {
             StatusCode = HttpStatusCode.OK,

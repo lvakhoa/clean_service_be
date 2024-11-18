@@ -7,7 +7,7 @@ public interface ISchedulerService
 {
     
     //Task<Pagination<BookingResponseDto>> GetScheduledBookingByHelperId(string helperId, int? page, int? limit);
-    Task<Pagination<BookingResponseDto>> QueryScheduledBooking(string? helperId,string? customerId, int? page, int? limit);
+    Task<Pagination<BookingResponseDto>> QueryScheduledBooking(string? customerId = null, string? helperId = null, int? page = null, int? limit = null);
     // Task<Pagination<BookingResponseDto>> GetScheduledBookingByCustomerId(string customerId, int? page, int? limit);
     // Task<Pagination<BookingResponseDto>> GetAllScheduledBookings(int? page, int? limit);
     
