@@ -1,4 +1,5 @@
 using System.Net;
+using System.Security.Claims;
 using CleanService.Src.Constant;
 using CleanService.Src.Filters;
 using CleanService.Src.Models;
@@ -347,4 +348,45 @@ public class ManageController : Controller
         });
     }
     
+    [HttpGet("feedbacks/customer")]
+    public async Task<ActionResult<Pagination<FeedbackResponseDto>>> GetFeedbacksOfCurrentCustomer(int? page, int? limit)
+    {
+        if (page < 1 || limit < 1)
+        {
+            throw new ExceptionResponse(HttpStatusCode.BadRequest, "Page or limit param is negative",
+                ExceptionConvention.ValidationFailed);
+        }
+        
+        var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
+        
+        var feedbacks = await _manageService.GetFeedbacksOfCurrentCustomer(userId, page, limit);
+        
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Get feedbacks of current customer successfully",
+            Data = feedbacks
+        });
+    }
+    
+    [HttpGet("refunds/customer")]
+    public async Task<ActionResult<Pagination<RefundResponseDto>>> GetRefundsOfCurrentCustomer(int? page, int? limit)
+    {
+        if (page < 1 || limit < 1)
+        {
+            throw new ExceptionResponse(HttpStatusCode.BadRequest, "Page or limit param is negative",
+                ExceptionConvention.ValidationFailed);
+        }
+        
+        var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
+        
+        var refunds = await _manageService.GetRefundsOfCurrentCustomer(userId, page, limit);
+        
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Get refunds of current customer successfully",
+            Data = refunds
+        });
+    }
 }
