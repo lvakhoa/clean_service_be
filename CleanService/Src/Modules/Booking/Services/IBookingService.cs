@@ -15,7 +15,7 @@ public interface IBookingService
 
     Task<BookingResponseDto?> GetBookingById(Guid id);
     
-    Task<string?> AssignHelperToBooking(Bookings booking);
+    Task<string?> AssignHelperToBooking(Bookings booking, Users customer);
     
     Task CreateRefund(CreateRefundRequestDto createRefundRequestDto);
     

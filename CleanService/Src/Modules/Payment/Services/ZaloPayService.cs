@@ -1,6 +1,7 @@
 using System.Globalization;
 using System.Text;
 using CleanService.Src.Models;
+using CleanService.Src.Modules.Payment.Mapping.DTOs.PayOs;
 using CleanService.Src.Utils;
 using CleanService.Src.Utils.Crypto;
 using CleanService.Src.Utils.RequestClient;
@@ -64,7 +65,17 @@ public class ZaloPayService : IPaymentService
         return "";
     }
 
+    public bool CheckWebhookSignature(string signature, WebhookData body)
+    {
+        throw new NotImplementedException();
+    }
+
     public Task ConfirmPayment(int orderCode)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task CancelPayment(int orderCode)
     {
         throw new NotImplementedException();
     }

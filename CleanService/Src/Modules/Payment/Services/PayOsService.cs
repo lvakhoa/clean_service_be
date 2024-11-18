@@ -1,5 +1,6 @@
 using System.Net;
 using System.Text;
+using CleanService.Src.Constant;
 using CleanService.Src.Models;
 using CleanService.Src.Modules.Payment.Infrastructures;
 using CleanService.Src.Modules.Payment.Mapping.DTOs.PayOs;
@@ -34,36 +35,11 @@ public class PayOsService : IPaymentService
 
     public async Task<string> CreatePaymentLink(Bookings booking)
     {
-        // var items = new List<Dictionary<string, object>>(new[]
-        // {
-        //     new Dictionary<string, object>
-        //     {
-        //         { "name", booking.ServiceType.Name },
-        //         { "quantity", 1 },
-        //         { "price", Convert.ToInt32(decimal.Round(booking.TotalPrice)) }
-        //     }
-        // });
-        //
-        // var requestBody = new Dictionary<string, object>
-        // {
-        //     { "orderCode", new Random().Next(1, 100) },
-        //     { "amount", Convert.ToInt32(decimal.Round(booking.TotalPrice)) },
-        //     { "description", "Clean" },
-        //     { "buyerName", booking.Customer.FullName },
-        //     { "buyerEmail", booking.Customer.Email },
-        //     { "buyerPhone", booking.Customer.PhoneNumber ?? "" },
-        //     { "buyerAddress", booking.Customer.Address ?? "" },
-        //     { "items", items },
-        //     { "cancelUrl", "https://your-cancel-url.com" },
-        //     { "returnUrl", "https://your-success-url.com" },
-        //     { "expiredAt", Timestamp.GetTimeStamp(DateTime.Now.AddMinutes(20)) },
-        // };
-
         var requestBody = new CreatePaymentLinkDto
         {
             OrderCode = booking.OrderId,
             Amount = Convert.ToInt32(decimal.Round(booking.TotalPrice)),
-            Description = booking.Location,
+            Description = booking.ServiceType.Name,
             BuyerName = booking.Customer.FullName,
             BuyerEmail = booking.Customer.Email,
             BuyerPhone = booking.Customer.PhoneNumber ?? "",
@@ -93,11 +69,33 @@ public class PayOsService : IPaymentService
             { "x-client-id", _clientId },
             { "x-api-key", _apiKey },
         };
-        var response = await _requestClient.PostAsync<PaymentLinkResponseDto>(uri: _url + "/payment-requests", content:
-            new StringContent(JsonConvert.SerializeObject(requestBody)), contentType: "application/json",
-            headers: headers);
+        try
+        {
+            var response = await _requestClient.PostAsync<PaymentLinkResponseDto>(uri: _url + "/payment-requests",
+                content:
+                new StringContent(JsonConvert.SerializeObject(requestBody)), contentType: "application/json",
+                headers: headers);
+            return response.Data.CheckoutUrl;
+        }
+        catch (Exception e)
+        {
+            throw new ExceptionResponse(HttpStatusCode.BadRequest, "Failed to create payment link",
+                ExceptionConvention.CannotCreatePayment, new[] { e.Message });
+        }
+    }
 
-        return response.Data.CheckoutUrl;
+    public bool CheckWebhookSignature(string signature, WebhookData body)
+    {
+        var requestBodyDict = PaymentUtil.ConvertObjToDict(body);
+        var hmacInput = PaymentUtil.ConvertObjToQueryStr(requestBodyDict,
+            new List<string>
+            {
+                "orderCode", "amount", "description", "accountNumber", "reference", "transactionDateTime",
+                "currency", "paymentLinkId", "code", "desc", "counterAccountBankId", "counterAccountBankName",
+                "counterAccountName", "counterAccountNumber", "virtualAccountName", "virtualAccountNumber"
+            }, "&");
+        var dataSignature = HmacHelper.Compute(HmacAlgo.HMACSHA256, _checksumKey, hmacInput);
+        return dataSignature == signature;
     }
 
     public async Task ConfirmPayment(int orderCode)
@@ -107,6 +105,19 @@ public class PayOsService : IPaymentService
             return;
 
         booking.PaymentStatus = PaymentStatus.Paid;
+        await _paymentUnitOfWork.SaveChangesAsync();
+    }
+
+    public async Task CancelPayment(int orderCode)
+    {
+        var booking = await _paymentUnitOfWork.BookingRepository.FindOneAsync(entity => entity.OrderId == orderCode);
+        if (booking == null)
+            throw new ExceptionResponse(HttpStatusCode.NotFound, "Booking not found with order code " + orderCode,
+                ExceptionConvention.NotFound);
+
+        booking.Status = BookingStatus.Cancelled;
+        booking.CancellationReason = "Payment canceled";
+        booking.HelperId = null;
         await _paymentUnitOfWork.SaveChangesAsync();
     }
 }

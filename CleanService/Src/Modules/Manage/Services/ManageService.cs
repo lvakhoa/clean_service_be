@@ -332,7 +332,7 @@ public class ManageService : IManageService
         await _manageUnitOfWork.SaveChangesAsync();
     }
 
-    public Task<Pagination<RoomPricingResponseDto>> GetRoomPricing(int? page, int? limit)
+    public Task<Pagination<RoomPricingResponseDto>> GetRoomPricing(int? page, int? limit, RoomType? roomType, Guid? serviceTypeId)
     {
         var roomPricings = _manageUnitOfWork.RoomPricingRepository.Find(
             entity => true,
