@@ -167,12 +167,6 @@ public class CleanServiceContext : DbContext
         modelBuilder.Entity<Bookings>()
             .Navigation(b => b.BookingDetails)
             .AutoInclude();
-        modelBuilder.Entity<Bookings>()
-            .Navigation(b => b.Feedbacks)
-            .AutoInclude();
-        modelBuilder.Entity<Bookings>()
-            .Navigation(b => b.Refunds)
-            .AutoInclude();
 
         modelBuilder.Entity<Bookings>()
             .Property(b => b.Status)

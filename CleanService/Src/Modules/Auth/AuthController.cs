@@ -160,6 +160,7 @@ public class AuthController : ControllerBase
     }
 
     [HttpGet("me")]
+    [ExcludeProperties]
     public async Task<IActionResult> GetMe()
     {
         var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
