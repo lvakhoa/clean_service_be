@@ -1,5 +1,6 @@
 using System.Net;
 using System.Security.Claims;
+using CleanService.Src.Filters;
 using CleanService.Src.Modules.Booking.Mapping.DTOs;
 using CleanService.Src.Modules.Booking.Services;
 using CleanService.Src.Utils;
@@ -52,6 +53,7 @@ public class BookingController : Controller
     }
 
     [HttpGet("all")]
+    [ExcludeProperties]
     public async Task<ActionResult<Pagination<BookingResponseDto>>> GetAllBookings(int? page, int? limit)
     {
         var bookings = await _bookingService.GetAllBookings(page, limit);

@@ -1,3 +1,6 @@
+using CleanService.Src.Attributes;
+using CleanService.Src.Models;
+
 namespace CleanService.Src.Modules.Booking.Mapping.DTOs;
 
 
@@ -40,10 +43,6 @@ public class BookingResponseDto
     public ServiceTypeBookingResponse ServiceType { get; set; } = null!;
     
     public BookingDetailsResponse BookingDetails { get; set; } = null!;
-    
-    public List<FeedbackResponse>? Feedbacks { get; set; }
-
-    public List<RefundResponse>? Refunds { get; set; }
 }
 
 public class UserBookingResponse
@@ -116,34 +115,4 @@ public class BookingDetailsResponse
     public string? SpecialRequirements { get; set; }
     
     public DateTime CreatedAt { get; set; }
-}
-
-public class FeedbackResponse
-{
-    public string Id { get; set; } = null!;
-    
-    public string BookingId { get; set; } = null!;
-    
-    public string Title { get; set; } = null!;
-    
-    public string Description { get; set; } = null!;
-    
-    public DateTime CreatedAt { get; set; }
-    
-    public DateTime UpdatedAt { get; set; }
-}
-
-public class RefundResponse
-{
-    public string Id { get; set; } = null!;
-    
-    public string BookingId { get; set; } = null!;
-    
-    public string Reason { get; set; } = null!;
-    
-    public string  Status { get; set; } = null!;
-    
-    public DateTime CreatedAt { get; set; }
-    
-    public DateTime? ResolvedAt { get; set; }
 }

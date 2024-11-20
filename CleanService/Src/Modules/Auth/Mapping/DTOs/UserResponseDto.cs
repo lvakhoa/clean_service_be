@@ -1,9 +1,12 @@
+using CleanService.Src.Attributes;
+
 namespace CleanService.Src.Modules.Auth.Mapping.DTOs;
 
 public class UserResponseDto
 {
     public string Id { get; set; }
     
+    [RoleExpose(Models.UserType.Admin)]
     public string UserType { get; set; }
     
     public string? Gender { get; set; }
