@@ -7,6 +7,7 @@ using CleanService.Src.Modules.Notification;
 using CleanService.Src.Modules.Payment;
 using CleanService.Src.Modules.Scheduler;
 using CleanService.Src.Modules.ServiceType;
+using CleanService.Src.Modules.Storage;
 using CleanService.Src.Repositories;
 using CleanService.Src.Repositories.BlacklistedUser;
 using CleanService.Src.Repositories.Booking;
@@ -79,6 +80,14 @@ public static class AppModule
         // Inject Manage Module
         services
             .AddManageModule();
+        
+        // Inject Cloudinary Module
+        services
+            .AddStorageModule();
+        
+        // // Inject Cloudinary
+        // services
+        //     .AddCloudinary();
         
         return services;
     }

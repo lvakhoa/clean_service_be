@@ -52,6 +52,24 @@ public class ManageService : IManageService
             currentLimit));
     }
 
+    public async Task<HelperDetailResponseDto> GetHelperById(string id)
+    {
+        var helper = await _manageUnitOfWork.HelperRepository.FindOneAsync(entity => entity.Id == id,
+            new FindOptions
+            {
+                IsAsNoTracking = true
+            });
+
+        if (helper == null)
+        {
+            throw new KeyNotFoundException("Helper not found");
+        }
+        
+        var helperDto = _mapper.Map<HelperDetailResponseDto>(helper);
+
+        return helperDto;
+    }
+
     public Task<Pagination<UserResponseDto>> GetCustomer(int? page, int? limit, UserStatus? userStatus = UserStatus.Active)
     {
         Expression<Func<Users, bool>> predicate = entity => entity.Status == userStatus && entity.UserType == UserType.Customer;

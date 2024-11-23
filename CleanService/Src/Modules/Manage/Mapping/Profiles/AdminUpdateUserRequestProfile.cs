@@ -11,11 +11,11 @@ public class AdminUpdateUserRequestProfile:Profile
         CreateMap<AdminUpdateUserRequestDto, PartialUsers>()
             .ConstructUsing(dto => new PartialUsers()
             {
-                ProfilePicture = dto.ProfilePicture,
+                IdentityCard = dto.IdCardUri,
+                ProfilePicture = dto.ProfilePictureUri,
                 Gender = dto.Gender,
                 FullName = dto.FullName,
                 DateOfBirth = dto.DateOfBirth,
-                IdentityCard = dto.IdentityCard,
                 Address = dto.Address,
                 PhoneNumber = dto.PhoneNumber,
                 Status = dto.UserStatus,

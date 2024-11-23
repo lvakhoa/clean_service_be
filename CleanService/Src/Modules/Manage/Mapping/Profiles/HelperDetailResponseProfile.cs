@@ -27,7 +27,8 @@ public class HelperDetailResponseProfile: Profile
                 DateOfBirth = entity.User.DateOfBirth,
                 Address = entity.User.Address,
                 PhoneNumber = entity.User.PhoneNumber,
-                Email = entity.User.Email
+                Email = entity.User.Email,
+                IdentityCard = entity.User.IdentityCard
             });
     }
 }

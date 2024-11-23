@@ -7,6 +7,8 @@ using CleanService.Src.Models;
 using CleanService.Src.Modules;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using CloudinaryDotNet;
+using CloudinaryDotNet.Actions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -73,6 +75,8 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services
     .AddAppDependency(builder.Configuration);
+
+Cloudinary cloudinary = new Cloudinary(builder.Configuration["CLOUDINARY_URL"]); 
 
 builder.Services
     .AddControllers()
