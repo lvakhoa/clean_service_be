@@ -7,8 +7,6 @@ public class UpdateUserRequestDto
 {
     //public string Id { get; set; } = null!;
     
-    public string? ProfilePicture { get; set; }
-    
     [EnumDataType(typeof(Gender), ErrorMessage = "Gender type must be Male, Female, or Other")]
     public string? Gender { get; set; } = null!;
     
@@ -16,7 +14,11 @@ public class UpdateUserRequestDto
     
     public DateTime? DateOfBirth { get; set; }
 
-    public string? IdentityCard { get; set; } = null!;
+    public string? IdentityCardUri { get; set; } = null!;
+    public IFormFile? IdentityCard { get; set; }
+    
+    public string? ProfilePictureUri { get; set; }
+    public IFormFile? ProfilePicture { get; set; } = null!;
     
     public string? Address { get; set; } = null!;
     

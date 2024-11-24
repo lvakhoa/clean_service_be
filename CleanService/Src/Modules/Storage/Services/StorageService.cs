@@ -30,8 +30,7 @@ public class StorageService: IStorageService
         {
             throw new ArgumentException("File is empty.");
         }
-
-        // Đọc nội dung tệp
+        
         using var stream = file.OpenReadStream();
         
         var uploadParams = new RawUploadParams
@@ -39,8 +38,7 @@ public class StorageService: IStorageService
             File = new FileDescription(file.FileName, stream),
             PublicId = $"files/{Path.GetFileNameWithoutExtension(file.FileName)}",
         };
-
-        // Upload lên Cloudinary
+        
         var result = await _cloudinary.UploadAsync(uploadParams);
 
         if (result.StatusCode != System.Net.HttpStatusCode.OK)

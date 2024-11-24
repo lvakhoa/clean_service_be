@@ -6,6 +6,7 @@ namespace CleanService.Src.Modules.Manage.Mapping.DTOs;
 public class AdminUpdateUserRequestDto
 {
     public string? ProfilePictureUri { get; set; }
+    public IFormFile? ProfilePicture { get; set; }
     
     [EnumDataType(typeof(Gender), ErrorMessage = "Gender type must be Male, Female, or Other")]
     public Gender? Gender { get; set; } = null!;
@@ -16,6 +17,8 @@ public class AdminUpdateUserRequestDto
     public DateTime? DateOfBirth { get; set; }
     
     public string? IdCardUri { get; set; } = null!;
+    
+    public IFormFile? IdCard { get; set; }
     
     [MaxLength(255)]
     public string? Address { get; set; } = null!;

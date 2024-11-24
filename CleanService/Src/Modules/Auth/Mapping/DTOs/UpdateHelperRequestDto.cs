@@ -9,7 +9,9 @@ public class UpdateHelperRequestDto
     
     public string? ExperienceDescription { get; set; }
 
-    public string? ResumeUploaded { get; set; }
+    public string? ResumeUploadeUri { get; set; }
+    
+    public IFormFile? ResumeUploaded { get; set; }
 
     public string[]? ServicesOffered { get; set; }
 

@@ -38,8 +38,20 @@ public class ManageController : Controller
     [HttpPatch("users/{id}")]
     [ModelValidation]
     public async Task<IActionResult> UpdateUser(string id,
-        [FromBody] AdminUpdateUserRequestDto adminUpdateUserRequestDto)
+        [FromForm] AdminUpdateUserRequestDto adminUpdateUserRequestDto)
     {
+        if(adminUpdateUserRequestDto.ProfilePicture != null)
+        {
+            var result = await _storageService.UploadImageAsync(adminUpdateUserRequestDto.ProfilePicture);
+            adminUpdateUserRequestDto.ProfilePictureUri = result.Uri.ToString();
+        }
+        
+        if(adminUpdateUserRequestDto.IdCard != null)
+        {
+            var result = await _storageService.UploadImageAsync(adminUpdateUserRequestDto.IdCard);
+            adminUpdateUserRequestDto.IdCardUri = result.Uri.ToString();
+        }
+        
         await _manageService.UpdateUserInfo(id, adminUpdateUserRequestDto);
 
         return Ok(new SuccessResponse
@@ -48,44 +60,7 @@ public class ManageController : Controller
             Message = "Update user successfully"
         });
     }
-
-    [HttpPatch("users/{id}/id-card")]
-    public async Task<IActionResult> UpdateIdCard(string id, [FromForm] IFormFile idCard)
-    {
-        var image = await _storageService.UploadImageAsync(idCard);
-        
-        var updateIdCard = new AdminUpdateUserRequestDto
-        {
-            IdCardUri = image.Uri.ToString()
-        };
-
-        await _manageService.UpdateUserInfo(id, updateIdCard);
-
-        return Ok(new SuccessResponse
-        {
-            StatusCode = HttpStatusCode.OK,
-            Message = "Update id card successfully"
-        });
-    }
     
-    [HttpPatch("users/{id}/profile-picture")]
-    public async Task<IActionResult> UpdateProfilePicture(string id, [FromForm] IFormFile profilePicture)
-    {
-        var image = await _storageService.UploadImageAsync(profilePicture);
-        
-        var updateProfilePicture = new AdminUpdateUserRequestDto
-        {
-            ProfilePictureUri = image.Uri.ToString()
-        };
-
-        await _manageService.UpdateUserInfo(id, updateProfilePicture);
-
-        return Ok(new SuccessResponse
-        {
-            StatusCode = HttpStatusCode.OK,
-            Message = "Update profile picture successfully"
-        });
-    }
     [HttpGet("users")]
     public async Task<ActionResult<Pagination<UserResponseDto>>> GetUsers(UserType? userType, int? page, int? limit,
         UserStatus? userStatus = UserStatus.Active)
@@ -130,20 +105,6 @@ public class ManageController : Controller
         });
     }
     
-    [HttpGet("customers/me")]
-    public async Task<ActionResult<UserResponseDto>> GetCurrentCustomer()
-    {
-        var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
-        var customer = await _manageService.GetCustomerById(userId);
-
-        return Ok(new SuccessResponse
-        {
-            StatusCode = HttpStatusCode.OK,
-            Message = "Get current customer successfully",
-            Data = customer
-        });
-    } 
-    
     //Helper
     [HttpGet("helpers")]
     public async Task<ActionResult<Pagination<HelperDetailResponseDto>>> GetHelpers(int? page, int? limit)
@@ -164,20 +125,6 @@ public class ManageController : Controller
         });
     }
     
-    [HttpGet("helpers/me")]
-    public async Task<ActionResult<HelperDetailResponseDto>> GetCurrentHelper()
-    {
-        var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
-        var helper = await _manageService.GetHelperById(userId);
-
-        return Ok(new SuccessResponse
-        {
-            StatusCode = HttpStatusCode.OK,
-            Message = "Get current helper successfully",
-            Data = helper
-        });
-    }
-    
     [HttpGet("helpers/{id}")]
     public async Task<ActionResult<HelperDetailResponseDto>> GetHelperById(string id)
     {
@@ -190,6 +137,7 @@ public class ManageController : Controller
             Data = helper
         });
     }
+    
     [HttpPatch("helpers/{id}")]
     [ModelValidation]
     public async Task<IActionResult> UpdateHelper(string id,
@@ -201,25 +149,6 @@ public class ManageController : Controller
         {
             StatusCode = HttpStatusCode.OK,
             Message = "Update helper successfully"
-        });
-    }
-    
-    [HttpPatch("helpers/{id}/resume")]
-    public async Task<IActionResult> UpdateHelperResume(string id, [FromForm] IFormFile resume)
-    {
-        var file = await _storageService.UploadFileAsync(resume);
-        
-        var updateResume = new AdminUpdateHelperRequestDto
-        {
-            ResumeUploaded = file.Uri.ToString()
-        };
-
-        await _manageService.UpdateHelperInfo(id, updateResume);
-
-        return Ok(new SuccessResponse
-        {
-            StatusCode = HttpStatusCode.OK,
-            Message = "Update helper resume successfully"
         });
     }
     

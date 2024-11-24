@@ -5,6 +5,7 @@ using CleanService.Src.Filters;
 using CleanService.Src.Models;
 using CleanService.Src.Modules.Auth.Mapping.DTOs;
 using CleanService.Src.Modules.Auth.Services;
+using CleanService.Src.Modules.Storage.Services;
 using CleanService.Src.Utils;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -22,10 +23,12 @@ namespace CleanService.Src.Modules.Auth;
 public class AuthController : ControllerBase
 {
     private readonly IAuthService _authService;
+    private readonly IStorageService _storageService;
 
-    public AuthController(IAuthService authService)
+    public AuthController(IAuthService authService, IStorageService storageService)
     {
         _authService = authService;
+        _storageService = storageService;
     }
 
     [AllowAnonymous]
@@ -223,6 +226,54 @@ public class AuthController : ControllerBase
             {
                 Claims = claims
             }
+        });
+    }
+    
+    [HttpPatch("me")]
+    public async Task<IActionResult> UpdateCurrentCustomer([FromForm] UpdateUserRequestDto updateUserRequestDto)
+    {
+        var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null)
+            throw new ExceptionResponse(HttpStatusCode.Unauthorized, "Unauthorized", ExceptionConvention.Unauthorized);
+
+        if (updateUserRequestDto.ProfilePicture != null)
+        {
+            var result = await _storageService.UploadImageAsync(updateUserRequestDto.ProfilePicture);
+            updateUserRequestDto.ProfilePictureUri = result.Uri.ToString();
+        }
+        
+        if (updateUserRequestDto.IdentityCard != null)
+        {
+            var result = await _storageService.UploadImageAsync(updateUserRequestDto.IdentityCard);
+            updateUserRequestDto.IdentityCardUri = result.Uri.ToString();
+        }
+        
+        await _authService.UpdateInfo(userId, updateUserRequestDto);
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Update personal information successfully"
+        });
+    }
+    
+    [HttpPatch("helper/me")]
+    public async Task<IActionResult> UpdateCurrentHelper([FromForm] UpdateHelperRequestDto updateHelperRequestDto)
+    {
+        var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
+        if (userId == null)
+            throw new ExceptionResponse(HttpStatusCode.Unauthorized, "Unauthorized", ExceptionConvention.Unauthorized);
+        
+        if( updateHelperRequestDto.ResumeUploaded != null)
+        {
+            var result = await _storageService.UploadFileAsync(updateHelperRequestDto.ResumeUploaded);
+            updateHelperRequestDto.ResumeUploadeUri = result.Uri.ToString();
+        }
+        
+        await _authService.UpdateHelperInfo(userId, updateHelperRequestDto);
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Update personal information successfully"
         });
     }
 }
