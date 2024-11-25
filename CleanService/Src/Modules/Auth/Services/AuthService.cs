@@ -5,6 +5,7 @@ using CleanService.Src.Constant;
 using CleanService.Src.Models;
 using CleanService.Src.Modules.Auth.Infrastructures;
 using CleanService.Src.Modules.Auth.Mapping.DTOs;
+using CleanService.Src.Modules.Storage.Services;
 using CleanService.Src.Repositories;
 using CleanService.Src.Utils.RequestClient;
 using Newtonsoft.Json;
@@ -18,14 +19,16 @@ public class AuthService : IAuthService
     private readonly IConfiguration _configuration;
     private readonly IAuthUnitOfWork _authUnitOfWork;
     private readonly IMapper _mapper;
+    private readonly IStorageService _storageService;
 
     public AuthService(IRequestClient requestClient, IConfiguration configuration, IAuthUnitOfWork authUnitOfWork,
-        IMapper mapper)
+        IMapper mapper, IStorageService storageService)
     {
         _requestClient = requestClient;
         _configuration = configuration;
         _authUnitOfWork = authUnitOfWork;
         _mapper = mapper;
+        _storageService = storageService;
     }
 
     public async Task RegisterUser(RegistrationRequestDto registrationRequestDto)
@@ -89,7 +92,17 @@ public class AuthService : IAuthService
         if (user == null)
             throw new KeyNotFoundException("User not found");
         _authUnitOfWork.UserRepository.Detach(user);
+        
+        if(user.ProfilePicture != null && updateUserRequestDto.ProfilePicture != null)
+        {
+            await _storageService.DeleteFileAsync(user.ProfilePicture);
+        }
 
+        if (user.IdentityCard != null && updateUserRequestDto.IdentityCard != null)
+        {
+            await _storageService.DeleteFileAsync(user.IdentityCard);
+        }
+        
         var userEntity = _mapper.Map<PartialUsers>(updateUserRequestDto);
         _authUnitOfWork.UserRepository.Update(userEntity, user);
 
@@ -106,7 +119,12 @@ public class AuthService : IAuthService
         if (helper == null)
             throw new KeyNotFoundException("User not found");
         _authUnitOfWork.HelperRepository.Detach(helper);
-
+        
+        if(helper.ResumeUploaded != null && updateHelperRequestDto.ResumeUploaded != null)
+        {
+            await _storageService.DeleteFileAsync(helper.ResumeUploaded);
+        }
+        
         var helperEntity = _mapper.Map<PartialHelper>(updateHelperRequestDto);
         _authUnitOfWork.HelperRepository.Update(helperEntity, helper);
 

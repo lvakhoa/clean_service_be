@@ -12,10 +12,10 @@ public class AdminUpdateUserRequestProfile:Profile
             .ConstructUsing(dto => new PartialUsers()
             {
                 ProfilePicture = dto.ProfilePicture,
+                IdentityCard = dto.IdCard,
                 Gender = dto.Gender,
                 FullName = dto.FullName,
                 DateOfBirth = dto.DateOfBirth,
-                IdentityCard = dto.IdentityCard,
                 Address = dto.Address,
                 PhoneNumber = dto.PhoneNumber,
                 Status = dto.UserStatus,

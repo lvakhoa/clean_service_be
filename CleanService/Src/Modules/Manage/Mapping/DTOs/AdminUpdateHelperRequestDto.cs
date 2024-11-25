@@ -8,6 +8,8 @@ public class AdminUpdateHelperRequestDto
     public string? ExperienceDescription { get; set; }
 
     public string? ResumeUploaded { get; set; }
+    
+    public IFormFile? ResumeUploadedFile { get; set; }
 
     public string[]? ServicesOffered { get; set; }
 

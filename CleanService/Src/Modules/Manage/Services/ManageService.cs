@@ -15,6 +15,7 @@ using CleanService.Src.Utils;
 using Pagination.EntityFrameworkCore.Extensions;
 using System.Security.Claims;
 using CleanService.Src.Modules.Auth.Mapping.DTOs;
+using CleanService.Src.Modules.Storage.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CleanService.Src.Modules.Manage.Services;
@@ -23,11 +24,13 @@ public class ManageService : IManageService
 {
     private readonly IManageUnitOfWork _manageUnitOfWork;
     private readonly IMapper _mapper;
+    private readonly IStorageService _storageService;
 
-    public ManageService(IManageUnitOfWork manageUnitOfWork, IMapper mapper)
+    public ManageService(IManageUnitOfWork manageUnitOfWork, IMapper mapper, IStorageService storageService)
     {
         _manageUnitOfWork = manageUnitOfWork;
         _mapper = mapper;
+        _storageService = storageService;
     }
 
     public Task<Pagination<HelperDetailResponseDto>> GetHelper(int? page, int? limit, UserStatus? userStatus = UserStatus.Active)
@@ -50,6 +53,24 @@ public class ManageService : IManageService
         return Task.FromResult(new Pagination<HelperDetailResponseDto>(helperDto, totalHelpers,
             currentPage,
             currentLimit));
+    }
+
+    public async Task<HelperDetailResponseDto> GetHelperById(string id)
+    {
+        var helper = await _manageUnitOfWork.HelperRepository.FindOneAsync(entity => entity.Id == id,
+            new FindOptions
+            {
+                IsAsNoTracking = true
+            });
+
+        if (helper == null)
+        {
+            throw new KeyNotFoundException("Helper not found");
+        }
+        
+        var helperDto = _mapper.Map<HelperDetailResponseDto>(helper);
+
+        return helperDto;
     }
 
     public Task<Pagination<UserResponseDto>> GetCustomer(int? page, int? limit, UserStatus? userStatus = UserStatus.Active)
@@ -293,6 +314,16 @@ public class ManageService : IManageService
             throw new KeyNotFoundException("User not found");
         _manageUnitOfWork.UserRepository.Detach(user);
         
+        if(user.ProfilePicture != null && user.ProfilePicture.Length > 0 && adminUpdateUserRequestDto.ProfilePicture != null)
+        {
+            await _storageService.DeleteFileAsync(user.ProfilePicture);
+        }
+
+        if (user.IdentityCard != null && user.IdentityCard.Length > 0 && adminUpdateUserRequestDto.IdCard != null)
+        {
+            await _storageService.DeleteFileAsync(user.IdentityCard);
+        }
+        
         var userEntity = _mapper.Map<PartialUsers>(adminUpdateUserRequestDto);
         
         _manageUnitOfWork.UserRepository.Update(userEntity, user);
@@ -307,9 +338,15 @@ public class ManageService : IManageService
             IsAsNoTracking = true,
             IsIgnoreAutoIncludes = true
         });
+        
         if (helper == null)
             throw new KeyNotFoundException("Helper not found");
         _manageUnitOfWork.HelperRepository.Detach(helper);
+        
+        if (helper.ResumeUploaded != null)
+        {
+            await _storageService.DeleteFileAsync(helper.ResumeUploaded);
+        }
         
         var helperEntity = _mapper.Map<PartialHelper>(adminUpdateHelperRequestDto);
         

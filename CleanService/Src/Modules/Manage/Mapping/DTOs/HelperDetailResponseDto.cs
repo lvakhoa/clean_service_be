@@ -6,6 +6,8 @@ public class HelperDetailResponseDto
     
     public string? ExperienceDescription { get; set; }
     
+    public string? IdentityCard { get; set; }
+    
     public string? ResumeUploaded { get; set; }
     
     public string[]? ServicesOffered { get; set; }

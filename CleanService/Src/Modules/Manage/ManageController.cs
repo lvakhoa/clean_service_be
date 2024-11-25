@@ -5,15 +5,13 @@ using CleanService.Src.Filters;
 using CleanService.Src.Models;
 using CleanService.Src.Modules.Auth.Mapping.DTOs;
 using CleanService.Src.Modules.Auth.Services;
-using CleanService.Src.Modules.Booking.Mapping.DTOs;
-using CleanService.Src.Modules.Booking.Services;
 using CleanService.Src.Modules.Manage.Mapping.DTOs;
 using CleanService.Src.Modules.Manage.Mapping.DTOs.DurationPrice;
 using CleanService.Src.Modules.Manage.Mapping.DTOs.Refund;
 using CleanService.Src.Modules.Manage.Mapping.DTOs.RoomPricing;
 using CleanService.Src.Modules.Manage.Services;
+using CleanService.Src.Modules.Storage.Services;
 using CleanService.Src.Utils;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Pagination.EntityFrameworkCore.Extensions;
 
@@ -24,13 +22,42 @@ public class ManageController : Controller
 {
     private readonly IManageService _manageService;
     private readonly IAuthService _authService;
+    private readonly IStorageService _storageService;
 
-    public ManageController(IManageService manageService, IAuthService authService)
+    public ManageController(IManageService manageService, IAuthService authService, IStorageService storageService)
     {
         _manageService = manageService;
         _authService = authService;
+        _storageService = storageService;
     }
+    
+    //User
+    [HttpPatch("users/{id}")]
+    [ModelValidation]
+    public async Task<IActionResult> UpdateUser(string id,
+        [FromForm] AdminUpdateUserRequestDto adminUpdateUserRequestDto)
+    {
+        if(adminUpdateUserRequestDto.ProfilePictureFile != null)
+        {
+            var result = await _storageService.UploadImageAsync(adminUpdateUserRequestDto.ProfilePictureFile);
+            adminUpdateUserRequestDto.ProfilePicture = result.Uri.ToString();
+        }
+        
+        if(adminUpdateUserRequestDto.IdCardFile != null)
+        {
+            var result = await _storageService.UploadImageAsync(adminUpdateUserRequestDto.IdCardFile);
+            adminUpdateUserRequestDto.IdCard = result.Uri.ToString();
+        }
+        
+        await _manageService.UpdateUserInfo(id, adminUpdateUserRequestDto);
 
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Update user successfully"
+        });
+    }
+    
     [HttpGet("users")]
     public async Task<ActionResult<Pagination<UserResponseDto>>> GetUsers(UserType? userType, int? page, int? limit,
         UserStatus? userStatus = UserStatus.Active)
@@ -43,7 +70,8 @@ public class ManageController : Controller
             Data = users
         });
     }
-
+    
+    //Customer
     [HttpGet("customers")]
     public async Task<ActionResult<UserResponseDto>> GetCustomers(int? page, int? limit)
     {
@@ -73,8 +101,8 @@ public class ManageController : Controller
             Data = customer
         });
     }
-
-
+    
+    //Helper
     [HttpGet("helpers")]
     public async Task<ActionResult<Pagination<HelperDetailResponseDto>>> GetHelpers(int? page, int? limit)
     {
@@ -93,7 +121,41 @@ public class ManageController : Controller
             Data = helpers
         });
     }
+    
+    [HttpGet("helpers/{id}")]
+    public async Task<ActionResult<HelperDetailResponseDto>> GetHelperById(string id)
+    {
+        var helper = await _manageService.GetHelperById(id);
 
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Get helper successfully",
+            Data = helper
+        });
+    }
+    
+    [HttpPatch("helpers/{id}")]
+    [ModelValidation]
+    public async Task<IActionResult> UpdateHelper(string id,
+        [FromForm] AdminUpdateHelperRequestDto adminUpdateHelperRequestDto)
+    {   
+        if(adminUpdateHelperRequestDto.ResumeUploadedFile != null)
+        {
+            var result = await _storageService.UploadFileAsync(adminUpdateHelperRequestDto.ResumeUploadedFile);
+            adminUpdateHelperRequestDto.ResumeUploaded = result.Uri.ToString();
+        }
+        
+        await _manageService.UpdateHelperInfo(id, adminUpdateHelperRequestDto);
+
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Update helper successfully"
+        });
+    }
+    
+    //Refund
     [HttpGet("refunds")]
     public async Task<ActionResult<Pagination<RefundResponseDto>>> GetRefunds(RefundStatus? status, int? page,
         int? limit)
@@ -166,7 +228,29 @@ public class ManageController : Controller
             Message = "Delete refund successfully"
         });
     }
+    
+    [HttpGet("refunds/customer")]
+    public async Task<ActionResult<Pagination<RefundResponseDto>>> GetRefundsOfCurrentCustomer(int? page, int? limit)
+    {
+        if (page < 1 || limit < 1)
+        {
+            throw new ExceptionResponse(HttpStatusCode.BadRequest, "Page or limit param is negative",
+                ExceptionConvention.ValidationFailed);
+        }
 
+        var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
+
+        var refunds = await _manageService.GetRefundsOfCurrentCustomer(userId, page, limit);
+
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Get refunds of current customer successfully",
+            Data = refunds
+        });
+    }
+
+    //Room Pricing
     [HttpGet("room-pricing")]
     public async Task<ActionResult<Pagination<RoomPricingResponseDto>>> GetRoomPricings(int? page, int? limit,
         RoomType? roomType, Guid? serviceTypeId)
@@ -226,7 +310,8 @@ public class ManageController : Controller
             Message = "Delete room pricing successfully"
         });
     }
-
+    
+    //Duration Price
     [HttpPost("duration-price")]
     [ModelValidation]
     public async Task<IActionResult> CreateDurationPrice(
@@ -285,7 +370,8 @@ public class ManageController : Controller
             Message = "Delete duration price successfully"
         });
     }
-
+    
+    //Feedback
     [HttpGet("feedbacks")]
     public async Task<ActionResult<Pagination<FeedbackResponseDto>>> GetFeedbacks(int? page, int? limit)
     {
@@ -329,35 +415,7 @@ public class ManageController : Controller
             Message = "Delete feedback successfully"
         });
     }
-
-    [HttpPatch("users/{id}")]
-    [ModelValidation]
-    public async Task<IActionResult> UpdateUser(string id,
-        [FromBody] AdminUpdateUserRequestDto adminUpdateUserRequestDto)
-    {
-        await _manageService.UpdateUserInfo(id, adminUpdateUserRequestDto);
-
-        return Ok(new SuccessResponse
-        {
-            StatusCode = HttpStatusCode.OK,
-            Message = "Update user successfully"
-        });
-    }
-
-    [HttpPatch("helpers/{id}")]
-    [ModelValidation]
-    public async Task<IActionResult> UpdateHelper(string id,
-        [FromBody] AdminUpdateHelperRequestDto adminUpdateHelperRequestDto)
-    {
-        await _manageService.UpdateHelperInfo(id, adminUpdateHelperRequestDto);
-
-        return Ok(new SuccessResponse
-        {
-            StatusCode = HttpStatusCode.OK,
-            Message = "Update helper successfully"
-        });
-    }
-
+    
     [HttpGet("feedbacks/customer")]
     public async Task<ActionResult<Pagination<FeedbackResponseDto>>> GetFeedbacksOfCurrentCustomer(int? page,
         int? limit)
@@ -379,25 +437,5 @@ public class ManageController : Controller
             Data = feedbacks
         });
     }
-
-    [HttpGet("refunds/customer")]
-    public async Task<ActionResult<Pagination<RefundResponseDto>>> GetRefundsOfCurrentCustomer(int? page, int? limit)
-    {
-        if (page < 1 || limit < 1)
-        {
-            throw new ExceptionResponse(HttpStatusCode.BadRequest, "Page or limit param is negative",
-                ExceptionConvention.ValidationFailed);
-        }
-
-        var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
-
-        var refunds = await _manageService.GetRefundsOfCurrentCustomer(userId, page, limit);
-
-        return Ok(new SuccessResponse
-        {
-            StatusCode = HttpStatusCode.OK,
-            Message = "Get refunds of current customer successfully",
-            Data = refunds
-        });
-    }
+    
 }

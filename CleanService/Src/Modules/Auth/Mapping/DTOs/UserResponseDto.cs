@@ -13,6 +13,8 @@ public class UserResponseDto
     
     public string? ProfilePicture { get; set; }
     
+    public string? IdentityCard { get; set; }
+    
     public string FullName { get; set; }
     
     public DateTime? DateOfBirth { get; set; }
