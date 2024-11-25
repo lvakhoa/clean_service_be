@@ -14,10 +14,10 @@ public class UpdateUserRequestProfile : Profile
                 //Id = dto.Id,
                 FullName = dto.FullName,
                 Gender = dto.Gender != null ? Enum.Parse<Gender>(dto.Gender) : null,
-                ProfilePicture = dto.ProfilePictureUri,
+                ProfilePicture = dto.ProfilePicture,
                 DateOfBirth = dto.DateOfBirth,
                 Address = dto.Address,
-                IdentityCard = dto.IdentityCardUri,
+                IdentityCard = dto.IdentityCard,
                 PhoneNumber = dto.PhoneNumber,
             });
     }

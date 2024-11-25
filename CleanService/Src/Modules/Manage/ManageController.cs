@@ -5,8 +5,6 @@ using CleanService.Src.Filters;
 using CleanService.Src.Models;
 using CleanService.Src.Modules.Auth.Mapping.DTOs;
 using CleanService.Src.Modules.Auth.Services;
-using CleanService.Src.Modules.Booking.Mapping.DTOs;
-using CleanService.Src.Modules.Booking.Services;
 using CleanService.Src.Modules.Manage.Mapping.DTOs;
 using CleanService.Src.Modules.Manage.Mapping.DTOs.DurationPrice;
 using CleanService.Src.Modules.Manage.Mapping.DTOs.Refund;
@@ -14,7 +12,6 @@ using CleanService.Src.Modules.Manage.Mapping.DTOs.RoomPricing;
 using CleanService.Src.Modules.Manage.Services;
 using CleanService.Src.Modules.Storage.Services;
 using CleanService.Src.Utils;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using Pagination.EntityFrameworkCore.Extensions;
 
@@ -40,16 +37,16 @@ public class ManageController : Controller
     public async Task<IActionResult> UpdateUser(string id,
         [FromForm] AdminUpdateUserRequestDto adminUpdateUserRequestDto)
     {
-        if(adminUpdateUserRequestDto.ProfilePicture != null)
+        if(adminUpdateUserRequestDto.ProfilePictureFile != null)
         {
-            var result = await _storageService.UploadImageAsync(adminUpdateUserRequestDto.ProfilePicture);
-            adminUpdateUserRequestDto.ProfilePictureUri = result.Uri.ToString();
+            var result = await _storageService.UploadImageAsync(adminUpdateUserRequestDto.ProfilePictureFile);
+            adminUpdateUserRequestDto.ProfilePicture = result.Uri.ToString();
         }
         
-        if(adminUpdateUserRequestDto.IdCard != null)
+        if(adminUpdateUserRequestDto.IdCardFile != null)
         {
-            var result = await _storageService.UploadImageAsync(adminUpdateUserRequestDto.IdCard);
-            adminUpdateUserRequestDto.IdCardUri = result.Uri.ToString();
+            var result = await _storageService.UploadImageAsync(adminUpdateUserRequestDto.IdCardFile);
+            adminUpdateUserRequestDto.IdCard = result.Uri.ToString();
         }
         
         await _manageService.UpdateUserInfo(id, adminUpdateUserRequestDto);
@@ -141,8 +138,14 @@ public class ManageController : Controller
     [HttpPatch("helpers/{id}")]
     [ModelValidation]
     public async Task<IActionResult> UpdateHelper(string id,
-        [FromBody] AdminUpdateHelperRequestDto adminUpdateHelperRequestDto)
-    {
+        [FromForm] AdminUpdateHelperRequestDto adminUpdateHelperRequestDto)
+    {   
+        if(adminUpdateHelperRequestDto.ResumeUploadedFile != null)
+        {
+            var result = await _storageService.UploadFileAsync(adminUpdateHelperRequestDto.ResumeUploadedFile);
+            adminUpdateHelperRequestDto.ResumeUploaded = result.Uri.ToString();
+        }
+        
         await _manageService.UpdateHelperInfo(id, adminUpdateHelperRequestDto);
 
         return Ok(new SuccessResponse

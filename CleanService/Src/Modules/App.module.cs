@@ -85,10 +85,6 @@ public static class AppModule
         services
             .AddStorageModule();
         
-        // // Inject Cloudinary
-        // services
-        //     .AddCloudinary();
-        
         return services;
     }
     

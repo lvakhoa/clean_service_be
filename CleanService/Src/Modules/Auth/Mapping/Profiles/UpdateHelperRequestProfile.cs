@@ -13,7 +13,7 @@ public class UpdateHelperRequestProfile : Profile
             {
                 //Id = dto.Id,
                 ExperienceDescription = dto.ExperienceDescription,
-                ResumeUploaded = dto.ResumeUploadeUri,
+                ResumeUploaded = dto.ResumeUploaded,
                 ServicesOffered = dto.ServicesOffered != null
                     ? dto.ServicesOffered.Select(Guid.Parse).ToArray()
                     : null,

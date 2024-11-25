@@ -14,11 +14,11 @@ public class UpdateUserRequestDto
     
     public DateTime? DateOfBirth { get; set; }
 
-    public string? IdentityCardUri { get; set; } = null!;
-    public IFormFile? IdentityCard { get; set; }
+    public string? IdentityCard { get; set; } = null!;
+    public IFormFile? IdentityCardFile { get; set; }
     
-    public string? ProfilePictureUri { get; set; }
-    public IFormFile? ProfilePicture { get; set; } = null!;
+    public string? ProfilePicture { get; set; }
+    public IFormFile? ProfilePictureFile { get; set; } = null!;
     
     public string? Address { get; set; } = null!;
     

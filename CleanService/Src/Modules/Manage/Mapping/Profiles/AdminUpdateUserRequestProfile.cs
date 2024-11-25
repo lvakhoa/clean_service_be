@@ -11,8 +11,8 @@ public class AdminUpdateUserRequestProfile:Profile
         CreateMap<AdminUpdateUserRequestDto, PartialUsers>()
             .ConstructUsing(dto => new PartialUsers()
             {
-                IdentityCard = dto.IdCardUri,
-                ProfilePicture = dto.ProfilePictureUri,
+                ProfilePicture = dto.ProfilePicture,
+                IdentityCard = dto.IdCard,
                 Gender = dto.Gender,
                 FullName = dto.FullName,
                 DateOfBirth = dto.DateOfBirth,
