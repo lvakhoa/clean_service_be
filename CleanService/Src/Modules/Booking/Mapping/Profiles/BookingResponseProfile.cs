@@ -75,5 +75,15 @@ public class BookingResponseProfile : Profile
                 SpecialRequirements = entity.SpecialRequirements,
                 CreatedAt = entity.CreatedAt
             });
+        CreateMap<Refunds, BookingRefundResponse>()
+            .ConstructUsing(entity => new BookingRefundResponse
+            {
+                Id = entity.Id.ToString(),
+                BookingId = entity.BookingId.ToString(),
+                Reason = entity.Reason,
+                Status = entity.Status.ToString(),
+                ResolvedAt = entity.ResolvedAt,
+                CreatedAt = entity.CreatedAt
+            });
     }
 }

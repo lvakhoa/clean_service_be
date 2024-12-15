@@ -60,7 +60,8 @@ public class SchedulerService : ISchedulerService
             limit,
             new FindOptions()
             {
-                IsAsNoTracking = true
+                IsAsNoTracking = true,
+                IsIgnoreAutoIncludes = false
             });
         var totalCount = await _bookingUnitOfWork.BookingRepository.CountAsync(x => (customerId == null || x.CustomerId == customerId) && 
             (helperId == null || x.HelperId == helperId));

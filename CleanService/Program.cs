@@ -79,12 +79,7 @@ builder.Services
 Cloudinary cloudinary = new Cloudinary(builder.Configuration["CLOUDINARY_URL"]); 
 
 builder.Services
-    .AddControllers()
-    .AddJsonOptions(x =>
-    {
-        x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
-        x.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-    });
+    .AddControllers();
 ;
 builder.Services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });
 

@@ -242,6 +242,15 @@ public class BookingService : IBookingService
             throw new KeyNotFoundException("Booking not found");
 
         await _bookingUnitOfWork.RefundRepository.AddAsync(complaint);
+        await _bookingUnitOfWork.SaveChangesAsync();
+        
+        _bookingUnitOfWork.BookingRepository.Detach(booking);
+
+        var updateBooking = new PartialBookings()
+        {
+            Status = BookingStatus.Pending,
+        };
+        _bookingUnitOfWork.BookingRepository.Update(updateBooking, booking);
 
         await _bookingUnitOfWork.SaveChangesAsync();
     }
