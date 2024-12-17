@@ -43,6 +43,24 @@ public class BookingResponseDto
     public ServiceTypeBookingResponse ServiceType { get; set; } = null!;
     
     public BookingDetailsResponse BookingDetails { get; set; } = null!;
+    
+    public List<BookingRefundResponse> BookingRefunds { get; set; } = new List<BookingRefundResponse>();
+}
+
+public class BookingRefundResponse
+{
+    public string Id { get; set; } = null!;
+    
+    public string BookingId { get; set; } = null!;
+    
+    public string Reason { get; set; } = null!;
+    
+    public string Status { get; set; } = null!;
+        
+    public DateTime CreatedAt { get; set; }
+    
+    public DateTime? ResolvedAt { get; set; }
+        
 }
 
 public class UserBookingResponse
