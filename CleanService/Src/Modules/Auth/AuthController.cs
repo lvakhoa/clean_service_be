@@ -18,7 +18,7 @@ using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Modules.Auth;
 
-[Authorize]
+// [Authorize]
 [ApiController]
 [Route("[controller]")]
 public class AuthController : ControllerBase
