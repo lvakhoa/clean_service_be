@@ -58,11 +58,21 @@ public class AuthService : IAuthService
 
     public async Task LogoutUser(string id)
     {
+        var secretKey = _configuration.GetValue<string>("OAuthProvider:SecretKey");
         // Get all user's sessions
-        var sessions = await _requestClient.GetJson<Session[]>($"{RemoteBaseUrl.ClerkBaseUrl}sessions?user_id={id}&status=active");
+        var sessions = await _requestClient.GetJson<List<Dictionary<string, object?>>>(
+            $"{RemoteBaseUrl.ClerkBaseUrl}/sessions?user_id={id}&status=active", new Dictionary<string, object>
+            {
+                { "Authorization", $"Bearer {secretKey}" }
+            });
+
         foreach (var s in sessions)
         {
-            await _requestClient.PostFormAsync($"{RemoteBaseUrl.ClerkBaseUrl}sessions/{s.Id}/revoke", new Dictionary<string, string>());
+            await _requestClient.PostFormAsync($"{RemoteBaseUrl.ClerkBaseUrl}/sessions/{s["id"]}/revoke",
+                new Dictionary<string, string>(), headers: new Dictionary<string, object>
+                {
+                    { "Authorization", $"Bearer {secretKey}" }
+                });
         }
     }
 
@@ -92,8 +102,8 @@ public class AuthService : IAuthService
         if (user == null)
             throw new KeyNotFoundException("User not found");
         _authUnitOfWork.UserRepository.Detach(user);
-        
-        if(user.ProfilePicture != null && updateUserRequestDto.ProfilePicture != null)
+
+        if (user.ProfilePicture != null && updateUserRequestDto.ProfilePicture != null)
         {
             await _storageService.DeleteFileAsync(user.ProfilePicture);
         }
@@ -102,7 +112,7 @@ public class AuthService : IAuthService
         {
             await _storageService.DeleteFileAsync(user.IdentityCard);
         }
-        
+
         var userEntity = _mapper.Map<PartialUsers>(updateUserRequestDto);
         _authUnitOfWork.UserRepository.Update(userEntity, user);
 
@@ -119,12 +129,12 @@ public class AuthService : IAuthService
         if (helper == null)
             throw new KeyNotFoundException("User not found");
         _authUnitOfWork.HelperRepository.Detach(helper);
-        
-        if(helper.ResumeUploaded != null && updateHelperRequestDto.ResumeUploaded != null)
+
+        if (helper.ResumeUploaded != null && updateHelperRequestDto.ResumeUploaded != null)
         {
             await _storageService.DeleteFileAsync(helper.ResumeUploaded);
         }
-        
+
         var helperEntity = _mapper.Map<PartialHelper>(updateHelperRequestDto);
         _authUnitOfWork.HelperRepository.Update(helperEntity, helper);
 
@@ -189,7 +199,7 @@ public class AuthService : IAuthService
                 { "client_id", _configuration.GetValue<string>("OAuthProvider:ClientId")! },
                 { "client_secret", _configuration.GetValue<string>("OAuthProvider:ClientSecret")! },
                 { "grant_type", "authorization_code" },
-                { "redirect_uri", "http://localhost:5011/api/v1/oauth/callback"}
+                { "redirect_uri", "http://localhost:5011/api/v1/oauth/callback" }
             });
     }
 

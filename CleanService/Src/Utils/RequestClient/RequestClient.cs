@@ -81,7 +81,8 @@ public class RequestClient : IRequestClient
 
         var response = await _requestClient.SendAsync(request);
         var responseString = await response.Content.ReadAsStringAsync();
-        return JsonConvert.DeserializeObject<T>(responseString);
+        var e = JsonConvert.DeserializeObject<T>(responseString);
+        return e;
     }
 
     public Task<Dictionary<string, object>> GetJson(string uri, Dictionary<string, object>? headers = null)
