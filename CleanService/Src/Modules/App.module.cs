@@ -6,6 +6,7 @@ using CleanService.Src.Modules.Manage;
 using CleanService.Src.Modules.Notification;
 using CleanService.Src.Modules.Payment;
 using CleanService.Src.Modules.Scheduler;
+using CleanService.Src.Modules.ServiceCategory;
 using CleanService.Src.Modules.ServiceType;
 using CleanService.Src.Modules.Storage;
 using CleanService.Src.Repositories;
@@ -61,9 +62,13 @@ public static class AppModule
         services
             .AddBookingModule();
         
-        // Inject Service Module
+        // Inject Service Type Module
         services
             .AddServiceTypeModule();
+        
+        // Inject Service Category Module
+        services
+            .AddServiceCategoryModule();
         
         // Inject Contract Module
         services

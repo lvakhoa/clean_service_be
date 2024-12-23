@@ -203,7 +203,7 @@ public class ManageService : IManageService
     
     public Task<Pagination<RefundResponseDto>> GetRefunds(RefundStatus? status,int? page, int? limit)
     {
-        Expression<Func<Refunds, bool>> predicate = status != null? entity => entity.Status == status : entity => true;
+        Expression<Func<Refunds, bool>> predicate = status != null ? entity => entity.Status == status : entity => true;
         
         var refunds = _manageUnitOfWork.RefundRepository.Find(predicate,
             order: entity => entity.CreatedAt,false,null, null,
@@ -371,9 +371,18 @@ public class ManageService : IManageService
 
     public Task<Pagination<RoomPricingResponseDto>> GetRoomPricing(int? page, int? limit, RoomType? roomType, Guid? serviceTypeId)
     {
+        Expression<Func<RoomPricing, bool>> predicate = entity => true;
+        if (roomType != null && serviceTypeId == null) 
+            predicate = entity => entity.RoomType == roomType;
+        if (serviceTypeId != null && roomType == null)
+            predicate = entity => entity.ServiceTypeId == serviceTypeId;
+        if (serviceTypeId != null && roomType != null)
+            predicate = entity => entity.ServiceTypeId == serviceTypeId && entity.RoomType == roomType;
+        
+        
         var roomPricings = _manageUnitOfWork.RoomPricingRepository.Find(
-            entity => true,
-            entity => entity.CreatedAt,false,
+            predicate,
+            entity => entity.RoomCount,false,
             null,
             null,
             new FindOptions
