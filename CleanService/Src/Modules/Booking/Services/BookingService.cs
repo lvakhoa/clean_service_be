@@ -173,7 +173,7 @@ public class BookingService : IBookingService
 
         int? minJobTaken = null;
         var relevantStatuses = new List<BookingStatus>
-            { BookingStatus.Pending, BookingStatus.Confirmed, BookingStatus.InProgress };
+            { BookingStatus.Confirmed, BookingStatus.InProgress };
 
         foreach (var helper in allHelpers)
         {
@@ -210,9 +210,9 @@ public class BookingService : IBookingService
             .ToList();
 
         // Filter out helpers who do not offer the required service
-        availableHelpers = availableHelpers
-            .Where(x => x.ServicesOffered != null && x.ServicesOffered.Contains(booking.ServiceTypeId))
-            .ToList();
+        // availableHelpers = availableHelpers
+        //     .Where(x => x.ServicesOffered != null && x.ServicesOffered.Contains(booking.ServiceTypeId))
+        //     .ToList();
 
         if (!availableHelpers.Any()) return null;
 
