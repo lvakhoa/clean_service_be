@@ -121,6 +121,9 @@ public class CleanServiceContext : DbContext
         modelBuilder.Entity<ServiceTypes>()
             .Navigation(s => s.DurationPrice)
             .AutoInclude();
+        modelBuilder.Entity<ServiceTypes>()
+            .Navigation(s => s.Category)
+            .AutoInclude();
 
         modelBuilder.Entity<ServiceTypes>()
             .Property(s => s.CreatedAt)

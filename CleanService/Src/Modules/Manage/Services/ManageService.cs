@@ -501,7 +501,7 @@ public class ManageService : IManageService
             throw new KeyNotFoundException("Room Pricing not found");
         
         var serviceType = await _manageUnitOfWork.ServiceTypeRepository.FindOneAsync(entity => entity.Id == updateDurationPriceRequestDto.ServiceTypeId);
-        if(serviceType == null )
+        if(serviceType == null && updateDurationPriceRequestDto.ServiceTypeId != null )
             throw new KeyNotFoundException("Service Type not found");
         
         if(updateDurationPriceRequestDto.DurationHours != null && updateDurationPriceRequestDto.DurationHours < 1)
