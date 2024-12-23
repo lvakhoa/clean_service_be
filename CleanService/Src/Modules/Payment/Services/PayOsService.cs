@@ -53,8 +53,8 @@ public class PayOsService : IPaymentService
                     Price = Convert.ToInt32(decimal.Round(booking.TotalPrice))
                 }
             },
-            CancelUrl = "https://your-cancel-url.com", // Change later
-            ReturnUrl = "https://your-success-url.com", // Change later
+            CancelUrl = "http://localhost:3000/payment-cancelled", // Change later
+            ReturnUrl = "http://localhost:3000/payment-success", // Change later
             ExpiredAt = Timestamp.GetTimeStamp(DateTime.Now.AddMinutes(20))
         };
         var requestBodyDict = PaymentUtil.ConvertObjToDict(requestBody);
