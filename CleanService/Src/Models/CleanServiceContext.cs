@@ -103,9 +103,9 @@ public class CleanServiceContext : DbContext
             .HasDefaultValue(DateTime.Now);
         
         // Service Categories entity config
-        modelBuilder.Entity<ServiceCategories>()
-            .Navigation(s => s.ServiceTypes)
-            .AutoInclude();
+        // modelBuilder.Entity<ServiceCategories>()
+        //     .Navigation(s => s.ServiceTypes)
+        //     .AutoInclude();
 
         modelBuilder.Entity<ServiceCategories>()
             .Property(s => s.CreatedAt)
