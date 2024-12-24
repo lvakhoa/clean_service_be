@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using AutoMapper;
 using CleanService.Src.Models;
 using CleanService.Src.Modules.ServiceType.Infrastructures;
@@ -59,9 +60,11 @@ public class ServiceTypeService : IServiceTypeService
         await _serviceTypeUnitOfWork.SaveChangesAsync();
     }
 
-    public async Task<Pagination<ServiceTypeResponseDto>> GetServiceTypes(int? page, int? limit)
+    public async Task<Pagination<ServiceTypeResponseDto>> GetServiceTypes(int? page, int? limit, Guid? categoryId)
     {
-        var serviceTypes = _serviceTypeUnitOfWork.ServiceTypeRepository.GetAll(page, limit,
+        Expression<Func<ServiceTypes, bool>> predicate = categoryId != null ? entity => entity.CategoryId == categoryId : entity => true;
+
+        var serviceTypes = _serviceTypeUnitOfWork.ServiceTypeRepository.Find(predicate, null, false, page, limit,
             new FindOptions()
             {
                 IsAsNoTracking = true

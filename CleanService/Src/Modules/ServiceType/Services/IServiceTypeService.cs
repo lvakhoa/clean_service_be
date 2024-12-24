@@ -11,5 +11,5 @@ public interface IServiceTypeService
     
     Task<ServiceTypeResponseDto?> GetServiceTypeById(Guid id);
     
-    Task<Pagination<ServiceTypeResponseDto>> GetServiceTypes(int? page, int? limit);
+    Task<Pagination<ServiceTypeResponseDto>> GetServiceTypes(int? page, int? limit, Guid? categoryId);
 }
