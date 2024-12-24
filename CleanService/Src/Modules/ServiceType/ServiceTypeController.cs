@@ -40,9 +40,9 @@ public class ServiceTypeController : Controller
     }
     
     [HttpGet("all")]
-    public async Task<ActionResult<Pagination<ServiceTypeResponseDto>>> GetAllServices(int? page, int? limit)
+    public async Task<ActionResult<Pagination<ServiceTypeResponseDto>>> GetAllServices(int? page, int? limit, Guid? categoryId)
     {
-        var serviceTypes = await _serviceTypeService.GetServiceTypes(page, limit);
+        var serviceTypes = await _serviceTypeService.GetServiceTypes(page, limit, categoryId);
         return Ok(new SuccessResponse
         {
             StatusCode = HttpStatusCode.OK,

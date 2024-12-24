@@ -468,7 +468,7 @@ public class ManageService : IManageService
     {
         var durationPrices = _manageUnitOfWork.DurationPriceRepository.Find(
             entity => true,
-            entity => entity.CreatedAt,false,
+            entity => entity.DurationHours,false,
             null,
             null,
             new FindOptions
