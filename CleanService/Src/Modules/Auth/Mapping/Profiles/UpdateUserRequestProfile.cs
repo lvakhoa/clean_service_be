@@ -1,5 +1,7 @@
 using AutoMapper;
+
 using CleanService.Src.Models;
+using CleanService.Src.Models.Enums;
 using CleanService.Src.Modules.Auth.Mapping.DTOs;
 
 namespace CleanService.Src.Modules.Auth.Mapping.Profiles;

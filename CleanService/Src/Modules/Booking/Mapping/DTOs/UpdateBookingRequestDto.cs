@@ -1,4 +1,6 @@
 using CleanService.Src.Models;
+using CleanService.Src.Models.Configurations;
+
 using Microsoft.EntityFrameworkCore;
 
 namespace CleanService.Src.Modules.Booking.Mapping.DTOs
@@ -6,7 +8,7 @@ namespace CleanService.Src.Modules.Booking.Mapping.DTOs
     public class UpdateBookingRequestDto
     {
         //public string Id { get; set; } = null!;
-        
+
         public string? HelperId { get; set; }
 
         public string? Location { get; set; }

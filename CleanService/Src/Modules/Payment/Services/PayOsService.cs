@@ -1,12 +1,17 @@
 using System.Net;
 using System.Text;
+
 using CleanService.Src.Constant;
+using CleanService.Src.Exceptions;
+using CleanService.Src.Infrastructures.Repositories;
+using CleanService.Src.Infrastructures.Specifications.Impl;
 using CleanService.Src.Models;
-using CleanService.Src.Modules.Payment.Infrastructures;
+using CleanService.Src.Models.Configurations;
 using CleanService.Src.Modules.Payment.Mapping.DTOs.PayOs;
 using CleanService.Src.Utils;
 using CleanService.Src.Utils.Crypto;
 using CleanService.Src.Utils.RequestClient;
+
 using Newtonsoft.Json;
 
 namespace CleanService.Src.Modules.Payment.Services;
@@ -19,10 +24,10 @@ public class PayOsService : IPaymentService
     private readonly string _apiKey;
     private readonly string _checksumKey;
     private readonly string _url;
-    private readonly IPaymentUnitOfWork _paymentUnitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
 
     public PayOsService(IRequestClient requestClient, IConfiguration configuration,
-        IPaymentUnitOfWork paymentUnitOfWork)
+        IUnitOfWork unitOfWork)
     {
         _requestClient = requestClient;
         _configuration = configuration;
@@ -30,7 +35,7 @@ public class PayOsService : IPaymentService
         _apiKey = _configuration["PayOS:ApiKey"]!;
         _checksumKey = _configuration["PayOS:ChecksumKey"]!;
         _url = _configuration["PayOS:Url"]!;
-        _paymentUnitOfWork = paymentUnitOfWork;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<string> CreatePaymentLink(Bookings booking)
@@ -79,8 +84,8 @@ public class PayOsService : IPaymentService
         }
         catch (Exception e)
         {
-            throw new ExceptionResponse(HttpStatusCode.BadRequest, "Failed to create payment link",
-                ExceptionConvention.CannotCreatePayment, new[] { e.Message });
+            throw new UnprocessableRequestException("Failed to create payment link", new[] { e.Message },
+                ExceptionConvention.CannotCreatePayment);
         }
     }
 
@@ -100,24 +105,24 @@ public class PayOsService : IPaymentService
 
     public async Task ConfirmPayment(int orderCode)
     {
-        var booking = await _paymentUnitOfWork.BookingRepository.FindOneAsync(entity => entity.OrderId == orderCode);
+        var booking = await _unitOfWork.Repository<Bookings, PartialBookings>().GetFirstAsync(BookingSpecification.GetBookingByOrderIdSpec(orderCode));
         if (booking == null)
             return;
 
         booking.PaymentStatus = PaymentStatus.Paid;
-        await _paymentUnitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task CancelPayment(int orderCode)
     {
-        var booking = await _paymentUnitOfWork.BookingRepository.FindOneAsync(entity => entity.OrderId == orderCode);
+        var booking = await _unitOfWork.Repository<Bookings, PartialBookings>().GetFirstAsync(BookingSpecification.GetBookingByOrderIdSpec(orderCode));
         if (booking == null)
-            throw new ExceptionResponse(HttpStatusCode.NotFound, "Booking not found with order code " + orderCode,
+            throw new NotFoundException("Booking not found with order code " + orderCode,
                 ExceptionConvention.NotFound);
 
         booking.Status = BookingStatus.Cancelled;
         booking.CancellationReason = "Payment canceled";
         booking.HelperId = null;
-        await _paymentUnitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
     }
 }

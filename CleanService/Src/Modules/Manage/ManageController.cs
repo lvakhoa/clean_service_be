@@ -1,8 +1,11 @@
 using System.Net;
 using System.Security.Claims;
+
 using CleanService.Src.Constant;
+using CleanService.Src.Exceptions;
 using CleanService.Src.Filters;
 using CleanService.Src.Models;
+using CleanService.Src.Models.Enums;
 using CleanService.Src.Modules.Auth.Mapping.DTOs;
 using CleanService.Src.Modules.Auth.Services;
 using CleanService.Src.Modules.Manage.Mapping.DTOs;
@@ -12,7 +15,9 @@ using CleanService.Src.Modules.Manage.Mapping.DTOs.RoomPricing;
 using CleanService.Src.Modules.Manage.Services;
 using CleanService.Src.Modules.Storage.Services;
 using CleanService.Src.Utils;
+
 using Microsoft.AspNetCore.Mvc;
+
 using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Modules.Manage;
@@ -30,25 +35,25 @@ public class ManageController : Controller
         _authService = authService;
         _storageService = storageService;
     }
-    
+
     //User
     [HttpPatch("users/{id}")]
     [ModelValidation]
     public async Task<IActionResult> UpdateUser(string id,
         [FromForm] AdminUpdateUserRequestDto adminUpdateUserRequestDto)
     {
-        if(adminUpdateUserRequestDto.ProfilePictureFile != null)
+        if (adminUpdateUserRequestDto.ProfilePictureFile != null)
         {
             var result = await _storageService.UploadImageAsync(adminUpdateUserRequestDto.ProfilePictureFile);
             adminUpdateUserRequestDto.ProfilePicture = result.Uri.ToString();
         }
-        
-        if(adminUpdateUserRequestDto.IdCardFile != null)
+
+        if (adminUpdateUserRequestDto.IdCardFile != null)
         {
             var result = await _storageService.UploadImageAsync(adminUpdateUserRequestDto.IdCardFile);
             adminUpdateUserRequestDto.IdCard = result.Uri.ToString();
         }
-        
+
         await _manageService.UpdateUserInfo(id, adminUpdateUserRequestDto);
 
         return Ok(new SuccessResponse
@@ -57,7 +62,7 @@ public class ManageController : Controller
             Message = "Update user successfully"
         });
     }
-    
+
     [HttpGet("users")]
     public async Task<ActionResult<Pagination<UserResponseDto>>> GetUsers(UserType? userType, int? page, int? limit,
         UserStatus? userStatus = UserStatus.Active)
@@ -70,15 +75,15 @@ public class ManageController : Controller
             Data = users
         });
     }
-    
+
     //Customer
     [HttpGet("customers")]
     public async Task<ActionResult<UserResponseDto>> GetCustomers(int? page, int? limit)
     {
         if (page < 1 || limit < 1)
         {
-            throw new ExceptionResponse(HttpStatusCode.BadRequest, "Page or limit param is negative",
-                ExceptionConvention.ValidationFailed);
+            throw new UnprocessableRequestException("Page or limit param is negative",
+                exceptionCode: ExceptionConvention.ValidationFailed);
         }
 
         var customer = await _manageService.GetCustomer(page, limit);
@@ -101,15 +106,15 @@ public class ManageController : Controller
             Data = customer
         });
     }
-    
+
     //Helper
     [HttpGet("helpers")]
     public async Task<ActionResult<Pagination<HelperDetailResponseDto>>> GetHelpers(int? page, int? limit)
     {
         if (page < 1 || limit < 1)
         {
-            throw new ExceptionResponse(HttpStatusCode.BadRequest, "Page or limit param is negative",
-                ExceptionConvention.ValidationFailed);
+            throw new UnprocessableRequestException("Page or limit param is negative",
+                exceptionCode: ExceptionConvention.ValidationFailed);
         }
 
         var helpers = await _manageService.GetHelper(page, limit);
@@ -121,7 +126,7 @@ public class ManageController : Controller
             Data = helpers
         });
     }
-    
+
     [HttpGet("helpers/{id}")]
     public async Task<ActionResult<HelperDetailResponseDto>> GetHelperById(string id)
     {
@@ -134,18 +139,18 @@ public class ManageController : Controller
             Data = helper
         });
     }
-    
+
     [HttpPatch("helpers/{id}")]
     [ModelValidation]
     public async Task<IActionResult> UpdateHelper(string id,
         [FromForm] AdminUpdateHelperRequestDto adminUpdateHelperRequestDto)
-    {   
-        if(adminUpdateHelperRequestDto.ResumeUploadedFile != null)
+    {
+        if (adminUpdateHelperRequestDto.ResumeUploadedFile != null)
         {
             var result = await _storageService.UploadFileAsync(adminUpdateHelperRequestDto.ResumeUploadedFile);
             adminUpdateHelperRequestDto.ResumeUploaded = result.Uri.ToString();
         }
-        
+
         await _manageService.UpdateHelperInfo(id, adminUpdateHelperRequestDto);
 
         return Ok(new SuccessResponse
@@ -154,7 +159,7 @@ public class ManageController : Controller
             Message = "Update helper successfully"
         });
     }
-    
+
     //Refund
     [HttpGet("refunds")]
     public async Task<ActionResult<Pagination<RefundResponseDto>>> GetRefunds(RefundStatus? status, int? page,
@@ -162,8 +167,8 @@ public class ManageController : Controller
     {
         if (page < 1 || limit < 1)
         {
-            throw new ExceptionResponse(HttpStatusCode.BadRequest, "Page or limit param is negative",
-                ExceptionConvention.ValidationFailed);
+            throw new UnprocessableRequestException("Page or limit param is negative",
+                exceptionCode: ExceptionConvention.ValidationFailed);
         }
 
         var complaints = await _manageService.GetRefunds(status, page, limit);
@@ -228,14 +233,14 @@ public class ManageController : Controller
             Message = "Delete refund successfully"
         });
     }
-    
+
     [HttpGet("refunds/customer")]
     public async Task<ActionResult<Pagination<RefundResponseDto>>> GetRefundsOfCurrentCustomer(int? page, int? limit)
     {
         if (page < 1 || limit < 1)
         {
-            throw new ExceptionResponse(HttpStatusCode.BadRequest, "Page or limit param is negative",
-                ExceptionConvention.ValidationFailed);
+            throw new UnprocessableRequestException("Page or limit param is negative",
+                exceptionCode: ExceptionConvention.ValidationFailed);
         }
 
         var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
@@ -257,8 +262,8 @@ public class ManageController : Controller
     {
         if (page < 1 || limit < 1)
         {
-            throw new ExceptionResponse(HttpStatusCode.BadRequest, "Page or limit param is negative",
-                ExceptionConvention.ValidationFailed);
+            throw new UnprocessableRequestException("Page or limit param is negative",
+                exceptionCode: ExceptionConvention.ValidationFailed);
         }
 
         var roomPricings = await _manageService.GetRoomPricing(page, limit, roomType, serviceTypeId);
@@ -310,7 +315,7 @@ public class ManageController : Controller
             Message = "Delete room pricing successfully"
         });
     }
-    
+
     //Duration Price
     [HttpPost("duration-price")]
     [ModelValidation]
@@ -331,8 +336,8 @@ public class ManageController : Controller
     {
         if (page < 1 || limit < 1)
         {
-            throw new ExceptionResponse(HttpStatusCode.BadRequest, "Page or limit param is negative",
-                ExceptionConvention.ValidationFailed);
+            throw new UnprocessableRequestException("Page or limit param is negative",
+                exceptionCode: ExceptionConvention.ValidationFailed);
         }
 
         var durationPrices = await _manageService.GetDurationPrices(page, limit);
@@ -370,15 +375,15 @@ public class ManageController : Controller
             Message = "Delete duration price successfully"
         });
     }
-    
+
     //Feedback
     [HttpGet("feedbacks")]
     public async Task<ActionResult<Pagination<FeedbackResponseDto>>> GetFeedbacks(int? page, int? limit)
     {
         if (page < 1 || limit < 1)
         {
-            throw new ExceptionResponse(HttpStatusCode.BadRequest, "Page or limit param is negative",
-                ExceptionConvention.ValidationFailed);
+            throw new UnprocessableRequestException("Page or limit param is negative",
+                exceptionCode: ExceptionConvention.ValidationFailed);
         }
 
         var feedbacks = await _manageService.GetFeedbacks(page, limit);
@@ -415,15 +420,15 @@ public class ManageController : Controller
             Message = "Delete feedback successfully"
         });
     }
-    
+
     [HttpGet("feedbacks/customer")]
     public async Task<ActionResult<Pagination<FeedbackResponseDto>>> GetFeedbacksOfCurrentCustomer(int? page,
         int? limit)
     {
         if (page < 1 || limit < 1)
         {
-            throw new ExceptionResponse(HttpStatusCode.BadRequest, "Page or limit param is negative",
-                ExceptionConvention.ValidationFailed);
+            throw new UnprocessableRequestException("Page or limit param is negative",
+                exceptionCode: ExceptionConvention.ValidationFailed);
         }
 
         var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
@@ -437,5 +442,5 @@ public class ManageController : Controller
             Data = feedbacks
         });
     }
-    
+
 }

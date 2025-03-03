@@ -1,75 +1,62 @@
 using System.Linq.Expressions;
+
 using AutoMapper;
+
+using CleanService.Src.Infrastructures.Repositories;
+using CleanService.Src.Infrastructures.Specifications.Impl;
 using CleanService.Src.Models;
-using CleanService.Src.Modules.ServiceType.Infrastructures;
 using CleanService.Src.Modules.ServiceType.Mapping.DTOs;
-using CleanService.Src.Repositories;
+
 using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Modules.ServiceType.Services;
 
 public class ServiceTypeService : IServiceTypeService
 {
-    private readonly IServiceTypeUnitOfWork _serviceTypeUnitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public ServiceTypeService(IServiceTypeUnitOfWork serviceTypeUnitOfWork, IMapper mapper)
+    public ServiceTypeService(IUnitOfWork unitOfWork, IMapper mapper)
     {
-        _serviceTypeUnitOfWork = serviceTypeUnitOfWork;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
     public async Task CreateServiceType(CreateServiceTypeRequestDto createServiceTypeDto)
     {
         var serviceType = _mapper.Map<ServiceTypes>(createServiceTypeDto);
-        var category =
-            await _serviceTypeUnitOfWork.ServiceCategoryRepository.FindOneAsync(entity =>
-                entity.Id == serviceType.CategoryId);
-        if (category == null)
-            throw new KeyNotFoundException("Category not found");
+        await _unitOfWork.Repository<ServiceCategories, PartialServiceCategories>().GetFirstOrThrowAsync(ServiceCategorySpecification.GetServiceCategoryById(Guid.Parse(createServiceTypeDto.CategoryId))
+       );
 
-        await _serviceTypeUnitOfWork.ServiceTypeRepository.AddAsync(serviceType);
-        await _serviceTypeUnitOfWork.SaveChangesAsync();
+        await _unitOfWork.Repository<ServiceTypes, PartialServiceTypes>().AddAsync(serviceType);
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task UpdateServiceType(Guid id, UpdateServiceTypeRequestDto updateServiceTypeDto)
     {
-        var serviceType = await _serviceTypeUnitOfWork.ServiceTypeRepository.FindOneAsync(entity => entity.Id == id,
-            new FindOptions
-            {
-                IsAsNoTracking = true,
-                IsIgnoreAutoIncludes = true
-            });
-        if (serviceType == null)
-            throw new KeyNotFoundException("Service type not found");
+        var serviceType = await _unitOfWork.Repository<ServiceTypes, PartialServiceTypes>().GetFirstOrThrowAsync(
+        );
 
         var serviceTypeEntity = _mapper.Map<PartialServiceTypes>(updateServiceTypeDto);
 
-        var category =
-            await _serviceTypeUnitOfWork.ServiceCategoryRepository.FindOneAsync(entity =>
-                entity.Id == serviceType.CategoryId, new FindOptions
-            {
-                IsAsNoTracking = true,
-                IsIgnoreAutoIncludes = true
-            });
-        if (category == null)
-            throw new KeyNotFoundException("Category not found");
+        await _unitOfWork.Repository<ServiceCategories, PartialServiceCategories>().GetFirstOrThrowAsync(ServiceCategorySpecification.GetServiceCategoryById(id)
+        );
 
-        _serviceTypeUnitOfWork.ServiceTypeRepository.Detach(serviceType);
-        _serviceTypeUnitOfWork.ServiceTypeRepository.Update(serviceTypeEntity, serviceType);
-        await _serviceTypeUnitOfWork.SaveChangesAsync();
+        await _unitOfWork.Repository<ServiceTypes, PartialServiceTypes>().Detach(serviceType);
+        await _unitOfWork.Repository<ServiceTypes, PartialServiceTypes>().UpdateAsync(serviceTypeEntity, serviceType);
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task<Pagination<ServiceTypeResponseDto>> GetServiceTypes(int? page, int? limit, Guid? categoryId)
     {
-        Expression<Func<ServiceTypes, bool>> predicate = categoryId != null ? entity => entity.CategoryId == categoryId : entity => true;
+        var serviceTypeSpec = ServiceTypeSpecification.GetServiceTypeByCategoryIdSpec(categoryId);
+        if (page.HasValue && limit.HasValue)
+        {
+            serviceTypeSpec.ApplyPaging((page.Value - 1) * limit.Value, limit.Value);
+        }
 
-        var serviceTypes = _serviceTypeUnitOfWork.ServiceTypeRepository.Find(predicate, null, false, page, limit,
-            new FindOptions()
-            {
-                IsAsNoTracking = true
-            });
-        var totalServiceTypes = await _serviceTypeUnitOfWork.ServiceTypeRepository.CountAsync();
+        var serviceTypes = _unitOfWork.Repository<ServiceTypes, PartialServiceTypes>().GetAllAsync(serviceTypeSpec);
+        var totalServiceTypes = await _unitOfWork.Repository<ServiceTypes, PartialServiceTypes>().CountAsync();
 
         var serviceTypeDtos = _mapper.Map<ServiceTypeResponseDto[]>(serviceTypes);
 
@@ -83,11 +70,7 @@ public class ServiceTypeService : IServiceTypeService
 
     public async Task<ServiceTypeResponseDto?> GetServiceTypeById(Guid id)
     {
-        var serviceTypeEntity = await _serviceTypeUnitOfWork.ServiceTypeRepository.FindOneAsync(entity =>
-            entity.Id == id);
-        if(serviceTypeEntity == null)
-            throw new KeyNotFoundException("Service type not found");
-        
+        var serviceTypeEntity = await _unitOfWork.Repository<ServiceTypes, PartialServiceTypes>().GetFirstOrThrowAsync(ServiceTypeSpecification.GetServiceTypeByIdSpec(id));
         return _mapper.Map<ServiceTypeResponseDto>(serviceTypeEntity);
     }
 }

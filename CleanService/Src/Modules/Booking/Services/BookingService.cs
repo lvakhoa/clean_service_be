@@ -1,26 +1,33 @@
 using System.Net;
+
 using AutoMapper;
+
 using CleanService.Src.Constant;
+using CleanService.Src.Exceptions;
+using CleanService.Src.Infrastructures.Repositories;
+using CleanService.Src.Infrastructures.Specifications.Impl;
 using CleanService.Src.Models;
-using CleanService.Src.Modules.Booking.Infrastructures;
+using CleanService.Src.Models.Configurations;
+using CleanService.Src.Models.Enums;
 using CleanService.Src.Modules.Booking.Mapping.DTOs;
 using CleanService.Src.Modules.Payment.Services;
-using CleanService.Src.Repositories;
-using Pagination.EntityFrameworkCore.Extensions;
 using CleanService.Src.Utils;
+
 using Microsoft.EntityFrameworkCore;
+
+using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Modules.Booking.Services;
 
 public class BookingService : IBookingService
 {
-    private readonly IBookingUnitOfWork _bookingUnitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IPaymentService _paymentService;
     private readonly IMapper _mapper;
 
-    public BookingService(IBookingUnitOfWork bookingUnitOfWork, IPaymentService paymentService, IMapper mapper)
+    public BookingService(IUnitOfWork unitOfWork, IPaymentService paymentService, IMapper mapper)
     {
-        _bookingUnitOfWork = bookingUnitOfWork;
+        _unitOfWork = unitOfWork;
         _paymentService = paymentService;
         _mapper = mapper;
     }
@@ -29,20 +36,19 @@ public class BookingService : IBookingService
     {
         var booking = _mapper.Map<Bookings>(createBookingDto);
 
-        var customer = await _bookingUnitOfWork.UserRepository.FindOneAsync(entity => entity.Id == booking.CustomerId);
-        if (customer == null)
-            throw new KeyNotFoundException("Customer not found");
-        var serviceType =
-            await _bookingUnitOfWork.ServiceTypeRepository.FindOneAsync(entity => entity.Id == booking.ServiceTypeId);
-        if (serviceType == null)
-            throw new KeyNotFoundException("Service type not found");
-        
+        var customerSpec = UserSpecification.GetUserByIdSpec(createBookingDto.CustomerId);
+        var customer = await _unitOfWork.Repository<Users, PartialUsers>().GetFirstOrThrowAsync(customerSpec);
+
+        var serviceTypeSpec = ServiceTypeSpecification.GetServiceTypeByIdSpec(booking.ServiceTypeId);
+        var serviceType = await _unitOfWork.Repository<ServiceTypes, PartialServiceTypes>()
+            .GetFirstOrThrowAsync(serviceTypeSpec);
+
         booking.HelperId = await AssignHelperToBooking(booking, customer);
         if (booking.HelperId == null)
         {
             booking.Status = BookingStatus.Cancelled;
-            throw new ExceptionResponse(HttpStatusCode.Conflict, "No helper available for the requested time",
-                ExceptionConvention.NoHelperAvailable);
+            throw new UnprocessableRequestException("No helper available for the requested time",
+                exceptionCode: ExceptionConvention.NoHelperAvailable);
         }
         else
         {
@@ -56,140 +62,117 @@ public class BookingService : IBookingService
          */
         var basePrice = serviceType.BasePrice;
         var bedroomPricing =
-            (await _bookingUnitOfWork.RoomPricingRepository.FindOneAsync(entity =>
-                entity.RoomType == RoomType.Bedroom && entity.RoomCount == booking.BookingDetails.BedroomCount))
-            ?.AdditionalPrice ?? 0;
+            (await _unitOfWork.Repository<RoomPricing, PartialRoomPricing>().GetFirstAsync(
+                RoomPricingSpecification.GetRoomPricingByTypeAndCountSpec(RoomType.Bedroom,
+                    booking.BookingDetails.BedroomCount)))?.AdditionalPrice ?? 0;
         var bathroomPricing =
-            (await _bookingUnitOfWork.RoomPricingRepository.FindOneAsync(entity =>
-                entity.RoomType == RoomType.Bathroom && entity.RoomCount == booking.BookingDetails.BathroomCount))
-            ?.AdditionalPrice ?? 0;
+            (await _unitOfWork.Repository<RoomPricing, PartialRoomPricing>().GetFirstAsync(
+                RoomPricingSpecification.GetRoomPricingByTypeAndCountSpec(RoomType.Bathroom,
+                    booking.BookingDetails.BathroomCount)))?.AdditionalPrice ?? 0;
         var kitchenPricing =
-            (await _bookingUnitOfWork.RoomPricingRepository.FindOneAsync(entity =>
-                entity.RoomType == RoomType.Kitchen && entity.RoomCount == booking.BookingDetails.KitchenCount))
-            ?.AdditionalPrice ?? 0;
+            (await _unitOfWork.Repository<RoomPricing, PartialRoomPricing>().GetFirstAsync(
+                RoomPricingSpecification.GetRoomPricingByTypeAndCountSpec(RoomType.Kitchen,
+                    booking.BookingDetails.KitchenCount)))?.AdditionalPrice ?? 0;
         var livingRoomPricing =
-            (await _bookingUnitOfWork.RoomPricingRepository.FindOneAsync(entity =>
-                entity.RoomType == RoomType.LivingRoom && entity.RoomCount == booking.BookingDetails.LivingRoomCount))
-            ?.AdditionalPrice ?? 0;
-        var durationPricing = (await _bookingUnitOfWork.DurationPriceRepository
-                .FindOneAsync(entity => entity.Id == booking.BookingDetails.DurationPriceId))
-            ?.PriceMultiplier ?? 0;
+            (await _unitOfWork.Repository<RoomPricing, PartialRoomPricing>().GetFirstAsync(
+                RoomPricingSpecification.GetRoomPricingByTypeAndCountSpec(RoomType.LivingRoom,
+                    booking.BookingDetails.LivingRoomCount)))?.AdditionalPrice ?? 0;
+        var durationPricing =
+            (await _unitOfWork.Repository<DurationPrice, PartialDurationPrice>().GetFirstAsync(
+                DurationPriceSpecification.GetDurationPriceByIdSpec(
+                    booking.BookingDetails.DurationPriceId ?? Guid.Empty)))?.PriceMultiplier ?? 0;
 
-        var totalPrice = basePrice + bedroomPricing + bathroomPricing +
-                         kitchenPricing + livingRoomPricing +
+        var totalPrice = basePrice + bedroomPricing + bathroomPricing + kitchenPricing + livingRoomPricing +
                          basePrice * durationPricing;
         booking.TotalPrice = totalPrice;
 
-        var totalBookings = await _bookingUnitOfWork.BookingRepository.CountAsync();
+        var totalBookings = await _unitOfWork.Repository<Bookings, PartialBookings>().CountAsync();
         booking.OrderId = totalBookings + 1000;
 
-        await _bookingUnitOfWork.BookingRepository.AddAsync(booking);
+        await _unitOfWork.Repository<Bookings, PartialBookings>().AddAsync(booking);
 
-        await _bookingUnitOfWork.BookingContractRepository.AddAsync(new BookingContracts()
+        await _unitOfWork.Repository<BookingContracts, PartialBookingContracts>().AddAsync(new BookingContracts()
         {
             BookingId = booking.Id,
             Content = createBookingDto.ContractContent
         });
 
         var paymentLink = await _paymentService.CreatePaymentLink(booking);
-        
-        await _bookingUnitOfWork.SaveChangesAsync();
+
+        await _unitOfWork.SaveChangesAsync();
 
         return paymentLink;
     }
 
     public async Task UpdateBooking(Guid id, UpdateBookingRequestDto updateBookingDto)
     {
-        var booking = await _bookingUnitOfWork.BookingRepository.FindOneAsync(entity => entity.Id == id, new FindOptions
-        {
-            IsIgnoreAutoIncludes = true
-        });
-        if (booking == null)
-            throw new KeyNotFoundException("Booking not found");
-        _bookingUnitOfWork.BookingRepository.Detach(booking);
+        var booking = await _unitOfWork.Repository<Bookings, PartialBookings>()
+            .GetFirstOrThrowAsync(BookingSpecification.GetBookingByIdSpec(id));
+        await _unitOfWork.Repository<Bookings, PartialBookings>().Detach(booking);
 
         var updateBooking = _mapper.Map<PartialBookings>(updateBookingDto);
-        _bookingUnitOfWork.BookingRepository.Update(updateBooking, booking);
+        await _unitOfWork.Repository<Bookings, PartialBookings>().UpdateAsync(updateBooking, booking);
 
-        await _bookingUnitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task<Pagination<BookingResponseDto>> GetAllBookings(int? page, int? limit)
     {
-        var bookings = _bookingUnitOfWork.BookingRepository.GetAll(page, limit,
-            new FindOptions()
-            {
-                IsAsNoTracking = true
-            });
-        var totalBookings = await _bookingUnitOfWork.BookingRepository.CountAsync();
+        var bookingSpec = BookingSpecification.GetPagedBookingsSpec(page, limit);
+        var bookings = _unitOfWork.Repository<Bookings, PartialBookings>().GetAllAsync(bookingSpec);
+        var totalBookings = await _unitOfWork.Repository<Bookings, PartialBookings>().CountAsync();
 
         var bookingDtos = _mapper.Map<BookingResponseDto[]>(bookings);
 
         var currentPage = page ?? 1;
         var currentLimit = limit ?? totalBookings;
 
-        return new Pagination<BookingResponseDto>(bookingDtos, totalBookings,
-            currentPage,
-            currentLimit);
+        return new Pagination<BookingResponseDto>(bookingDtos, totalBookings, currentPage, currentLimit);
     }
 
     public async Task<Pagination<CusRefundResponseDto>> GetAllComplaints(int? page, int? limit)
     {
-        var complaints = _bookingUnitOfWork.RefundRepository.GetAll(page, limit,
-            new FindOptions()
-            {
-                IsAsNoTracking = true
-            });
-        var totalComplaints = await _bookingUnitOfWork.RefundRepository.CountAsync();
+        var refundSpec = RefundSpecification.GetPagedRefundsSpec(page, limit);
+        var complaints = _unitOfWork.Repository<Refunds, PartialRefunds>().GetAllAsync(refundSpec);
+        var totalComplaints = await _unitOfWork.Repository<Refunds, PartialRefunds>().CountAsync();
 
         var complaintDtos = _mapper.Map<CusRefundResponseDto[]>(complaints);
 
         var currentPage = page ?? 1;
         var currentLimit = limit ?? totalComplaints;
 
-        return new Pagination<CusRefundResponseDto>(
-            complaintDtos,
-            totalComplaints,
-            currentPage,
-            currentLimit);
+        return new Pagination<CusRefundResponseDto>(complaintDtos, totalComplaints, currentPage, currentLimit);
     }
 
     public async Task<BookingResponseDto?> GetBookingById(Guid id)
     {
-        var booking = await _bookingUnitOfWork.BookingRepository.FindOneAsync(entity => entity.Id == id)
+        return await _unitOfWork.Repository<Bookings, PartialBookings>()
+            .GetFirstOrThrowAsync(BookingSpecification.GetBookingByIdSpec(id))
             .ContinueWith(task => _mapper.Map<BookingResponseDto>(task.Result));
-        if (booking == null)
-            throw new KeyNotFoundException("Booking not found");
-
-        var bookingDto = _mapper.Map<BookingResponseDto>(booking);
-        return bookingDto;
     }
 
     public async Task<string?> AssignHelperToBooking(Bookings booking, Users customer)
     {
         // Get the list of all helpers
-        var allHelpers = _bookingUnitOfWork.HelperRepository.GetAll().ToList();
+        var allHelpers = await _unitOfWork.Repository<Helpers, PartialHelper>().GetAllAsync();
         var availableHelpers = new List<Helpers>();
 
         int? minJobTaken = null;
-        var relevantStatuses = new List<BookingStatus>
-            { BookingStatus.Confirmed, BookingStatus.InProgress };
+        var relevantStatuses = new List<BookingStatus> { BookingStatus.Confirmed, BookingStatus.InProgress };
 
         foreach (var helper in allHelpers)
         {
             // Get the list of bookings for the current helper
-            var helperBookings =
-                await _bookingUnitOfWork.BookingRepository.GetBookingByUserId(relevantStatuses, helper.Id,
-                    UserType.Helper);
+            var helperBookings = await _unitOfWork.Repository<Bookings, PartialBookings>()
+                .GetAllAsync(
+                    BookingSpecification.GetBookingByUserIdAndStatusSpec(helper.Id, UserType.Helper, relevantStatuses));
             var jobCount = helperBookings.Count(x =>
                 x.Status is BookingStatus.Completed or BookingStatus.Confirmed or BookingStatus.InProgress);
 
             // Check if the helper is available during the requested time
             var isAvailable = helperBookings.All(x =>
-                !relevantStatuses.Contains(x.Status) ||
-                x.ScheduledEndTime <= booking.ScheduledStartTime ||
-                x.ScheduledStartTime >= booking.ScheduledEndTime
-            );
+                !relevantStatuses.Contains(x.Status) || x.ScheduledEndTime <= booking.ScheduledStartTime ||
+                x.ScheduledStartTime >= booking.ScheduledEndTime);
 
             // Check the helper with the least job taken this month
             if (!isAvailable) continue;
@@ -229,64 +212,45 @@ public class BookingService : IBookingService
     //Refund service
     public async Task CreateRefund(CreateRefundRequestDto createRefundRequestDto)
     {
-        // if (createRefundRequestDto == null)
-        // {
-        //     throw new ArgumentNullException(nameof(createRefundRequestDto), "Complaint data cannot be null.");
-        // }
         var complaint = _mapper.Map<Refunds>(createRefundRequestDto);
 
-        var booking =
-            await _bookingUnitOfWork.BookingRepository.FindOneAsync(entity =>
-                entity.Id == createRefundRequestDto.BookingId);
-        if (booking == null)
-            throw new KeyNotFoundException("Booking not found");
+        var booking = await _unitOfWork.Repository<Bookings, PartialBookings>()
+            .GetFirstOrThrowAsync(BookingSpecification.GetBookingByIdSpec(complaint.BookingId));
 
-        await _bookingUnitOfWork.RefundRepository.AddAsync(complaint);
-        await _bookingUnitOfWork.SaveChangesAsync();
-        
-        _bookingUnitOfWork.BookingRepository.Detach(booking);
+        await _unitOfWork.Repository<Refunds, PartialRefunds>().AddAsync(complaint);
 
-        var updateBooking = new PartialBookings()
-        {
-            Status = BookingStatus.Pending,
-        };
-        _bookingUnitOfWork.BookingRepository.Update(updateBooking, booking);
+        await _unitOfWork.Repository<Bookings, PartialBookings>().Detach(booking);
 
-        await _bookingUnitOfWork.SaveChangesAsync();
+        var updateBooking = new PartialBookings() { Status = BookingStatus.Pending, };
+        await _unitOfWork.Repository<Bookings, PartialBookings>().UpdateAsync(updateBooking, booking);
+
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task UpdateRefund(Guid id, CusUpdateRefundRequestDto cusUpdateRefundRequestDto)
     {
-        var refund = await _bookingUnitOfWork.RefundRepository.FindOneAsync(entity => entity.Id == id, new FindOptions
-        {
-            IsIgnoreAutoIncludes = true
-        });
-        if (refund == null)
-            throw new KeyNotFoundException("Refund request not found");
+        var refund = await _unitOfWork.Repository<Refunds, PartialRefunds>().GetFirstOrThrowAsync(RefundSpecification.GetRefundByIdSpec(id));
         if (refund.BookingId != cusUpdateRefundRequestDto.BookingId)
             throw new KeyNotFoundException("Booking ID does not exist in database");
 
-        _bookingUnitOfWork.RefundRepository.Detach(refund);
+        await _unitOfWork.Repository<Refunds, PartialRefunds>().Detach(refund);
 
         var updateRefund = _mapper.Map<PartialRefunds>(cusUpdateRefundRequestDto);
-        _bookingUnitOfWork.RefundRepository.Update(updateRefund, refund);
+        await _unitOfWork.Repository<Refunds, PartialRefunds>().UpdateAsync(updateRefund, refund);
 
-        await _bookingUnitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task<Pagination<CusRefundResponseDto>> GetComplaintByCustomerId(string? id, int? page, int? limit)
     {
-        var complaints = _bookingUnitOfWork.RefundRepository.Find(
-            entity => entity.Booking.CustomerId == id,
-            x => x.CreatedAt,
-            true,
-            page,
-            limit,
-            new FindOptions()
-            {
-                IsAsNoTracking = true
-            });
-        var totalCount = await complaints.CountAsync();
+        var refundSpec = RefundSpecification.GetRefundByCustomerIdSpec(id);
+        refundSpec.ApplyOrderByDescending(x => x.CreatedAt);
+        if (page.HasValue && limit.HasValue)
+        {
+            refundSpec.ApplyPaging((page.Value - 1) * limit.Value, limit.Value);
+        }
+        var complaints = await _unitOfWork.Repository<Refunds, PartialRefunds>().GetAllAsync(refundSpec);
+        var totalCount = complaints.Count();
         var complaintDtos = _mapper.Map<CusRefundResponseDto[]>(complaints);
 
         var currentPage = page ?? 1;
@@ -303,55 +267,34 @@ public class BookingService : IBookingService
         // {
         //     throw new ArgumentNullException(nameof(createFeedbackDto), "Feedback data cannot be null.");
         // }
-        var booking = await _bookingUnitOfWork.BookingRepository.FindOneAsync(
-            entity => entity.Id == createFeedbackDto.BookingId, new FindOptions()
-            {
-                IsIgnoreAutoIncludes = true
-            });
-        if (booking == null)
-            // throw new ExceptionResponse(
-            //     HttpStatusCode.NotFound,
-            //     "Booking not found",
-            //     "BOOKING_NOT_FOUND",
-            //     new string[] { "The booking with the given ID does not exist." });
-            throw new KeyNotFoundException("Booking not found");
+        var booking = await _unitOfWork.Repository<Bookings, PartialBookings>().GetFirstOrThrowAsync(
+            BookingSpecification.GetBookingByIdSpec(createFeedbackDto.BookingId));
         if (booking.Status != BookingStatus.Completed)
-            throw new ExceptionResponse(
-                HttpStatusCode.BadRequest,
-                "Cannot create feedback if booking status is not completed.",
-                ExceptionConvention.BookingStatusNotCompleted,
-                new string[] { "Feedback can only be created for bookings with 'Completed' status." });
-        //throw new InvalidOperationException("Cannot create feedback if booking status is not completed.");
+            throw new BadRequestException("Cannot create feedback if booking status is not completed.",
+                ExceptionConvention.BookingStatusNotCompleted);
 
         var feedback = _mapper.Map<Feedbacks>(createFeedbackDto);
-        await _bookingUnitOfWork.FeedbackRepository.AddAsync(feedback);
-        await _bookingUnitOfWork.SaveChangesAsync();
+        await _unitOfWork.Repository<Feedbacks, PartialFeedback>().AddAsync(feedback);
 
         //update booking rating
-        _bookingUnitOfWork.BookingRepository.Detach(booking);
+        await _unitOfWork.Repository<Bookings, PartialBookings>().Detach(booking);
 
-        var updateBooking = new PartialBookings()
-        {
-            HelperRating = createFeedbackDto.Rating,
-        };
-        _bookingUnitOfWork.BookingRepository.Update(updateBooking, booking);
+        var updateBooking = new PartialBookings() { HelperRating = createFeedbackDto.Rating, };
+        await _unitOfWork.Repository<Bookings, PartialBookings>().UpdateAsync(updateBooking, booking);
 
-        await _bookingUnitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task<Pagination<CusFeedbackResponseDto>> GetFeedbackByCustomerId(string? id, int? page, int? limit)
     {
-        var feedbacks = _bookingUnitOfWork.FeedbackRepository.Find(
-            entity => entity.Booking.CustomerId == id,
-            x => x.CreatedAt,
-            true,
-            page,
-            limit,
-            new FindOptions()
-            {
-                IsAsNoTracking = true
-            });
-        var totalCount = await feedbacks.CountAsync();
+        var feedbackSpec = FeedbackSpecification.GetFeedbackByCustomerIdSpec(id);
+        feedbackSpec.ApplyOrderByDescending(x => x.CreatedAt);
+        if (page.HasValue && limit.HasValue)
+        {
+            feedbackSpec.ApplyPaging((page.Value - 1) * limit.Value, limit.Value);
+        }
+        var feedbacks = await _unitOfWork.Repository<Feedbacks, PartialFeedback>().GetAllAsync(feedbackSpec);
+        var totalCount = feedbacks.Count;
         var feedbackDtos = _mapper.Map<CusFeedbackResponseDto[]>(feedbacks);
 
         var currentPage = page ?? 1;

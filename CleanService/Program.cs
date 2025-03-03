@@ -1,24 +1,24 @@
 using System.Net;
 using System.Security.Claims;
 using System.Text.Json.Serialization;
+
+using CleanService.Src.Configs;
 using CleanService.Src.Constant;
+using CleanService.Src.Exceptions;
 using CleanService.Src.Middlewares;
 using CleanService.Src.Models;
+using CleanService.Src.Models.Enums;
 using CleanService.Src.Modules;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-builder.Services
-    .AddDbContext<CleanServiceContext>(options =>
-        options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString))
-            .LogTo(Console.WriteLine, LogLevel.Information)
-            .EnableSensitiveDataLogging()
-            .EnableDetailedErrors());
+builder.Services.AddConfig(builder.Configuration);
 
 var origins = Environment.GetEnvironmentVariable("ORIGINS")?.Split(",")
               ?? new[] { "http://localhost:3000" };
@@ -43,7 +43,7 @@ builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
 builder.Services.AddProblemDetails();
 
-builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+builder.Services.AddExceptionHandler<ExceptionHandler>();
 
 builder.Services.AddAuthorization(options =>
 {
@@ -76,7 +76,7 @@ builder.Services.AddAuthorization(options =>
 builder.Services
     .AddAppDependency(builder.Configuration);
 
-Cloudinary cloudinary = new Cloudinary(builder.Configuration["CLOUDINARY_URL"]); 
+Cloudinary cloudinary = new Cloudinary(builder.Configuration["CLOUDINARY_URL"]);
 
 builder.Services
     .AddControllers();

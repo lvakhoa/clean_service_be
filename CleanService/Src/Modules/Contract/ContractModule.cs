@@ -1,4 +1,3 @@
-using CleanService.Src.Modules.Contract.Infrastructures;
 using CleanService.Src.Modules.Contract.Mapping.Profiles;
 using CleanService.Src.Modules.Contract.Services;
 
@@ -11,19 +10,17 @@ public static class ContractModule
         services
             .AddAutoMapper(typeof(CreateContractRequestProfile))
             .AddAutoMapper(typeof(UpdateContractRequestProfile));
-        
-        return services;
-    }
-    
-    public static IServiceCollection AddContractDependency(this IServiceCollection services)
-    {
-        services
-            .AddScoped<IContractService, ContractService>()
-            .AddScoped<IContractUnitOfWork, ContractUnitOfWork>();
 
         return services;
     }
-    
+
+    public static IServiceCollection AddContractDependency(this IServiceCollection services)
+    {
+        services.AddScoped<IContractService, ContractService>();
+
+        return services;
+    }
+
     public static IServiceCollection AddContractModule(this IServiceCollection services)
     {
         services

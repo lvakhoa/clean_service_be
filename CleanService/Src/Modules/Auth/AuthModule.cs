@@ -2,14 +2,15 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.Text.Json;
+
 using CleanService.Src.Constant;
 using CleanService.Src.Models;
-using CleanService.Src.Modules.Auth.Infrastructures;
+using CleanService.Src.Models.Enums;
 using CleanService.Src.Modules.Auth.Mapping.DTOs;
 using CleanService.Src.Modules.Auth.Mapping.Profiles;
 using CleanService.Src.Modules.Auth.Services;
-using CleanService.Src.Repositories.User;
 using CleanService.Src.Utils;
+
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OAuth;
@@ -66,12 +67,12 @@ public static class AuthModule
                 OnCreatingTicket = async context =>
                 {
                     var authService = context.HttpContext.RequestServices.GetRequiredService<IAuthService>();
-                    
+
                     // var queryString = context.Request.Query.ToList();
                     // var code = queryString.FirstOrDefault(q => q.Key == "code").Value.ToString();
                     // var state = queryString.FirstOrDefault(q => q.Key == "state").Value.ToString();
                     //     var tokenResponse = await authService.ExchangeCodeForTokensAsync(code);
-                    
+
                     // Send user's information to oauth provider
                     var request = new HttpRequestMessage(HttpMethod.Get, context.Options.UserInformationEndpoint);
                     request.Headers.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
@@ -113,31 +114,14 @@ public static class AuthModule
     public static IServiceCollection AddAuthDependency(this IServiceCollection services)
     {
         services
-            .AddScoped<IAuthService, AuthService>()
-            .AddScoped<IAuthUnitOfWork, AuthUnitOfWork>();
-
-        return services;
-    }
-
-    public static IServiceCollection AddAuthMapping(this IServiceCollection services)
-    {
-        services
-            .AddAutoMapper(typeof(RegistrationRequestProfile))
-            .AddAutoMapper(typeof(UpdateUserRequestProfile))
-            .AddAutoMapper(typeof(UpdateHelperRequestProfile))
-            .AddAutoMapper(typeof(UserResponseProfile))
-            .AddAutoMapper(typeof(HelperResponseProfile));
+            .AddScoped<IAuthService, AuthService>();
 
         return services;
     }
 
     public static IServiceCollection AddAuthModule(this IServiceCollection services, IConfiguration config)
     {
-        services
-            .AddTransient<IClaimsTransformation, ClaimsTransformation>()
-            .AddAuthScheme(config)
-            .AddAuthDependency()
-            .AddAuthMapping();
+        services.AddTransient<IClaimsTransformation, ClaimsTransformation>().AddAuthScheme(config).AddAuthDependency();
 
         return services;
     }

@@ -1,14 +1,19 @@
 using System.Linq.Expressions;
 using System.Net.Http.Headers;
+
 using AutoMapper;
+
 using CleanService.Src.Constant;
+using CleanService.Src.Infrastructures.Repositories;
+using CleanService.Src.Infrastructures.Specifications.Impl;
 using CleanService.Src.Models;
-using CleanService.Src.Modules.Auth.Infrastructures;
+using CleanService.Src.Models.Enums;
 using CleanService.Src.Modules.Auth.Mapping.DTOs;
 using CleanService.Src.Modules.Storage.Services;
-using CleanService.Src.Repositories;
 using CleanService.Src.Utils.RequestClient;
+
 using Newtonsoft.Json;
+
 using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Modules.Auth.Services;
@@ -17,42 +22,36 @@ public class AuthService : IAuthService
 {
     private readonly IRequestClient _requestClient;
     private readonly IConfiguration _configuration;
-    private readonly IAuthUnitOfWork _authUnitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IStorageService _storageService;
 
-    public AuthService(IRequestClient requestClient, IConfiguration configuration, IAuthUnitOfWork authUnitOfWork,
+    public AuthService(IRequestClient requestClient, IConfiguration configuration, IUnitOfWork unitOfWork,
         IMapper mapper, IStorageService storageService)
     {
         _requestClient = requestClient;
         _configuration = configuration;
-        _authUnitOfWork = authUnitOfWork;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
         _storageService = storageService;
     }
 
     public async Task RegisterUser(RegistrationRequestDto registrationRequestDto)
     {
-        var user = await _authUnitOfWork.UserRepository.FindOneAsync(entity => entity.Id == registrationRequestDto.Id,
-            new FindOptions
-            {
-                IsAsNoTracking = true
-            });
+        var userSpec = UserSpecification.GetUserByIdSpec(registrationRequestDto.Id);
+        var user = await _unitOfWork.Repository<Users, PartialUsers>().GetFirstAsync(userSpec);
 
         if (user == null)
         {
             var userEntity = _mapper.Map<Users>(registrationRequestDto);
-            await _authUnitOfWork.UserRepository.AddAsync(userEntity);
+            await _unitOfWork.Repository<Users, PartialUsers>().AddAsync(userEntity);
 
             if (userEntity.UserType == UserType.Helper)
             {
-                await _authUnitOfWork.HelperRepository.AddAsync(new Helpers
-                {
-                    Id = userEntity.Id
-                });
+                await _unitOfWork.Repository<Helpers, PartialHelper>().AddAsync(new Helpers { Id = userEntity.Id });
             }
 
-            await _authUnitOfWork.SaveChangesAsync();
+            await _unitOfWork.SaveChangesAsync();
         }
     }
 
@@ -61,47 +60,31 @@ public class AuthService : IAuthService
         var secretKey = _configuration.GetValue<string>("OAuthProvider:SecretKey");
         // Get all user's sessions
         var sessions = await _requestClient.GetJson<List<Dictionary<string, object?>>>(
-            $"{RemoteBaseUrl.ClerkBaseUrl}/sessions?user_id={id}&status=active", new Dictionary<string, object>
-            {
-                { "Authorization", $"Bearer {secretKey}" }
-            });
+            $"{RemoteBaseUrl.ClerkBaseUrl}/sessions?user_id={id}&status=active",
+            new Dictionary<string, object> { { "Authorization", $"Bearer {secretKey}" } });
 
         foreach (var s in sessions)
         {
             await _requestClient.PostFormAsync($"{RemoteBaseUrl.ClerkBaseUrl}/sessions/{s["id"]}/revoke",
-                new Dictionary<string, string>(), headers: new Dictionary<string, object>
-                {
-                    { "Authorization", $"Bearer {secretKey}" }
-                });
+                new Dictionary<string, string>(),
+                headers: new Dictionary<string, object> { { "Authorization", $"Bearer {secretKey}" } });
         }
     }
 
 
     public async Task<UserResponseDto?> GetUserById(string id)
     {
-        var user = await _authUnitOfWork.UserRepository.FindOneAsync(entity => entity.Id == id,
-            new FindOptions
-            {
-                IsAsNoTracking = true
-            });
-        if (user == null)
-            throw new KeyNotFoundException("User not found");
-
-        var userDto = _mapper.Map<UserResponseDto>(user);
-
-        return userDto;
+        var userSpec = UserSpecification.GetUserByIdSpec(id);
+        return await _unitOfWork.Repository<Users, PartialUsers>().GetFirstOrThrowAsync(userSpec)
+            .ContinueWith(u => _mapper.Map<UserResponseDto>(u.Result));
     }
 
     public async Task UpdateInfo(string id, UpdateUserRequestDto updateUserRequestDto)
     {
-        var user = await _authUnitOfWork.UserRepository.FindOneAsync(entity => entity.Id == id, new FindOptions
-        {
-            IsAsNoTracking = true,
-            IsIgnoreAutoIncludes = true
-        });
-        if (user == null)
-            throw new KeyNotFoundException("User not found");
-        _authUnitOfWork.UserRepository.Detach(user);
+        var userSpec = UserSpecification.GetUserByIdSpec(id);
+        var user = await _unitOfWork.Repository<Users, PartialUsers>().GetFirstAsync(userSpec);
+        if (user == null) throw new KeyNotFoundException("User not found");
+        await _unitOfWork.Repository<Users, PartialUsers>().Detach(user);
 
         if (user.ProfilePicture != null && updateUserRequestDto.ProfilePicture != null)
         {
@@ -114,21 +97,17 @@ public class AuthService : IAuthService
         }
 
         var userEntity = _mapper.Map<PartialUsers>(updateUserRequestDto);
-        _authUnitOfWork.UserRepository.Update(userEntity, user);
+        await _unitOfWork.Repository<Users, PartialUsers>().UpdateAsync(userEntity, user);
 
-        await _authUnitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task UpdateHelperInfo(string id, UpdateHelperRequestDto updateHelperRequestDto)
     {
-        var helper = await _authUnitOfWork.HelperRepository.FindOneAsync(entity => entity.Id == id, new FindOptions
-        {
-            IsAsNoTracking = true,
-            IsIgnoreAutoIncludes = true
-        });
-        if (helper == null)
-            throw new KeyNotFoundException("User not found");
-        _authUnitOfWork.HelperRepository.Detach(helper);
+        var helperSpec = HelperSpecification.GetHelperByIdSpec(id);
+        var helper = await _unitOfWork.Repository<Helpers, PartialHelper>().GetFirstAsync(helperSpec);
+        if (helper == null) throw new KeyNotFoundException("Helper not found");
+        await _unitOfWork.Repository<Helpers, PartialHelper>().Detach(helper);
 
         if (helper.ResumeUploaded != null && updateHelperRequestDto.ResumeUploaded != null)
         {
@@ -136,56 +115,46 @@ public class AuthService : IAuthService
         }
 
         var helperEntity = _mapper.Map<PartialHelper>(updateHelperRequestDto);
-        _authUnitOfWork.HelperRepository.Update(helperEntity, helper);
+        await _unitOfWork.Repository<Helpers, PartialHelper>().UpdateAsync(helperEntity, helper);
 
-        await _authUnitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task<Pagination<UserResponseDto>> GetUsers(UserType? userType, int? page, int? limit,
         UserStatus? status = UserStatus.Active)
     {
-        Expression<Func<Users, bool>> predicate = userType == null
-            ? entity => entity.Status == status
-            : entity => entity.UserType == userType && entity.Status == status;
+        var userSpec = UserSpecification.GetUserByStatusOrTypeSpec(userType, status);
+        if (page.HasValue && limit.HasValue)
+        {
+            userSpec.ApplyPaging((page.Value - 1) * limit.Value, limit.Value);
+        }
+        userSpec.ApplyOrderBy(x => x.FullName);
 
-        var users = _authUnitOfWork.UserRepository.Find(predicate,
-            order: entity => entity.FullName, false, page, limit,
-            new FindOptions
-            {
-                IsAsNoTracking = true
-            });
-        var totalUsers = await _authUnitOfWork.UserRepository.CountAsync(predicate);
+        var users = _unitOfWork.Repository<Users, PartialUsers>().GetAllAsync(userSpec);
+        var totalUsers = await _unitOfWork.Repository<Users, PartialUsers>().CountAsync(userSpec);
 
         var userDto = _mapper.Map<UserResponseDto[]>(users);
 
         var currentPage = page ?? 1;
         var currentLimit = limit ?? totalUsers;
 
-        return new Pagination<UserResponseDto>(userDto, totalUsers,
-            currentPage,
-            currentLimit);
+        return new Pagination<UserResponseDto>(userDto, totalUsers, currentPage, currentLimit);
     }
 
     public async Task ActivateUser(string id)
     {
-        var user = await _authUnitOfWork.UserRepository.FindOneAsync(entity => entity.Id == id);
-        if (user == null)
-            throw new KeyNotFoundException("User not found");
-
+        var userSpec = UserSpecification.GetUserByIdSpec(id);
+        var user = await _unitOfWork.Repository<Users, PartialUsers>().GetFirstOrThrowAsync(userSpec);
         user.Status = UserStatus.Active;
-
-        await _authUnitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task BlockUser(string id)
     {
-        var user = await _authUnitOfWork.UserRepository.FindOneAsync(entity => entity.Id == id);
-        if (user == null)
-            throw new KeyNotFoundException("User not found");
-
+        var userSpec = UserSpecification.GetUserByIdSpec(id);
+        var user = await _unitOfWork.Repository<Users, PartialUsers>().GetFirstOrThrowAsync(userSpec);
         user.Status = UserStatus.Blocked;
-
-        await _authUnitOfWork.SaveChangesAsync();
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task<Tokens> ExchangeCodeForTokensAsync(string code)
@@ -208,10 +177,7 @@ public class AuthService : IAuthService
         var providerDomain = _configuration.GetValue<string>("OAuthProvider:Domain");
 
         return await _requestClient.GetJson<UserInfo>(AuthProvider.UserInformationEndpoint(providerDomain!),
-            new Dictionary<string, object>
-            {
-                { "Bearer", accessToken }
-            });
+            new Dictionary<string, object> { { "Bearer", accessToken } });
     }
 
     public async Task<bool> CheckUserExistsAsync(string email)

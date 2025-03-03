@@ -1,11 +1,13 @@
 using AutoMapper;
+
 using CleanService.Src.Models;
+using CleanService.Src.Models.Enums;
 using CleanService.Src.Modules.Manage.Mapping.DTOs;
 using CleanService.Src.Modules.Manage.Mapping.DTOs.RoomPricing;
 
 namespace CleanService.Src.Modules.Manage.Mapping.Profiles;
 
-public class RoomPricingProfile: Profile
+public class RoomPricingProfile : Profile
 {
     public RoomPricingProfile()
     {
@@ -21,7 +23,7 @@ public class RoomPricingProfile: Profile
                 AdditionalPrice = entity.AdditionalPrice,
                 CreatedAt = entity.CreatedAt,
             });
-        
+
         //For Update
         CreateMap<UpdateRoomPricingRequestDto, PartialRoomPricing>()
             .ConstructUsing(entity => new PartialRoomPricing
@@ -31,7 +33,7 @@ public class RoomPricingProfile: Profile
                 ServiceTypeId = entity.ServiceTypeId,
                 RoomType = entity.RoomType
             });
-        
+
         //For Create
         CreateMap<CreateRoomPricingRequestDto, RoomPricing>()
             .ConstructUsing(dto => new RoomPricing

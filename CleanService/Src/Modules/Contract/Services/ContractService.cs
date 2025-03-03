@@ -1,73 +1,62 @@
 using AutoMapper;
+
+using CleanService.Src.Infrastructures.Repositories;
+using CleanService.Src.Infrastructures.Specifications.Impl;
 using CleanService.Src.Models;
-using CleanService.Src.Modules.Contract.Infrastructures;
 using CleanService.Src.Modules.Contract.Mapping.DTOs;
-using CleanService.Src.Repositories;
+
 using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Modules.Contract.Services;
 
 public class ContractService : IContractService
 {
-    private readonly IContractUnitOfWork _contractUnitOfWork;
+    private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
 
-    public ContractService(IContractUnitOfWork contractUnitOfWork, IMapper mapper)
+    public ContractService(IUnitOfWork unitOfWork, IMapper mapper)
     {
-        _contractUnitOfWork = contractUnitOfWork;
+        _unitOfWork = unitOfWork;
         _mapper = mapper;
     }
 
     public async Task CreateContract(CreateContractRequestDto createContractDto)
     {
         var contractEntity = _mapper.Map<Contracts>(createContractDto);
-        await _contractUnitOfWork.ContractRepository.AddAsync(contractEntity);
-        await _contractUnitOfWork.SaveChangesAsync();
+        await _unitOfWork.Repository<Contracts, PartialContracts>().AddAsync(contractEntity);
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task UpdateContract(Guid id, UpdateContractRequestDto updateContractDto)
     {
-        var contract = await _contractUnitOfWork.ContractRepository.FindOneAsync(entity => entity.Id == id,
-            new FindOptions()
-            {
-                IsIgnoreAutoIncludes = true
-            });
-        if (contract == null)
-            throw new KeyNotFoundException("Contract not found");
+        var contract = await _unitOfWork.Repository<Contracts, PartialContracts>()
+            .GetFirstOrThrowAsync(ContractSpecification.GetContractByIdSpec(id));
 
         var contractEntity = _mapper.Map<PartialContracts>(updateContractDto);
 
-        _contractUnitOfWork.ContractRepository.Update(contractEntity, contract);
-        
-        await _contractUnitOfWork.SaveChangesAsync();
+        await _unitOfWork.Repository<Contracts, PartialContracts>().UpdateAsync(contractEntity, contract);
+
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public async Task<Pagination<ContractResponseDto>> GetAllContracts(int? page, int? limit)
     {
-        var contracts = _contractUnitOfWork.ContractRepository.GetAll(page, limit,
-            new FindOptions()
-            {
-                IsAsNoTracking = true
-            });
-        var totalContracts = await _contractUnitOfWork.ContractRepository.CountAsync();
+        var contracts = _unitOfWork.Repository<Contracts, PartialContracts>()
+            .GetAllAsync(ContractSpecification.GetPagedContractsSpec(page, limit));
+        var totalContracts = await _unitOfWork.Repository<Contracts, PartialContracts>().CountAsync();
 
         var contractDtos = _mapper.Map<ContractResponseDto[]>(contracts);
 
         var currentPage = page ?? 1;
         var currentLimit = limit ?? totalContracts;
 
-        return new Pagination<ContractResponseDto>(contractDtos, totalContracts,
-            currentPage,
-            currentLimit);
+        return new Pagination<ContractResponseDto>(contractDtos, totalContracts, currentPage, currentLimit);
     }
 
     public async Task<ContractResponseDto?> GetContractById(Guid id)
     {
-        var contract = await _contractUnitOfWork.ContractRepository.FindOneAsync(entity => entity.Id == id);
-        if (contract == null)
-            throw new KeyNotFoundException("Contract not found");
-        
-        var contractDto = _mapper.Map<ContractResponseDto>(contract);
-        return contractDto;
+        return await _unitOfWork.Repository<Contracts, PartialContracts>()
+            .GetFirstOrThrowAsync(ContractSpecification.GetContractByIdSpec(id))
+            .ContinueWith(x => _mapper.Map<ContractResponseDto>(x.Result));
     }
 }

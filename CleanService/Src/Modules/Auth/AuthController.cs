@@ -1,27 +1,31 @@
 using System.Net;
 using System.Security.Claims;
+
+using CleanService.Src.Common;
 using CleanService.Src.Constant;
+using CleanService.Src.Exceptions;
 using CleanService.Src.Filters;
 using CleanService.Src.Models;
+using CleanService.Src.Models.Enums;
 using CleanService.Src.Modules.Auth.Mapping.DTOs;
 using CleanService.Src.Modules.Auth.Services;
+using CleanService.Src.Modules.Manage.Mapping.DTOs;
 using CleanService.Src.Modules.Manage.Services;
 using CleanService.Src.Modules.Storage.Services;
 using CleanService.Src.Utils;
+
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+
 using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Modules.Auth;
 
-// [Authorize]
-[ApiController]
-[Route("[controller]")]
-public class AuthController : ControllerBase
+public class AuthController : ApiController
 {
     private readonly IAuthService _authService;
     private readonly IStorageService _storageService;
@@ -49,38 +53,27 @@ public class AuthController : ControllerBase
     [AllowAnonymous]
     public IActionResult SignUpCustomer()
     {
-        var properties = new AuthenticationProperties
-        {
-            RedirectUri = Url.Action("OAuthRedirect", "Auth")
-        };
+        var properties = new AuthenticationProperties { RedirectUri = Url.Action("OAuthRedirect", "Auth") };
         properties.Items["role"] = UserType.Customer.ToString();
 
-        return Challenge(properties,
-            authenticationSchemes: new[] { AuthProvider.Provider });
+        return Challenge(properties, authenticationSchemes: new[] { AuthProvider.Provider });
     }
 
     [HttpGet("signup/helper")]
     [AllowAnonymous]
     public IActionResult SignUpHelper()
     {
-        var properties = new AuthenticationProperties
-        {
-            RedirectUri = Url.Action("OAuthRedirect", "Auth")
-        };
+        var properties = new AuthenticationProperties { RedirectUri = Url.Action("OAuthRedirect", "Auth") };
         properties.Items["role"] = UserType.Helper.ToString();
 
-        return Challenge(properties,
-            authenticationSchemes: new[] { AuthProvider.Provider });
+        return Challenge(properties, authenticationSchemes: new[] { AuthProvider.Provider });
     }
 
     [HttpGet("login")]
     [AllowAnonymous]
     public IActionResult LogIn()
     {
-        return Challenge(new AuthenticationProperties()
-            {
-                RedirectUri = Url.Action("OAuthRedirect", "Auth")
-            },
+        return Challenge(new AuthenticationProperties() { RedirectUri = Url.Action("OAuthRedirect", "Auth") },
             authenticationSchemes: new[] { AuthProvider.Provider });
     }
 
@@ -88,30 +81,19 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> LogOut()
     {
         var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        if (userId == null)
-            throw new ExceptionResponse(HttpStatusCode.Unauthorized, "Unauthorized", ExceptionConvention.Unauthorized);
-        
-        await _authService.LogoutUser(userId);
-        if (Request.Cookies[".AspNetCore.Cookies"] != null)
-            Response.Cookies.Delete(".AspNetCore.Cookies");
+        if (userId == null) throw new UnauthorizedAccessException();
 
-        return Ok(new SuccessResponse
-        {
-            StatusCode = HttpStatusCode.OK,
-            Message = "Logout successfully",
-        });
+        await _authService.LogoutUser(userId);
+        if (Request.Cookies[".AspNetCore.Cookies"] != null) Response.Cookies.Delete(".AspNetCore.Cookies");
+
+        return Ok(new ApiSuccessResult<string>(StatusCodes.Status200OK, "Logout successfully"));
     }
 
     [HttpGet("user/{id}")]
     public async Task<IActionResult> GetUserById(string id)
     {
         var user = await _authService.GetUserById(id);
-        return Ok(new SuccessResponse
-        {
-            StatusCode = HttpStatusCode.OK,
-            Message = "Get user successfully",
-            Data = user
-        });
+        return Ok(new ApiSuccessResult<UserResponseDto>(StatusCodes.Status200OK, "Get user successfully", user));
     }
 
     [HttpPatch("user/{id}")]
@@ -121,15 +103,11 @@ public class AuthController : ControllerBase
         var currentUserId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
         if (currentUserId != id && !User.IsInRole(UserType.Admin.ToString()))
         {
-            throw new ExceptionResponse(HttpStatusCode.Forbidden, "Forbidden", ExceptionConvention.Forbidden);
+            throw new ForbiddenException("Forbidden");
         }
 
         await _authService.UpdateInfo(id, updateUserRequestDto);
-        return Ok(new SuccessResponse
-        {
-            StatusCode = HttpStatusCode.OK,
-            Message = "Update user's information successfully"
-        });
+        return Ok(new ApiSuccessResult<string>(StatusCodes.Status200OK, "Update user's information successfully"));
     }
 
     [HttpPatch("helper/{id}")]
@@ -144,11 +122,7 @@ public class AuthController : ControllerBase
         // }
 
         await _authService.UpdateHelperInfo(id, updateHelperRequestDto);
-        return Ok(new SuccessResponse
-        {
-            StatusCode = HttpStatusCode.OK,
-            Message = "Update helper's information successfully"
-        });
+        return Ok(new ApiSuccessResult<string>(StatusCodes.Status200OK, "Update helper's information successfully"));
     }
 
     [HttpGet("users")]
@@ -158,12 +132,12 @@ public class AuthController : ControllerBase
     {
         if (page < 1 || limit < 1)
         {
-            throw new ExceptionResponse(HttpStatusCode.BadRequest, "Page or limit param is negative",
-                ExceptionConvention.ValidationFailed);
+            throw new BadRequestException("Page or limit param is negative", ExceptionConvention.ValidationFailed);
         }
 
         var users = await _authService.GetUsers(userType, page, limit, status);
-        return Ok(users);
+        return Ok(new ApiSuccessResult<Pagination<UserResponseDto>>(StatusCodes.Status200OK, "Get users successfully",
+            users));
     }
 
     [HttpGet("me")]
@@ -171,16 +145,11 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> GetMe()
     {
         var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        if (userId == null)
-            throw new ExceptionResponse(HttpStatusCode.Unauthorized, "Unauthorized", ExceptionConvention.Unauthorized);
+        if (userId == null) throw new UnauthorizedAccessException();
 
         var user = await _authService.GetUserById(userId);
-        return Ok(new SuccessResponse
-        {
-            StatusCode = HttpStatusCode.OK,
-            Message = "Get personal information successfully",
-            Data = user
-        });
+        return Ok(new ApiSuccessResult<UserResponseDto>(StatusCodes.Status200OK,
+            "Get personal information successfully", user));
     }
 
     [HttpPatch("user/{id}/block")]
@@ -188,11 +157,7 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> BlockUser(string id)
     {
         await _authService.BlockUser(id);
-        return Ok(new SuccessResponse
-        {
-            StatusCode = HttpStatusCode.OK,
-            Message = "Block user successfully"
-        });
+        return Ok(new ApiSuccessResult<string>(StatusCodes.Status200OK, "Block user successfully"));
     }
 
     [HttpPatch("user/{id}/activate")]
@@ -200,11 +165,7 @@ public class AuthController : ControllerBase
     public async Task<IActionResult> ActivateUser(string id)
     {
         await _authService.ActivateUser(id);
-        return Ok(new SuccessResponse
-        {
-            StatusCode = HttpStatusCode.OK,
-            Message = "Activate user successfully"
-        });
+        return Ok(new ApiSuccessResult<string>(StatusCodes.Status200OK, "Activate user successfully"));
     }
 
     [HttpPost("decode")]
@@ -222,78 +183,56 @@ public class AuthController : ControllerBase
             };
             return new { type, pair.Value };
         }).ToList();
-        return Ok(new SuccessResponse
-        {
-            StatusCode = HttpStatusCode.OK,
-            Message = "Decode cookie successfully",
-            Data = new
-            {
-                Claims = claims
-            }
-        });
+        return Ok(new ApiSuccessResult<object>(StatusCodes.Status200OK, "Decode cookie successfully",
+            new { Claims = claims }));
     }
-    
+
     [HttpPatch("me")]
     public async Task<IActionResult> UpdateCurrentCustomer([FromForm] UpdateUserRequestDto updateUserRequestDto)
     {
         var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        if (userId == null)
-            throw new ExceptionResponse(HttpStatusCode.Unauthorized, "Unauthorized", ExceptionConvention.Unauthorized);
+        if (userId == null) throw new UnauthorizedAccessException();
 
         if (updateUserRequestDto.ProfilePictureFile != null)
         {
             var result = await _storageService.UploadImageAsync(updateUserRequestDto.ProfilePictureFile);
             updateUserRequestDto.ProfilePicture = result.Uri.ToString();
         }
-        
+
         if (updateUserRequestDto.IdentityCardFile != null)
         {
             var result = await _storageService.UploadImageAsync(updateUserRequestDto.IdentityCardFile);
             updateUserRequestDto.IdentityCard = result.Uri.ToString();
         }
-        
+
         await _authService.UpdateInfo(userId, updateUserRequestDto);
-        return Ok(new SuccessResponse
-        {
-            StatusCode = HttpStatusCode.OK,
-            Message = "Update personal information successfully"
-        });
+        return Ok(new ApiSuccessResult<object>(StatusCodes.Status200OK, "Update personal information successfully"));
     }
-    
+
     [HttpGet("helper/me")]
     public async Task<IActionResult> GetCurrentHelper()
     {
         var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        if (userId == null)
-            throw new ExceptionResponse(HttpStatusCode.Unauthorized, "Unauthorized", ExceptionConvention.Unauthorized);
-        
+        if (userId == null) throw new UnauthorizedAccessException();
+
         var helper = await _manageService.GetHelperById(userId);
-        return Ok(new SuccessResponse
-        {
-            StatusCode = HttpStatusCode.OK,
-            Message = "Get personal information successfully",
-            Data = helper
-        });
+        return Ok(new ApiSuccessResult<HelperDetailResponseDto>(StatusCodes.Status200OK,
+            "Get personal information successfully", helper));
     }
-    
+
     [HttpPatch("helper/me")]
     public async Task<IActionResult> UpdateCurrentHelper([FromForm] UpdateHelperRequestDto updateHelperRequestDto)
     {
         var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
-        if (userId == null)
-            throw new ExceptionResponse(HttpStatusCode.Unauthorized, "Unauthorized", ExceptionConvention.Unauthorized);
-        
-        if( updateHelperRequestDto.ResumeUploadedFile != null)
+        if (userId == null) throw new UnauthorizedAccessException();
+
+        if (updateHelperRequestDto.ResumeUploadedFile != null)
         {
             var result = await _storageService.UploadFileAsync(updateHelperRequestDto.ResumeUploadedFile);
             updateHelperRequestDto.ResumeUploaded = result.Uri.ToString();
         }
-        
+
         await _authService.UpdateHelperInfo(userId, updateHelperRequestDto);
-        return Ok(new SuccessResponse
-        {
-            StatusCode = HttpStatusCode.OK,
-            Message = "Update personal information successfully"
-        });
+        return Ok(new ApiSuccessResult<object>(StatusCodes.Status200OK, "Update personal information successfully"));
     }
 }

@@ -1,11 +1,14 @@
 using System.Net;
 using System.Security.Claims;
+
 using CleanService.Src.Constant;
+using CleanService.Src.Exceptions;
 using CleanService.Src.Models;
 using CleanService.Src.Modules.Booking.Mapping.DTOs;
 using CleanService.Src.Modules.Booking.Services;
 using CleanService.Src.Modules.Scheduler.Services;
 using CleanService.Src.Utils;
+
 using Microsoft.AspNetCore.Mvc;
 
 namespace CleanService.Src.Modules.Scheduler;
@@ -19,7 +22,7 @@ public class SchedulerController : Controller
     {
         _schedulerService = schedulerService;
     }
-    
+
     // [HttpGet("all")]
     // public async Task<ActionResult<BookingResponseDto[]>> GetScheduledBookings(int? page, int? limit)
     // {
@@ -38,8 +41,8 @@ public class SchedulerController : Controller
         var userId = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
         var userType = User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value;
         if (userId == null)
-            throw new ExceptionResponse(HttpStatusCode.Unauthorized, "Unauthorized", ExceptionConvention.Unauthorized);
-        
+            throw new UnauthorizedAccessException();
+
         if (userType == "Customer")
         {
             var result = await _schedulerService.QueryScheduledBooking(userId);
@@ -63,10 +66,10 @@ public class SchedulerController : Controller
         }
         else
         {
-            throw new ExceptionResponse(HttpStatusCode.Forbidden, "Forbidden", ExceptionConvention.Forbidden);
+            throw new ForbiddenException("Forbidden");
         }
     }
-    
+
     [HttpGet()]
     public async Task<ActionResult<BookingResponseDto[]>> GetScheduledBookingByHelperId(string? helperId, string? customerId, int? page, int? limit)
     {
@@ -83,7 +86,7 @@ public class SchedulerController : Controller
     public async Task<ActionResult<BookingResponseDto>> GetScheduledBookingById(Guid id)
     {
         var booking = await _schedulerService.GetScheduledBookingById(id);
-        if(booking == null) return NotFound(new { message = "Booking not found." }); 
+        if (booking == null) return NotFound(new { message = "Booking not found." });
         return Ok(new SuccessResponse
         {
             StatusCode = HttpStatusCode.OK,
@@ -92,7 +95,7 @@ public class SchedulerController : Controller
         });
     }
 
-    
+
 
     [HttpPatch("cancel/{id}")]
     public async Task<ActionResult> CancelScheduledBooking(Guid id)

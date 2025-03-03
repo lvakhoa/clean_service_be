@@ -1,4 +1,5 @@
 using CleanService.Src.Models;
+using CleanService.Src.Models.Configurations;
 
 namespace CleanService.Src.Constant;
 

@@ -1,11 +1,16 @@
 using System.Reflection;
 using System.Security.Claims;
+
 using CleanService.Src.Attributes;
 using CleanService.Src.Models;
+using CleanService.Src.Models.Enums;
 using CleanService.Src.Utils;
+
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+
 using Newtonsoft.Json;
+
 using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Filters;
