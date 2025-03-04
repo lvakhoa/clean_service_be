@@ -1,0 +1,16 @@
+name: Move assigned card
+on:
+  issues:
+    types: [assigned]
+env:
+  MY_GITHUB_TOKEN: ${{ secrets.ADD_TO_PROJECT_TOKEN }}
+  
+jobs:
+  move-assigned-card:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: srggrs/assign-one-project-github-action@1.2.1
+        if: github.event.action == 'assigned'
+        with:
+          project: 'https://github.com/users/lvakhoa/projects/5'
+          column_name: 'In progress'
