@@ -1,23 +1,31 @@
-﻿FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER $APP_UID
-WORKDIR /app
-EXPOSE 8080
-EXPOSE 8081
-
+﻿# Stage 1: Build Stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
-ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
+
+# restore
+ENV HUSKY=0
 COPY ["CleanService/CleanService.csproj", "CleanService/"]
 RUN dotnet restore "CleanService/CleanService.csproj"
-COPY . .
-WORKDIR "/src/CleanService"
-RUN dotnet build "CleanService.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
+# Install EF Core CLI inside the build container
+RUN dotnet tool install --global dotnet-ef
+
+# Set PATH so that dotnet-ef is available
+ENV PATH="$PATH:/root/.dotnet/tools"
+
+# build
+COPY ["CleanService/", "CleanService/"]
+RUN dotnet build 'CleanService/CleanService.csproj' -c Release -o /app/build
+
+# Stage 2: Publish Stage
 FROM build AS publish
-ARG BUILD_CONFIGURATION=Release
-RUN dotnet publish "CleanService.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
+RUN dotnet publish 'CleanService/CleanService.csproj' -c Release -o /app/publish
 
-FROM base AS final
+# Statge 3: Run Stage
+FROM mcr.microsoft.com/dotnet/sdk:8.0
+ENV ASPNETCORE_HTTP_PORTS=5011
+EXPOSE 5011
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "CleanService.dll"]
+

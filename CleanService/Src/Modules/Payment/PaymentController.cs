@@ -1,16 +1,17 @@
 using System.Net;
+
+using CleanService.Src.Common;
 using CleanService.Src.Constant;
 using CleanService.Src.Modules.Payment.Mapping.DTOs.PayOs;
 using CleanService.Src.Modules.Payment.Services;
 using CleanService.Src.Utils;
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace CleanService.Src.Modules.Payment;
 
-[Route("[controller]")]
-[ApiController]
-public class PaymentController : ControllerBase
+public class PaymentController : ApiController
 {
     private readonly IPaymentService _paymentService;
 
@@ -34,7 +35,7 @@ public class PaymentController : ControllerBase
             Message = "Payment confirmed successfully"
         });
     }
-    
+
     [HttpPatch("cancel/{orderId:int}")]
     public async Task<ActionResult> CancelPayment(int orderId)
     {

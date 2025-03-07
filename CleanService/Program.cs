@@ -4,6 +4,7 @@ using System.Text.Json.Serialization;
 
 using CleanService.Src.Configs;
 using CleanService.Src.Constant;
+using CleanService.Src.Database;
 using CleanService.Src.Exceptions;
 using CleanService.Src.Middlewares;
 using CleanService.Src.Models;
@@ -20,21 +21,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddConfig(builder.Configuration);
 
-var origins = Environment.GetEnvironmentVariable("ORIGINS")?.Split(",")
-              ?? new[] { "http://localhost:3000" };
+var origins = Environment.GetEnvironmentVariable("ORIGINS")?.Split(",") ?? new[] { "http://localhost:3000" };
+
 const string allowPolicy = "AllowCors";
-builder.Services
-    .AddCors(options =>
-    {
-        options.AddPolicy(allowPolicy, policy =>
-        {
-            policy
-                .WithOrigins(origins)
-                .AllowCredentials()
-                .AllowAnyHeader()
-                .AllowAnyMethod();
-        });
-    });
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy(allowPolicy,
+        policy => { policy.WithOrigins(origins).AllowCredentials().AllowAnyHeader().AllowAnyMethod(); });
+});
 
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
@@ -73,35 +67,32 @@ builder.Services.AddAuthorization(options =>
         });
 });
 
-builder.Services
-    .AddAppDependency(builder.Configuration);
+builder.Services.AddAppDependency(builder.Configuration);
 
 Cloudinary cloudinary = new Cloudinary(builder.Configuration["CLOUDINARY_URL"]);
 
-builder.Services
-    .AddControllers();
-;
+builder.Services.AddControllers();
+
 builder.Services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });
 
 var app = builder.Build();
 
-if (!app.Environment.IsDevelopment())
-{
-    app.UseExceptionHandler("/Error");
-    app.UseHsts();
-    app.UseHttpsRedirection();
-}
-else
-{
-    app.UseDeveloperExceptionPage();
-    app.UseExceptionHandler();
-}
+using var scope = app.Services.CreateScope();
+
+await AutomatedMigration.MigrateAsync(scope.ServiceProvider);
+
+app.UseSwagger();
+app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Cleaning Service V1"); });
+
+app.UseExceptionHandler();
+
+app.UseHttpsRedirection();
 
 app.UseCors(allowPolicy);
 
 app.Use(async (context, next) =>
 {
-    if (context.Request.Path.StartsWithSegments("/api/v1"))
+    if (context.Request.Path.StartsWithSegments("/api"))
     {
         await next();
     }
@@ -116,27 +107,15 @@ app.Use(async (context, next) =>
     }
 });
 
-app.UsePathBase(new PathString("/api/v1"));
 app.UseRouting();
 
-app.UseStatusCodePages(new StatusCodePagesOptions
-{
-    HandleAsync = async ctx =>
-    {
-        if (ctx.HttpContext.Response.StatusCode == 404)
-        {
-            await ctx.HttpContext.Response.WriteAsJsonAsync(new
-            {
-                StatusCode = HttpStatusCode.NotFound,
-                Message = "Route not found",
-                ExceptionCode = ExceptionConvention.NotFound,
-            });
-        }
-    }
-});
-
 app.UseAuthentication();
+
 app.UseAuthorization();
+
+app.UseMiddleware<PerformanceMiddleware>();
+
+app.UseMiddleware<TransactionMiddleware>();
 
 app.MapControllers();
 

@@ -1,14 +1,17 @@
 using System.Net;
+
+using CleanService.Src.Common;
 using CleanService.Src.Modules.ServiceType.Mapping.DTOs;
 using CleanService.Src.Modules.ServiceType.Services;
 using CleanService.Src.Utils;
+
 using Microsoft.AspNetCore.Mvc;
+
 using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Modules.ServiceType;
 
-[Route("[controller]")]
-public class ServiceTypeController : Controller
+public class ServiceTypeController : ApiController
 {
     private readonly IServiceTypeService _serviceTypeService;
 
@@ -16,7 +19,7 @@ public class ServiceTypeController : Controller
     {
         _serviceTypeService = serviceTypeService;
     }
-    
+
     [HttpPost("create")]
     public async Task<ActionResult> CreateServiceType([FromBody] CreateServiceTypeRequestDto createServiceType)
     {
@@ -27,7 +30,7 @@ public class ServiceTypeController : Controller
             Message = "Create service type successfully",
         });
     }
-    
+
     [HttpPatch("update/{id}")]
     public async Task<ActionResult> UpdateServiceType(Guid id, [FromBody] UpdateServiceTypeRequestDto updateServiceType)
     {
@@ -38,7 +41,7 @@ public class ServiceTypeController : Controller
             Message = "Update service type successfully",
         });
     }
-    
+
     [HttpGet("all")]
     public async Task<ActionResult<Pagination<ServiceTypeResponseDto>>> GetAllServices(int? page, int? limit, Guid? categoryId)
     {
@@ -50,7 +53,7 @@ public class ServiceTypeController : Controller
             Data = serviceTypes
         });
     }
-    
+
     [HttpGet("{id}")]
     public async Task<ActionResult<ServiceTypeResponseDto?>> GetServiceTypeById(Guid id)
     {
