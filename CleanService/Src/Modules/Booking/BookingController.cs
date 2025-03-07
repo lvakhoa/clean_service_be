@@ -1,17 +1,20 @@
 using System.Net;
 using System.Security.Claims;
+
+using CleanService.Src.Common;
 using CleanService.Src.Filters;
 using CleanService.Src.Modules.Booking.Mapping.DTOs;
 using CleanService.Src.Modules.Booking.Services;
 using CleanService.Src.Utils;
+
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+
 using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Modules.Booking;
 
-[Route("[controller]")]
-public class BookingController : Controller
+public class BookingController : ApiController
 {
     private readonly IBookingService _bookingService;
 
@@ -24,7 +27,7 @@ public class BookingController : Controller
     public async Task<ActionResult> CreateBooking([FromBody] CreateBookingRequestDto createBooking)
     {
         var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
-        if(userId == null)
+        if (userId == null)
         {
             throw new UnauthorizedAccessException("Unauthorized");
         }
@@ -66,7 +69,7 @@ public class BookingController : Controller
     }
 
     [HttpGet("refund")]
-    public async Task<ActionResult<Pagination<BookingResponseDto>>> GetRefundByCustomerId(string? customerId,int? page, int? limit)
+    public async Task<ActionResult<Pagination<BookingResponseDto>>> GetRefundByCustomerId(string? customerId, int? page, int? limit)
     {
         var refunds = await _bookingService.GetComplaintByCustomerId(customerId, page, limit);
         return Ok(new SuccessResponse
@@ -76,9 +79,9 @@ public class BookingController : Controller
             Data = refunds
         });
     }
-    
+
     [HttpGet("feedback")]
-    public async Task<ActionResult<Pagination<BookingResponseDto>>> GetFeedbackByCustomerId(string? customerId,int? page, int? limit)
+    public async Task<ActionResult<Pagination<BookingResponseDto>>> GetFeedbackByCustomerId(string? customerId, int? page, int? limit)
     {
         var refunds = await _bookingService.GetFeedbackByCustomerId(customerId, page, limit);
         return Ok(new SuccessResponse
@@ -100,7 +103,7 @@ public class BookingController : Controller
             Data = booking
         });
     }
-    
+
     [HttpPost("refund")]
     public async Task<ActionResult> CreateRefund([FromBody] CreateRefundRequestDto createRefund)
     {
@@ -111,7 +114,7 @@ public class BookingController : Controller
             Message = "Create refund successfully"
         });
     }
-    
+
     [HttpPatch("refund/{id}")]
     public async Task<ActionResult> UpdateRefund(Guid id, [FromBody] CusUpdateRefundRequestDto cusUpdateRefund)
     {
@@ -122,17 +125,17 @@ public class BookingController : Controller
             Message = "Update refund successfully"
         });
     }
-    
-    
+
+
     [HttpPost("feedback")]
     public async Task<ActionResult> CreateFeedback([FromBody] CreateFeedbackDto createFeedback)
     {
-            await _bookingService.CreateFeedback(createFeedback);
+        await _bookingService.CreateFeedback(createFeedback);
 
-            return CreatedAtAction("CreateFeedback", new SuccessResponse()
-            {
-                StatusCode = HttpStatusCode.Created,
-                Message = "Create feedback successfully"
-            });
+        return CreatedAtAction("CreateFeedback", new SuccessResponse()
+        {
+            StatusCode = HttpStatusCode.Created,
+            Message = "Create feedback successfully"
+        });
     }
 }

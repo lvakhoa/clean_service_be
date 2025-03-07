@@ -1,6 +1,7 @@
 using System.Net;
 using System.Security.Claims;
 
+using CleanService.Src.Common;
 using CleanService.Src.Constant;
 using CleanService.Src.Exceptions;
 using CleanService.Src.Models;
@@ -13,8 +14,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace CleanService.Src.Modules.Scheduler;
 
-[Route("[controller]")]
-public class SchedulerController : Controller
+public class SchedulerController : ApiController
 {
     private readonly ISchedulerService _schedulerService;
 

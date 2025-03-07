@@ -1,14 +1,17 @@
 using System.Net;
+
+using CleanService.Src.Common;
 using CleanService.Src.Modules.Contract.Mapping.DTOs;
 using CleanService.Src.Modules.Contract.Services;
 using CleanService.Src.Utils;
+
 using Microsoft.AspNetCore.Mvc;
+
 using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Modules.Contract;
 
-[Route("[controller]")]
-public class ContractController : Controller
+public class ContractController : ApiController
 {
     private readonly IContractService _contractService;
 
@@ -16,29 +19,29 @@ public class ContractController : Controller
     {
         _contractService = contractService;
     }
-    
+
     [HttpPost("create")]
     public async Task<ActionResult> CreateContract([FromBody] CreateContractRequestDto createContract)
     {
-         await _contractService.CreateContract(createContract);
-         return CreatedAtAction("CreateContract", new SuccessResponse
-         {
-             StatusCode = HttpStatusCode.Created,
-             Message = "Create contract successfully"
-         });
+        await _contractService.CreateContract(createContract);
+        return CreatedAtAction("CreateContract", new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.Created,
+            Message = "Create contract successfully"
+        });
     }
-    
+
     [HttpPatch("{id}")]
-    public async Task<ActionResult> UpdateContract(Guid id,[FromBody] UpdateContractRequestDto updateContract)
+    public async Task<ActionResult> UpdateContract(Guid id, [FromBody] UpdateContractRequestDto updateContract)
     {
-         await _contractService.UpdateContract(id, updateContract);
-         return Ok(new SuccessResponse
-         {
-             StatusCode = HttpStatusCode.OK,
-             Message = "Update contract successfully"
-         });
+        await _contractService.UpdateContract(id, updateContract);
+        return Ok(new SuccessResponse
+        {
+            StatusCode = HttpStatusCode.OK,
+            Message = "Update contract successfully"
+        });
     }
-    
+
     [HttpGet("all")]
     public async Task<ActionResult<Pagination<ContractResponseDto>>> GetAllContracts(int? page, int? limit)
     {
@@ -50,7 +53,7 @@ public class ContractController : Controller
             Data = contracts
         });
     }
-    
+
     [HttpGet("{id}")]
     public async Task<ActionResult<ContractResponseDto?>> GetContractById(Guid id)
     {

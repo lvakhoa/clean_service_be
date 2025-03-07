@@ -1,0 +1,53 @@
+services:
+    database:
+        image: mysql:latest
+        environment:
+            MYSQL_ROOT_PASSWORD: ${DB_HOST}
+            MYSQL_DATABASE: ${DB_NAME}
+            MYSQL_USER: ${DB_USER}
+            MYSQL_PASSWORD: ${DB_PASSWORD}
+            MYSQL_TCP_PORT: ${DB_PORT}
+        ports:
+            - ${DB_PORT}:3306
+        volumes:
+            - db_data:/var/lib/mysql
+        networks:
+            - db-network
+        healthcheck:
+            test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+            interval: 5s
+            timeout: 5s
+            retries: 55
+
+    adminer:
+        image: adminer:latest
+        restart: always
+        ports:
+            - 8080:8080
+        links:
+            - database
+        networks:
+            - db-network
+
+    application:
+        build:
+            context: .
+            dockerfile: Dockerfile
+        command: dotnet CleanService.dll
+        ports:
+            - 0.0.0.0:${APP_PORT}:${APP_PORT}
+        environment:
+            ConnectionStrings__DefaultConnection: "Server=${DB_HOST};Port=${DB_PORT};Database=${DB_NAME};User=${DB_USER};Password=${DB_PASSWORD};"
+        depends_on:
+            - database
+        links:
+            - database
+        networks:
+            - db-network
+        restart: always
+
+volumes:
+    db_data:
+networks:
+    db-network:
+        driver: bridge

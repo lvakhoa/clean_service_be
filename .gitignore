@@ -125,3 +125,5 @@ src/.vs/config/applicationhost.config
 
 CleanService/appsettings.Development.json
 CleanService/appsettings.json
+
+/.env

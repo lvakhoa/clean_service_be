@@ -1,6 +1,7 @@
 using System.Net;
 using System.Security.Claims;
 
+using CleanService.Src.Common;
 using CleanService.Src.Constant;
 using CleanService.Src.Exceptions;
 using CleanService.Src.Filters;
@@ -22,8 +23,7 @@ using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Modules.Manage;
 
-[Route("[controller]")]
-public class ManageController : Controller
+public class ManageController : ApiController
 {
     private readonly IManageService _manageService;
     private readonly IAuthService _authService;

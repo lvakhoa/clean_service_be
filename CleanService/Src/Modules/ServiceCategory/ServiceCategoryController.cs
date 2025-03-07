@@ -1,14 +1,17 @@
 using System.Net;
+
+using CleanService.Src.Common;
 using CleanService.Src.Modules.ServiceCategory.Mapping.DTOs;
 using CleanService.Src.Modules.ServiceCategory.Services;
 using CleanService.Src.Utils;
+
 using Microsoft.AspNetCore.Mvc;
+
 using Pagination.EntityFrameworkCore.Extensions;
 
 namespace CleanService.Src.Modules.ServiceCategory;
 
-[ApiController]
-public class ServiceCategoryController : ControllerBase
+public class ServiceCategoryController : ApiController
 {
     private readonly IServiceCategoryService _serviceCategoryService;
 
@@ -16,7 +19,7 @@ public class ServiceCategoryController : ControllerBase
     {
         _serviceCategoryService = serviceCategoryService;
     }
-    
+
     [HttpPost("create")]
     public async Task<ActionResult> CreateServiceCategory([FromBody] CreateServiceCategoryRequestDto createServiceCategory)
     {
@@ -27,7 +30,7 @@ public class ServiceCategoryController : ControllerBase
             Message = "Create service category successfully",
         });
     }
-    
+
     [HttpPatch("update/{id}")]
     public async Task<ActionResult> UpdateServiceCategory(Guid id, [FromBody] UpdateServiceCategoryRequestDto updateServiceCategory)
     {
@@ -38,7 +41,7 @@ public class ServiceCategoryController : ControllerBase
             Message = "Update service category successfully",
         });
     }
-    
+
     [HttpGet("all")]
     public async Task<ActionResult<Pagination<ServiceCategoryResponseDto>>> GetAllServiceCategories(int? page, int? limit)
     {
@@ -50,7 +53,7 @@ public class ServiceCategoryController : ControllerBase
             Data = serviceCategories
         });
     }
-    
+
     [HttpGet("{id}")]
     public async Task<ActionResult<ServiceCategoryResponseDto?>> GetServiceCategoryById(Guid id)
     {
