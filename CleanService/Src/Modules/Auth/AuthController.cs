@@ -30,9 +30,11 @@ public class AuthController : ApiController
     private readonly IAuthService _authService;
     private readonly IStorageService _storageService;
     private readonly IManageService _manageService;
+    private readonly IConfiguration _configuration;
 
-    public AuthController(IAuthService authService, IStorageService storageService, IManageService manageService)
+    public AuthController(IAuthService authService, IStorageService storageService, IManageService manageService, IConfiguration configuration)
     {
+        _configuration = configuration;
         _authService = authService;
         _storageService = storageService;
         _manageService = manageService;
@@ -46,7 +48,7 @@ public class AuthController : ApiController
         var cookies = Request.Cookies;
 
         cookies.ToList().ForEach(pair => Response.Cookies.Append(pair.Key, pair.Value));
-        return Redirect("http://localhost:3000/");
+        return Redirect($"{_configuration["WEB_URL"]}/");
     }
 
     [HttpGet("signup/customer")]
