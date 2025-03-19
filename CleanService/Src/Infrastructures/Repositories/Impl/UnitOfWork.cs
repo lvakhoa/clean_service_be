@@ -17,6 +17,7 @@ public class UnitOfWork : IUnitOfWork
     public IBaseRepository<T, TI> Repository<T, TI>() where T : BaseEntity, new() where TI : BaseEntity
     {
         var entityType = typeof(T);
+        var partialEntityType = typeof(TI);
 
         if (_repositories.ContainsKey(entityType))
         {
@@ -25,7 +26,7 @@ public class UnitOfWork : IUnitOfWork
 
         var repositoryType = typeof(BaseRepository<,>);
 
-        var repository = Activator.CreateInstance(repositoryType.MakeGenericType(entityType), _dbContext);
+        var repository = Activator.CreateInstance(repositoryType.MakeGenericType(entityType, partialEntityType), _dbContext);
 
         if (repository == null)
         {
