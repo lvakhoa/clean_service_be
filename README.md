@@ -3,6 +3,7 @@
 [![ASP.NET Core](https://img.shields.io/badge/ASP.NET%20Core-8.0-purple?style=flat&logo=.net)](https://dotnet.microsoft.com/)
 [![Entity Framework Core](https://img.shields.io/badge/EF%20Core-8.0-blue?style=flat&logo=.net)](https://docs.microsoft.com/en-us/ef/core/)
 [![MySQL](https://img.shields.io/badge/MySQL-8.0-blue?style=flat&logo=mysql)](https://www.postgresql.org/)
+[![Redis](https://img.shields.io/badge/Redis-7.4-DC382D?style=flat&logo=redis)](https://redis.io/lp/get-started1/?utm_campaign=gg_s_core_apac_en_brand_acq_21161918358&utm_source=google&utm_medium=cpc&utm_content=redis_exact&utm_term=&gad_source=1&gclid=Cj0KCQjw1um-BhDtARIsABjU5x7v5WI-b4S18STdeVoPS4yH44hwk2CepCYQpNwAzzDPSNax0WW2ws4aAtyLEALw_wcB)
 [![Docker](https://img.shields.io/badge/Docker-Latest-blue?style=flat&logo=docker)](https://www.docker.com/)
 [![License](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -36,6 +37,7 @@
 - File upload handling
 - Contract manage
 - Supports bank payments
+- Accelerate data querying with Redis
 
 ### Module-Specific Features
 - **Auth**: Handles user authentication, authorization.
@@ -55,6 +57,7 @@
 - **ASP.NET Core 8.0**
 - **Entity Framework Core 8.0**
 - **MySQL 8.0**
+- **Redis 7.4**
 - **AutoMapper** for object mapping
 
 ### External Services
@@ -70,6 +73,7 @@
 ### Prerequisites
 - .NET 8.0 SDK
 - MySQL 8.0+
+- Redis 7.4
 - Docker (optional)
 - IDE (Visual Studio 2022 or JetBrains Rider recommended)
 
