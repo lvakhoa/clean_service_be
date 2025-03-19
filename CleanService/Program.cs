@@ -68,7 +68,7 @@ builder.Services.AddAuthorization(options =>
         });
 });
 
-builder.Services.AddAppDependency(builder.Configuration);
+builder.Services.AddAppDependency(builder);
 
 builder.Services.RegisterRateLimiter();
 
@@ -92,7 +92,6 @@ app.UseSwaggerUI(c => { c.SwaggerEndpoint("/docs", "Cleaning Service V1"); });
 app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
-
 
 app.UseCors(allowPolicy);
 

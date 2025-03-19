@@ -17,22 +17,22 @@ namespace CleanService.Src.Modules;
 
 public static class AppModule
 {
-    public static IServiceCollection AddAppDependency(this IServiceCollection services, IConfiguration config)
+    public static IServiceCollection AddAppDependency(this IServiceCollection services, WebApplicationBuilder builder)
     {
         // Inject Configuration
         services
-            .AddSingleton<IConfiguration>(config);
+            .AddSingleton<IConfiguration>(builder.Configuration);
 
         services
             .AddTransient<IRequestClient, RequestClient>();
 
         // Inject Auth Module
         services
-            .AddAuthModule(config);
+            .AddAuthModule(builder);
 
         // Inject Mail Module
         services
-            .AddMailModule(config);
+            .AddMailModule(builder.Configuration);
 
         // Inject Booking Module
         services
