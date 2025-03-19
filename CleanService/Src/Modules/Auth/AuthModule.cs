@@ -19,7 +19,7 @@ namespace CleanService.Src.Modules.Auth;
 
 public static class AuthModule
 {
-    public static IServiceCollection AddAuthScheme(this IServiceCollection services, IConfiguration config)
+    public static IServiceCollection AddAuthScheme(this IServiceCollection services, WebApplicationBuilder builder)
     {
         services.AddAuthentication(options =>
         {
@@ -40,12 +40,19 @@ public static class AuthModule
                 });
                 return context.Response.CompleteAsync();
             };
+
+            if (!builder.Environment.IsDevelopment())
+            {
+                options.Cookie.HttpOnly = true;
+                options.Cookie.SameSite = SameSiteMode.Lax;
+                options.Cookie.Domain = builder.Configuration.GetValue<string>("WEB_DOMAIN");
+            }
         }).AddOAuth(AuthProvider.Provider, options =>
         {
-            var providerDomain = config.GetValue<string>("OAuthProvider:Domain");
+            var providerDomain = builder.Configuration.GetValue<string>("OAuthProvider:Domain");
 
-            options.ClientId = config.GetValue<string>("OAuthProvider:ClientId")!;
-            options.ClientSecret = config.GetValue<string>("OAuthProvider:ClientSecret")!;
+            options.ClientId = builder.Configuration.GetValue<string>("OAuthProvider:ClientId")!;
+            options.ClientSecret = builder.Configuration.GetValue<string>("OAuthProvider:ClientSecret")!;
 
             options.AuthorizationEndpoint = AuthProvider.AuthorizationEndpoint(providerDomain!);
             options.TokenEndpoint = AuthProvider.TokenEndpoint(providerDomain!);
@@ -119,9 +126,9 @@ public static class AuthModule
         return services;
     }
 
-    public static IServiceCollection AddAuthModule(this IServiceCollection services, IConfiguration config)
+    public static IServiceCollection AddAuthModule(this IServiceCollection services, WebApplicationBuilder builder)
     {
-        services.AddTransient<IClaimsTransformation, ClaimsTransformation>().AddAuthScheme(config).AddAuthDependency();
+        services.AddTransient<IClaimsTransformation, ClaimsTransformation>().AddAuthScheme(builder).AddAuthDependency();
 
         return services;
     }

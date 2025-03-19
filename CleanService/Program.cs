@@ -14,6 +14,7 @@ using CleanService.Src.Modules;
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
 
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -67,7 +68,11 @@ builder.Services.AddAuthorization(options =>
         });
 });
 
-builder.Services.AddAppDependency(builder.Configuration);
+builder.Services.AddAppDependency(builder);
+
+builder.Services.RegisterRateLimiter();
+
+builder.Services.AddCaching(builder.Configuration);
 
 Cloudinary cloudinary = new Cloudinary(builder.Configuration["CLOUDINARY_URL"]);
 
@@ -82,13 +87,15 @@ using var scope = app.Services.CreateScope();
 await AutomatedMigration.MigrateAsync(scope.ServiceProvider);
 
 app.UseSwagger();
-app.UseSwaggerUI(c => { c.SwaggerEndpoint("/swagger/v1/swagger.json", "Cleaning Service V1"); });
+app.UseSwaggerUI(c => { c.SwaggerEndpoint("/docs", "Cleaning Service V1"); });
 
 app.UseExceptionHandler();
 
 app.UseHttpsRedirection();
 
 app.UseCors(allowPolicy);
+
+app.UseRateLimiter();
 
 app.Use(async (context, next) =>
 {

@@ -23,7 +23,8 @@ RUN dotnet publish 'CleanService/CleanService.csproj' -c Release -o /app/publish
 
 # Statge 3: Run Stage
 FROM mcr.microsoft.com/dotnet/sdk:8.0
-ENV ASPNETCORE_HTTP_PORTS=5011
+ENV ASPNETCORE_HTTPS_PORTS=5011
+RUN dotnet dev-certs https --trust
 EXPOSE 5011
 WORKDIR /app
 COPY --from=publish /app/publish .

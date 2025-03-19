@@ -16,4 +16,5 @@ public static class ExceptionConvention
     public const string CannotCreatePayment = "ERR/CANNOT_CREATE_PAYMENT";
     public const string BadRequest = "ERR/BAD_REQUEST";
     public const string UnprocessableRequest = "ERR/UNPROCESSABLE_REQUEST";
+    public const string RateLimitExceeded = "ERR/RATE_LIMIT_EXCEEDED";
 }
