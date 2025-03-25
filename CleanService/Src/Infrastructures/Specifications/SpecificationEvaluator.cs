@@ -17,12 +17,18 @@ public class SpecificationEvaluator<T> where T : BaseEntity
         }
 
         // Includes all expression-based includes
-        query = specification?.Includes.Aggregate(query,
-            (current, include) => current.Include(include));
+        if (specification?.Includes != null)
+        {
+            query = specification?.Includes.Aggregate(query,
+                (current, include) => current.Include(include));
+        }
 
         // Include any string-based include statements
-        query = specification?.IncludeStrings.Aggregate(query,
-            (current, include) => current.Include(include));
+        if (specification?.IncludeStrings != null)
+        {
+            query = specification?.IncludeStrings.Aggregate(query,
+                (current, include) => current.Include(include));
+        }
 
         // Apply ordering if expressions are set
         if (specification?.OrderBy != null)

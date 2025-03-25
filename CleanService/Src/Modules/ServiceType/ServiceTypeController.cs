@@ -56,6 +56,7 @@ public class ServiceTypeController : ApiController
 
         var result = await _paginatedCache.GetPaginatedDataAsync(cacheBaseKey, page, limit,
             (p, l) => _serviceTypeService.GetServiceTypes(p, l, categoryId), TimeSpan.FromMinutes(5));
+
         return Ok(new SuccessResponse
         {
             StatusCode = HttpStatusCode.OK,

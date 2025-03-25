@@ -1,6 +1,7 @@
 services:
     database:
         image: mysql:latest
+        restart: always
         environment:
             MYSQL_ROOT_PASSWORD: ${DB_HOST}
             MYSQL_DATABASE: ${DB_NAME}
@@ -21,8 +22,12 @@ services:
 
     redis:
         image: redis:7-alpine
+        restart: always
         ports:
             - 6379:6379
+        command: redis-server --save 20 1 --loglevel warning --requirepass ${REDIS_PASSWORD}
+        volumes:
+            - cache:/data
 
     adminer:
         image: adminer:latest
@@ -43,17 +48,25 @@ services:
             - 0.0.0.0:${APP_PORT}:${APP_PORT}
         environment:
             ConnectionStrings__DefaultConnection: "Server=${DB_HOST};Port=${DB_PORT};Database=${DB_NAME};User=${DB_USER};Password=${DB_PASSWORD};"
+            Redis__Host: "${REDIS_HOST}"
+            Redis__Port: "${REDIS_PORT}"
+            Redis__User: "${REDIS_USER}"
+            Redis__Password: "${REDIS_PASSWORD}"
             ORIGINS: "https://clean-service.kwork.live"
         depends_on:
             - database
+            - redis
         links:
             - database
+            - redis
         networks:
             - db-network
         restart: always
 
 volumes:
     db_data:
+    cache:
+        driver: local
 networks:
     db-network:
         driver: bridge

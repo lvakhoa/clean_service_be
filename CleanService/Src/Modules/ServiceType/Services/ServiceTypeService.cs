@@ -55,10 +55,10 @@ public class ServiceTypeService : IServiceTypeService
             serviceTypeSpec.ApplyPaging((page.Value - 1) * limit.Value, limit.Value);
         }
 
-        var serviceTypes = _unitOfWork.Repository<ServiceTypes, PartialServiceTypes>().GetAllAsync(serviceTypeSpec);
+        var serviceTypes = await _unitOfWork.Repository<ServiceTypes, PartialServiceTypes>().GetAllAsync(serviceTypeSpec);
         var totalServiceTypes = await _unitOfWork.Repository<ServiceTypes, PartialServiceTypes>().CountAsync();
 
-        var serviceTypeDtos = _mapper.Map<ServiceTypeResponseDto[]>(serviceTypes);
+        var serviceTypeDtos = _mapper.Map<List<ServiceTypeResponseDto>>(serviceTypes);
 
         var currentPage = page ?? 1;
         var currentLimit = limit ?? totalServiceTypes;

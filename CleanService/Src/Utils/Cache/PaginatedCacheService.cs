@@ -24,23 +24,23 @@ public class PaginatedCacheService<T, TD> where T : Pagination<TD>, new() where 
         TimeSpan cacheDuration)
     {
         // Create cache keys for this specific request
-        string pageKey = $"{baseKey}:p{page}:s{pageSize}";
+        string dataKey = $"{baseKey}";
         string countKey = $"{baseKey}:count";
 
         // Try to get the current page from cache
-        var cachedItems = await _cacheService.GetAsync<List<TD>>(pageKey);
+        var cachedItems = await _cacheService.GetAsync<List<TD>>(dataKey);
         var cachedTotalCount = await _cacheService.GetAsync<int?>(countKey);
 
         // If we don't have the data cached, fetch from the database
         if (cachedItems == null || cachedTotalCount == null)
         {
-            _logger.LogInformation("Cache miss for {pageKey}", pageKey);
+            _logger.LogInformation("Cache miss for {dataKey}", dataKey);
 
             // Fetch data from data source
             var pagination = (await dataFetchFunc(page, pageSize)) as Pagination<TD>;
 
             // Cache the results
-            await _cacheService.SetAsync(pageKey, pagination.Results, cacheDuration);
+            await _cacheService.SetAsync(dataKey, pagination.Results, cacheDuration);
             await _cacheService.SetAsync(countKey, pagination.TotalItems, cacheDuration);
 
             return new Pagination<TD>
@@ -52,7 +52,7 @@ public class PaginatedCacheService<T, TD> where T : Pagination<TD>, new() where 
             };
         }
 
-        _logger.LogInformation("Cache hit for {pageKey}", pageKey);
+        _logger.LogInformation("Cache hit for {dataKey}", dataKey);
 
         // Return cached data
         return new Pagination<TD>(cachedItems, cachedTotalCount.Value, page ?? 1, pageSize ?? cachedTotalCount.Value);
