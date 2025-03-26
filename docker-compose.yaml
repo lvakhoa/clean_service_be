@@ -48,10 +48,10 @@ services:
             - 0.0.0.0:${APP_PORT}:${APP_PORT}
         environment:
             ConnectionStrings__DefaultConnection: "Server=${DB_HOST};Port=${DB_PORT};Database=${DB_NAME};User=${DB_USER};Password=${DB_PASSWORD};"
-            Redis__Host: "${REDIS_HOST}"
-            Redis__Port: "${REDIS_PORT}"
-            Redis__User: "${REDIS_USER}"
-            Redis__Password: "${REDIS_PASSWORD}"
+            Redis__Host: ${REDIS_HOST}
+            Redis__Port: ${REDIS_PORT}
+            Redis__User: ${REDIS_USER}
+            Redis__Password: ${REDIS_PASSWORD}
             ORIGINS: "https://clean-service.kwork.live"
         depends_on:
             - database
