@@ -16,17 +16,20 @@ public static class CachingConfig
         {
             EndPoints = { { redisHost, redisPort } },
             User = redisUser,
-            Password = redisPassword
+            Password = redisPassword,
+            ConnectTimeout = 5000,
+            SyncTimeout = 5000,
+            AsyncTimeout = 5000,
+            AllowAdmin = true,
+            Ssl = false
         };
 
-        try
+        services.AddSingleton<IConnectionMultiplexer>(sp =>
         {
-            services.AddSingleton<IConnectionMultiplexer>(sp => ConnectionMultiplexer.Connect(config));
-        }
-        catch (Exception ex)
-        {
-            throw new Exception("Error connecting to Redis", ex);
-        }
+            var connection = ConnectionMultiplexer.Connect(config);
+
+            return connection;
+        });
 
         services.AddStackExchangeRedisCache(options =>
         {

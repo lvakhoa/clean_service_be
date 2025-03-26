@@ -12,8 +12,6 @@ services:
             - ${DB_PORT}:3306
         volumes:
             - db_data:/var/lib/mysql
-        networks:
-            - db-network
         healthcheck:
             test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
             interval: 5s
@@ -36,8 +34,6 @@ services:
             - 8080:8080
         links:
             - database
-        networks:
-            - db-network
 
     application:
         build:
@@ -56,17 +52,9 @@ services:
         depends_on:
             - database
             - redis
-        links:
-            - database
-            - redis
-        networks:
-            - db-network
         restart: always
 
 volumes:
     db_data:
     cache:
         driver: local
-networks:
-    db-network:
-        driver: bridge
