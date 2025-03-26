@@ -19,7 +19,14 @@ public static class CachingConfig
             Password = redisPassword
         };
 
-        services.AddSingleton<IConnectionMultiplexer>(sp => ConnectionMultiplexer.Connect(config));
+        try
+        {
+            services.AddSingleton<IConnectionMultiplexer>(sp => ConnectionMultiplexer.Connect(config));
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("Error connecting to Redis", ex);
+        }
 
         services.AddStackExchangeRedisCache(options =>
         {
