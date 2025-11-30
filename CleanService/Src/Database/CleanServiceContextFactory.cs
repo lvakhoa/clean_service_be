@@ -1,3 +1,5 @@
+using CleanService.Src.Database;
+
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 

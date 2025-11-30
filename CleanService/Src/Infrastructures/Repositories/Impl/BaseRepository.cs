@@ -1,7 +1,7 @@
 using CleanService.Src.Common;
+using CleanService.Src.Database;
 using CleanService.Src.Exceptions;
 using CleanService.Src.Infrastructures.Specifications;
-using CleanService.Src.Models;
 
 using Microsoft.EntityFrameworkCore;
 

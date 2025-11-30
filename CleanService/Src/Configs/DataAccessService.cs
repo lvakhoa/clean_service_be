@@ -1,6 +1,6 @@
+using CleanService.Src.Database;
 using CleanService.Src.Infrastructures.Repositories;
 using CleanService.Src.Infrastructures.Repositories.Impl;
-using CleanService.Src.Models;
 
 using Microsoft.EntityFrameworkCore;
 

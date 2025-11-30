@@ -1,11 +1,11 @@
 using System.Security.Claims;
 
+using CleanService.Src.Database;
 using CleanService.Src.Infrastructures.Repositories;
 using CleanService.Src.Infrastructures.Specifications.Impl;
 using CleanService.Src.Models;
 
 using Microsoft.AspNetCore.Authentication;
-using Microsoft.EntityFrameworkCore;
 
 namespace CleanService.Src.Utils;
 

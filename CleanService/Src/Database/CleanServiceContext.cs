@@ -1,10 +1,12 @@
+using CleanService.Src.Models;
 using CleanService.Src.Models.Configurations;
 using CleanService.Src.Models.Enums;
 
 using EntityFramework.Exceptions.MySQL.Pomelo;
+
 using Microsoft.EntityFrameworkCore;
 
-namespace CleanService.Src.Models;
+namespace CleanService.Src.Database;
 
 public class CleanServiceContext : DbContext
 {

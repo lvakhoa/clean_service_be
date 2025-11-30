@@ -1,4 +1,4 @@
-using CleanService.Src.Models;
+using CleanService.Src.Database;
 
 namespace CleanService.Src.Middlewares;
 
