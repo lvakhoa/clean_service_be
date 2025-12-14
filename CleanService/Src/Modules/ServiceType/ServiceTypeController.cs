@@ -15,11 +15,11 @@ namespace CleanService.Src.Modules.ServiceType;
 public class ServiceTypeController : ApiController
 {
     private readonly IServiceTypeService _serviceTypeService;
-    private readonly PaginatedCacheService<Pagination<ServiceTypeResponseDto>, ServiceTypeResponseDto> _paginatedCache;
+    // private readonly PaginatedCacheService<Pagination<ServiceTypeResponseDto>, ServiceTypeResponseDto> _paginatedCache;
 
-    public ServiceTypeController(PaginatedCacheService<Pagination<ServiceTypeResponseDto>, ServiceTypeResponseDto> paginatedCache, IServiceTypeService serviceTypeService)
+    public ServiceTypeController(IServiceTypeService serviceTypeService)
     {
-        _paginatedCache = paginatedCache;
+        // _paginatedCache = paginatedCache;
         _serviceTypeService = serviceTypeService;
     }
 
@@ -29,7 +29,7 @@ public class ServiceTypeController : ApiController
         await _serviceTypeService.CreateServiceType(createServiceType);
 
         // Invalidate all service type caches when a new service type is created
-        await _paginatedCache.InvalidatePaginationCacheAsync("service-types");
+        // await _paginatedCache.InvalidatePaginationCacheAsync("service-types");
 
         return CreatedAtAction("CreateServiceType", new SuccessResponse
         {
