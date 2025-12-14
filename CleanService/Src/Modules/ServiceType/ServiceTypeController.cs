@@ -54,8 +54,10 @@ public class ServiceTypeController : ApiController
     {
         var cacheBaseKey = $"service-types:page_{page}:limit_{limit}:category_{categoryId}";
 
-        var result = await _paginatedCache.GetPaginatedDataAsync(cacheBaseKey, page, limit,
-            (p, l) => _serviceTypeService.GetServiceTypes(p, l, categoryId), TimeSpan.FromMinutes(5));
+        // var result = await _paginatedCache.GetPaginatedDataAsync(cacheBaseKey, page, limit,
+        //     (p, l) => _serviceTypeService.GetServiceTypes(p, l, categoryId), TimeSpan.FromMinutes(5));
+
+        var result = await _serviceTypeService.GetServiceTypes(page, limit, categoryId);
 
         return Ok(new SuccessResponse
         {
