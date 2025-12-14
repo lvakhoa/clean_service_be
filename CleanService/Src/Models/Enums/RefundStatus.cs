@@ -1,4 +1,4 @@
-namespace CleanService.Src.Models;
+namespace CleanService.Src.Models.Enums;
 
 public enum RefundStatus
 {

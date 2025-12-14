@@ -1,5 +1,5 @@
 using CleanService.Src.Models;
-using CleanService.Src.Models.Configurations;
+using CleanService.Src.Models.Enums;
 
 using Microsoft.EntityFrameworkCore;
 

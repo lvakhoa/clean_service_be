@@ -1,12 +1,9 @@
-using System.Linq.Expressions;
-using System.Net.Http.Headers;
-
 using AutoMapper;
 
 using CleanService.Src.Constant;
 using CleanService.Src.Infrastructures.Repositories;
 using CleanService.Src.Infrastructures.Specifications.Impl;
-using CleanService.Src.Models;
+using CleanService.Src.Models.Domains;
 using CleanService.Src.Models.Enums;
 using CleanService.Src.Modules.Auth.Mapping.DTOs;
 using CleanService.Src.Modules.Storage.Services;

@@ -5,7 +5,7 @@ using CleanService.Src.Common;
 
 using Microsoft.EntityFrameworkCore;
 
-namespace CleanService.Src.Models;
+namespace CleanService.Src.Models.Domains;
 
 [Comment("Additional information for users' type is helper")]
 public class Helpers : BaseEntity

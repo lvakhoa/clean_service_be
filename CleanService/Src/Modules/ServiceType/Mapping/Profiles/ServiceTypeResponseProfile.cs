@@ -1,5 +1,6 @@
 using AutoMapper;
 using CleanService.Src.Models;
+using CleanService.Src.Models.Domains;
 using CleanService.Src.Modules.ServiceType.Mapping.DTOs;
 
 namespace CleanService.Src.Modules.ServiceType.Mapping.Profiles;

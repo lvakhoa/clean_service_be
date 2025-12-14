@@ -1,4 +1,5 @@
 using CleanService.Src.Models;
+using CleanService.Src.Models.Domains;
 
 namespace CleanService.Src.Infrastructures.Specifications.Impl;
 

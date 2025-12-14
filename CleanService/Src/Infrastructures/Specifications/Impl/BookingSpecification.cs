@@ -1,5 +1,5 @@
 using CleanService.Src.Models;
-using CleanService.Src.Models.Configurations;
+using CleanService.Src.Models.Domains;
 using CleanService.Src.Models.Enums;
 
 namespace CleanService.Src.Infrastructures.Specifications.Impl;

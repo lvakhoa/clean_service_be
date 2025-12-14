@@ -2,7 +2,7 @@ using System.Net;
 
 using CleanService.Src.Common;
 using CleanService.Src.Constant;
-using CleanService.Src.Modules.Payment.Mapping.DTOs.PayOs;
+using CleanService.Src.Modules.Payment.Mapping.DTOs.ZaloPay;
 using CleanService.Src.Modules.Payment.Services;
 using CleanService.Src.Utils;
 
@@ -14,20 +14,23 @@ namespace CleanService.Src.Modules.Payment;
 public class PaymentController : ApiController
 {
     private readonly IPaymentService _paymentService;
+    private readonly ILogger<PaymentController> _logger;
 
     public PaymentController(IPaymentService paymentService)
     {
         _paymentService = paymentService;
     }
 
-    [HttpPost("confirm")]
-    public async Task<ActionResult> ConfirmPayment([FromBody] WebhookReceivingDto webhookReceivingDto)
+    [HttpPost("callback")]
+    public async Task<ActionResult> ConfirmPayment([FromBody] dynamic webhookReceivingDto)
     {
-        var isValid = _paymentService.CheckWebhookSignature(webhookReceivingDto.Signature, webhookReceivingDto.Data);
-        if (isValid)
-        {
-            await _paymentService.ConfirmPayment(webhookReceivingDto.Data.OrderCode);
-        }
+        // var isValid = _paymentService.CheckWebhookSignature(webhookReceivingDto.Signature, webhookReceivingDto.Data);
+        // if (isValid)
+        // {
+        //     await _paymentService.ConfirmPayment(webhookReceivingDto.Data.OrderCode);
+        // }
+
+        // _logger.LogInformation("Webhook received: {@webhookReceivingDto}", webhookReceivingDto);
 
         return Ok(new SuccessResponse
         {

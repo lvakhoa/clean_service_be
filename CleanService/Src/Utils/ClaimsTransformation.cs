@@ -4,6 +4,7 @@ using CleanService.Src.Database;
 using CleanService.Src.Infrastructures.Repositories;
 using CleanService.Src.Infrastructures.Specifications.Impl;
 using CleanService.Src.Models;
+using CleanService.Src.Models.Domains;
 
 using Microsoft.AspNetCore.Authentication;
 

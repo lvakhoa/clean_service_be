@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 using CleanService.Src.Common;
 
-namespace CleanService.Src.Models;
+namespace CleanService.Src.Models.Domains;
 
 public class BookingContracts : BaseEntity
 {

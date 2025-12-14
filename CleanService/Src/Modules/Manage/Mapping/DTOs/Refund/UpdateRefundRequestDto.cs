@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using CleanService.Src.Models;
+using CleanService.Src.Models.Enums;
 
 namespace CleanService.Src.Modules.Manage.Mapping.DTOs.Refund;
 

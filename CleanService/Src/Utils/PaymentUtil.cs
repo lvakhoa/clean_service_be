@@ -1,4 +1,5 @@
 using System.Text;
+
 using Newtonsoft.Json;
 
 namespace CleanService.Src.Utils;
@@ -9,7 +10,7 @@ public class PaymentUtil
     {
         return dict.OrderBy(k => k.Key).ToDictionary(k => k.Key, k => k.Value);
     }
-    
+
     public static Dictionary<string, object> ConvertObjToDict(object obj)
     {
         var json = JsonConvert.SerializeObject(obj);
@@ -17,14 +18,13 @@ public class PaymentUtil
     }
 
     public static string ConvertObjToQueryStr(Dictionary<string, object> dict, List<string> pickKeys,
-        string seperator = "&")
+        string seperator = "&", bool excludeKey = false)
     {
         var queryStr = new StringBuilder();
 
         foreach (var key in pickKeys)
         {
-            if (!dict.ContainsKey(key))
-                throw new Exception($"Key {key} not found in dictionary");
+            if (!dict.ContainsKey(key)) throw new Exception($"Key {key} not found in dictionary");
             var value = dict[key];
             if (value != null)
             {
@@ -37,7 +37,14 @@ public class PaymentUtil
                     value = "";
                 }
 
-                queryStr.Append($"{key}={value}{seperator}");
+                if (excludeKey)
+                {
+                    queryStr.Append($"{value}{seperator}");
+                }
+                else
+                {
+                    queryStr.Append($"{key}={value}{seperator}");
+                }
             }
         }
 

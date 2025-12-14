@@ -5,7 +5,7 @@ using CleanService.Src.Common;
 
 using Microsoft.EntityFrameworkCore;
 
-namespace CleanService.Src.Models;
+namespace CleanService.Src.Models.Domains;
 
 [Index(nameof(Name), nameof(CategoryId), IsUnique = true)]
 public class ServiceTypes : BaseEntity

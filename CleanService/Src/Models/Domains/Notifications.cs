@@ -2,9 +2,9 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 using CleanService.Src.Common;
-using CleanService.Src.Models.Configurations;
+using CleanService.Src.Models.Enums;
 
-namespace CleanService.Src.Models;
+namespace CleanService.Src.Models.Domains;
 
 public class Notifications : BaseEntity
 {

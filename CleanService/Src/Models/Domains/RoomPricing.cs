@@ -6,7 +6,7 @@ using CleanService.Src.Models.Enums;
 
 using Microsoft.EntityFrameworkCore;
 
-namespace CleanService.Src.Models;
+namespace CleanService.Src.Models.Domains;
 
 [Index(nameof(ServiceTypeId), nameof(RoomType), nameof(RoomCount), IsUnique = true)]
 public class RoomPricing : BaseEntity

@@ -1,4 +1,4 @@
-namespace CleanService.Src.Models.Configurations;
+namespace CleanService.Src.Models.Enums;
 
 public enum NotificationType
 {

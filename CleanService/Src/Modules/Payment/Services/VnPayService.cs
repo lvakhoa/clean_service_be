@@ -1,4 +1,6 @@
 using CleanService.Src.Models;
+using CleanService.Src.Models.Domains;
+using CleanService.Src.Modules.Payment.Mapping.DTOs;
 using CleanService.Src.Modules.Payment.Mapping.DTOs.PayOs;
 
 namespace CleanService.Src.Modules.Payment.Services;
@@ -11,7 +13,7 @@ public class VnPayService : IPaymentService
     private readonly string _tmnCode;
     private readonly string _hashSecret;
     private readonly string _vnpUrl;
-    
+
     public VnPayService(IHttpClientFactory httpClientFactory, IConfiguration configuration)
     {
         _httpClientFactory = httpClientFactory;
@@ -28,7 +30,7 @@ public class VnPayService : IPaymentService
          throw new NotImplementedException();
     }
 
-    public bool CheckWebhookSignature(string signature, WebhookData body)
+    public bool CheckWebhookSignature(string signature, BaseWebhookData body)
     {
         throw new NotImplementedException();
     }

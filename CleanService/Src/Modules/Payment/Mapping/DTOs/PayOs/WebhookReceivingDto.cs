@@ -26,7 +26,7 @@ public class WebhookReceivingDto
     public string Signature { get; set; } = null!;
 }
 
-public class WebhookData
+public class WebhookData : BaseWebhookData
 {
     [JsonPropertyName("orderCode")]
     [JsonProperty("orderCode")]

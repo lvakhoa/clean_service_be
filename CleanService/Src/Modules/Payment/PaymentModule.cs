@@ -6,7 +6,7 @@ public static class PaymentModule
 {
     public static IServiceCollection AddPaymentDependency(this IServiceCollection services)
     {
-        services.AddScoped<IPaymentService, PayOsService>();
+        services.AddScoped<IPaymentService, ZaloPayService>();
         return services;
     }
 

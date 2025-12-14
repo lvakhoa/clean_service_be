@@ -1,5 +1,5 @@
 using AutoMapper;
-using CleanService.Src.Models;
+using CleanService.Src.Models.Domains;
 using CleanService.Src.Modules.Manage.Mapping.DTOs;
 
 namespace CleanService.Src.Modules.Manage.Mapping.Profiles;
@@ -10,8 +10,8 @@ public class AdminUpdateHelperRequestProfile: Profile
     {
         CreateMap<AdminUpdateHelperRequestDto, PartialHelper>()
             .ForMember(dest => dest.ServicesOffered,
-                opt 
-                    => opt.Condition((src, dest, member) 
+                opt
+                    => opt.Condition((src, dest, member)
                         => src.ServicesOffered != null))
             .ConstructUsing(dto => new PartialHelper()
             {

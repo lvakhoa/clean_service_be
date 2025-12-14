@@ -3,6 +3,7 @@ using AutoMapper;
 using CleanService.Src.Infrastructures.Repositories;
 using CleanService.Src.Infrastructures.Specifications.Impl;
 using CleanService.Src.Models;
+using CleanService.Src.Models.Domains;
 using CleanService.Src.Modules.Contract.Mapping.DTOs;
 
 using Pagination.EntityFrameworkCore.Extensions;

@@ -1,4 +1,5 @@
 using CleanService.Src.Models;
+using CleanService.Src.Models.Domains;
 using CleanService.Src.Modules.Booking.Mapping.DTOs;
 using Microsoft.AspNetCore.Mvc;
 using Pagination.EntityFrameworkCore.Extensions;

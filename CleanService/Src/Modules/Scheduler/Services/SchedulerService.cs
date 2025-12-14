@@ -5,7 +5,7 @@ using AutoMapper;
 using CleanService.Src.Infrastructures.Repositories;
 using CleanService.Src.Infrastructures.Specifications.Impl;
 using CleanService.Src.Models;
-using CleanService.Src.Models.Configurations;
+using CleanService.Src.Models.Domains;
 using CleanService.Src.Models.Enums;
 using CleanService.Src.Modules.Booking.Mapping.DTOs;
 

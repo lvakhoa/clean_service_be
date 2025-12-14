@@ -5,7 +5,7 @@ using CleanService.Src.Common;
 
 using Microsoft.EntityFrameworkCore;
 
-namespace CleanService.Src.Models;
+namespace CleanService.Src.Models.Domains;
 
 [Index(nameof(ServiceTypeId), nameof(DurationHours), IsUnique = true)]
 public class DurationPrice : BaseEntity
