@@ -86,15 +86,23 @@ public class BookingService : IBookingService
                          basePrice * durationPricing;
         booking.TotalPrice = totalPrice;
 
-        var totalBookings = await _unitOfWork.Repository<Bookings, PartialBookings>().CountAsync();
-        booking.OrderId = totalBookings + 1000;
+        while (true)
+        {
+            var bookingOrderId = new Random().Next(100000, 999999);
+
+            var existingOrderId = await _unitOfWork.Repository<Bookings, PartialBookings>()
+                .AnyAsync(BookingSpecification.GetBookingByOrderIdSpec(bookingOrderId));
+            if (existingOrderId) continue;
+
+            booking.OrderId = bookingOrderId;
+            break;
+        }
 
         await _unitOfWork.Repository<Bookings, PartialBookings>().AddAsync(booking);
 
         await _unitOfWork.Repository<BookingContracts, PartialBookingContracts>().AddAsync(new BookingContracts()
         {
-            BookingId = booking.Id,
-            Content = createBookingDto.ContractContent
+            BookingId = booking.Id, Content = createBookingDto.ContractContent
         });
 
         var paymentLink = await _paymentService.CreatePaymentLink(booking);
@@ -229,7 +237,8 @@ public class BookingService : IBookingService
 
     public async Task UpdateRefund(Guid id, CusUpdateRefundRequestDto cusUpdateRefundRequestDto)
     {
-        var refund = await _unitOfWork.Repository<Refunds, PartialRefunds>().GetFirstOrThrowAsync(RefundSpecification.GetRefundByIdSpec(id));
+        var refund = await _unitOfWork.Repository<Refunds, PartialRefunds>()
+            .GetFirstOrThrowAsync(RefundSpecification.GetRefundByIdSpec(id));
         if (refund.BookingId != cusUpdateRefundRequestDto.BookingId)
             throw new KeyNotFoundException("Booking ID does not exist in database");
 
@@ -249,6 +258,7 @@ public class BookingService : IBookingService
         {
             refundSpec.ApplyPaging((page.Value - 1) * limit.Value, limit.Value);
         }
+
         var complaints = await _unitOfWork.Repository<Refunds, PartialRefunds>().GetAllAsync(refundSpec);
         var totalCount = complaints.Count();
         var complaintDtos = _mapper.Map<CusRefundResponseDto[]>(complaints);
@@ -293,6 +303,7 @@ public class BookingService : IBookingService
         {
             feedbackSpec.ApplyPaging((page.Value - 1) * limit.Value, limit.Value);
         }
+
         var feedbacks = await _unitOfWork.Repository<Feedbacks, PartialFeedback>().GetAllAsync(feedbackSpec);
         var totalCount = feedbacks.Count;
         var feedbackDtos = _mapper.Map<CusFeedbackResponseDto[]>(feedbacks);
