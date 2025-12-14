@@ -127,7 +127,7 @@ public class AuthService : IAuthService
         }
         userSpec.ApplyOrderBy(x => x.FullName);
 
-        var users = _unitOfWork.Repository<Users, PartialUsers>().GetAllAsync(userSpec);
+        var users = await _unitOfWork.Repository<Users, PartialUsers>().GetAllAsync(userSpec);
         var totalUsers = await _unitOfWork.Repository<Users, PartialUsers>().CountAsync(userSpec);
 
         var userDto = _mapper.Map<UserResponseDto[]>(users);
