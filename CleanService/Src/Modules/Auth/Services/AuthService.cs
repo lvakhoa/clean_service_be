@@ -1,15 +1,19 @@
 using AutoMapper;
 
 using CleanService.Src.Constant;
+using CleanService.Src.Exceptions;
 using CleanService.Src.Infrastructures.Repositories;
 using CleanService.Src.Infrastructures.Specifications.Impl;
 using CleanService.Src.Models.Domains;
 using CleanService.Src.Models.Enums;
 using CleanService.Src.Modules.Auth.Mapping.DTOs;
 using CleanService.Src.Modules.Storage.Services;
+using CleanService.Src.Utils;
 using CleanService.Src.Utils.RequestClient;
 
 using Newtonsoft.Json;
+
+using Org.BouncyCastle.Crypto.Generators;
 
 using Pagination.EntityFrameworkCore.Extensions;
 
@@ -51,6 +55,58 @@ public class AuthService : IAuthService
             await _unitOfWork.SaveChangesAsync();
         }
     }
+
+    public async Task<SignUpMobileResponseDto> RegisterUserMobile(SignUpMobileRequestDto signUpMobileRequestDto)
+    {
+        var existingEmailSpec = UserSpecification.GetUserByEmailSpec(signUpMobileRequestDto.Email);
+        var existingEmail = await _unitOfWork.Repository<Users, PartialUsers>().GetFirstAsync(existingEmailSpec);
+        if (existingEmail != null)
+        {
+            throw new BadRequestException("User with the given email already exists.");
+        }
+
+        var existingPhoneSpec = UserSpecification.GetUserByPhoneNumberSpec(signUpMobileRequestDto.PhoneNumber);
+        var existingPhone = await _unitOfWork.Repository<Users, PartialUsers>().GetFirstAsync(existingPhoneSpec);
+        if (existingPhone != null)
+        {
+            throw new BadRequestException("User with the given phone number already exists.");
+        }
+
+        var userEntity = _mapper.Map<Users>(signUpMobileRequestDto);
+        var hashedPassword = signUpMobileRequestDto.Password.HashPassword();
+        var persistedEntity = await _unitOfWork.Repository<Users, PartialUsers>().AddAsync(userEntity);
+        persistedEntity.Password = hashedPassword;
+
+        if (userEntity.UserType == UserType.Helper)
+        {
+            await _unitOfWork.Repository<Helpers, PartialHelper>().AddAsync(new Helpers { Id = userEntity.Id });
+        }
+
+        await _unitOfWork.SaveChangesAsync();
+
+        return new SignUpMobileResponseDto { UserId = persistedEntity.Id };
+    }
+
+    public Task<LogInMobileResponseDto> LoginUserMobile(LogInMobileRequestDto logInMobileRequestDto)
+    {
+        var userSpec = UserSpecification.GetUserByPhoneNumberSpec(logInMobileRequestDto.PhoneNumber);
+        if (userSpec == null)
+        {
+            throw new BadRequestException("Invalid phone number or password.");
+        }
+
+        return _unitOfWork.Repository<Users, PartialUsers>().GetFirstAsync(userSpec).ContinueWith(u =>
+        {
+            var user = u.Result;
+            if (user == null || !user.Password!.VerifyPassword(logInMobileRequestDto.Password))
+            {
+                throw new BadRequestException("Invalid phone number or password.");
+            }
+
+            return new LogInMobileResponseDto { UserId = user.Id, UserType = user.UserType};
+        });
+    }
+
 
     public async Task LogoutUser(string id)
     {
@@ -125,6 +181,7 @@ public class AuthService : IAuthService
         {
             userSpec.ApplyPaging((page.Value - 1) * limit.Value, limit.Value);
         }
+
         userSpec.ApplyOrderBy(x => x.FullName);
 
         var users = await _unitOfWork.Repository<Users, PartialUsers>().GetAllAsync(userSpec);

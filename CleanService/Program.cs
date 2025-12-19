@@ -10,6 +10,7 @@ using CleanService.Src.Middlewares;
 using CleanService.Src.Models;
 using CleanService.Src.Models.Enums;
 using CleanService.Src.Modules;
+using CleanService.Src.Utils;
 
 using CloudinaryDotNet;
 using CloudinaryDotNet.Actions;
@@ -76,7 +77,10 @@ builder.Services.AddCaching(builder.Configuration);
 
 Cloudinary cloudinary = new Cloudinary(builder.Configuration["CLOUDINARY_URL"]);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(new EnumOrStructJsonConverterFactory());
+});
 
 builder.Services.Configure<ApiBehaviorOptions>(options => { options.SuppressModelStateInvalidFilter = true; });
 

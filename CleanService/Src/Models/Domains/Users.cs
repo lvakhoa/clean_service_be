@@ -21,6 +21,8 @@ public class Users : BaseEntity
 
     public string? ProfilePicture { get; set; }
 
+    public string? Password { get; set; }
+
     [Required] [MaxLength(150)] public string FullName { get; set; } = null!;
 
     public DateTime? DateOfBirth { get; set; }

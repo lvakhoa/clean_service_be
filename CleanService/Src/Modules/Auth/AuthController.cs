@@ -32,7 +32,8 @@ public class AuthController : ApiController
     private readonly IManageService _manageService;
     private readonly IConfiguration _configuration;
 
-    public AuthController(IAuthService authService, IStorageService storageService, IManageService manageService, IConfiguration configuration)
+    public AuthController(IAuthService authService, IStorageService storageService, IManageService manageService,
+        IConfiguration configuration)
     {
         _configuration = configuration;
         _authService = authService;
@@ -69,6 +70,22 @@ public class AuthController : ApiController
         properties.Items["role"] = UserType.Helper.ToString();
 
         return Challenge(properties, authenticationSchemes: new[] { AuthProvider.Provider });
+    }
+
+    [HttpPost("signup/mobile")]
+    [AllowAnonymous]
+    public IActionResult SignUpMobile([FromBody] SignUpMobileRequestDto signUpMobileRequestDto)
+    {
+        return Ok(new ApiSuccessResult<SignUpMobileResponseDto>(StatusCodes.Status201Created,
+            "Sign up mobile successfully", _authService.RegisterUserMobile(signUpMobileRequestDto).Result));
+    }
+
+    [HttpPost("login/mobile")]
+    [AllowAnonymous]
+    public IActionResult LogInMobile([FromBody] LogInMobileRequestDto logInMobileRequestDto)
+    {
+        return Ok(new ApiSuccessResult<LogInMobileResponseDto>(StatusCodes.Status200OK, "Log in mobile successfully",
+            _authService.LoginUserMobile(logInMobileRequestDto).Result));
     }
 
     [HttpGet("login")]

@@ -16,6 +16,11 @@ public class UserSpecification
         return new BaseSpecification<Users>(x => x.Email == email);
     }
 
+    public static BaseSpecification<Users> GetUserByPhoneNumberSpec(string phone)
+    {
+        return new BaseSpecification<Users>(x => x.PhoneNumber == phone);
+    }
+
     public static BaseSpecification<Users> GetUserByStatusOrTypeSpec(UserType? userType, UserStatus? status)
     {
         return new BaseSpecification<Users>(x =>

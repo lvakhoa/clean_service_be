@@ -10,6 +10,10 @@ public interface IAuthService
 {
     public Task RegisterUser(RegistrationRequestDto registrationRequestDto);
 
+    public Task<SignUpMobileResponseDto> RegisterUserMobile(SignUpMobileRequestDto signUpMobileRequestDto);
+
+    public Task<LogInMobileResponseDto> LoginUserMobile(LogInMobileRequestDto logInMobileRequestDto);
+
     public Task LogoutUser(string id);
 
     public Task<UserResponseDto?> GetUserById(string id);

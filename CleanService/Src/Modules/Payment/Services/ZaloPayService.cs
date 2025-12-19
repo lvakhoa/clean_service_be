@@ -12,6 +12,7 @@ using CleanService.Src.Utils.RequestClient;
 using Newtonsoft.Json;
 
 using CreatePaymentLinkDto = CleanService.Src.Modules.Payment.Mapping.DTOs.ZaloPay.CreatePaymentLinkDto;
+using HttpClientHandler = CleanService.Src.Utils.HttpClientHandler;
 using PaymentItems = CleanService.Src.Modules.Payment.Mapping.DTOs.ZaloPay.PaymentItems;
 using PaymentLinkResponseDto = CleanService.Src.Modules.Payment.Mapping.DTOs.ZaloPay.PaymentLinkResponseDto;
 using WebhookData = CleanService.Src.Modules.Payment.Mapping.DTOs.ZaloPay.WebhookData;
@@ -22,17 +23,21 @@ public class ZaloPayService : IPaymentService
 {
     private readonly IRequestClient _requestClient;
     private readonly IConfiguration _configuration;
+    private readonly HttpClientHandler _httpClientHandler;
     private readonly string _appId;
     private readonly string _url;
     private readonly string _key1;
+    private readonly string _clientUrl;
 
-    public ZaloPayService(IRequestClient requestClient, IConfiguration configuration)
+    public ZaloPayService(IRequestClient requestClient, IConfiguration configuration, HttpClientHandler httpClientHandler)
     {
         _requestClient = requestClient;
         _configuration = configuration;
+        _httpClientHandler = httpClientHandler;
         _appId = _configuration["ZaloPay:AppId"]!;
         _url = _configuration["ZaloPay:Url"]!;
         _key1 = _configuration["ZaloPay:Key1"]!;
+        _clientUrl = httpClientHandler.getClientUrl();
     }
 
     public async Task<string> CreatePaymentLink(Bookings booking)
@@ -60,7 +65,7 @@ public class ZaloPayService : IPaymentService
             Description = booking.ServiceType.Name,
             EmbedData = JsonConvert.SerializeObject(new EmbedData()
             {
-                RedirectUrl = $"{_configuration["WEB_URL"]}/payment-result",
+                RedirectUrl = $"{_configuration["APP_URL"]}/payment-result",
             }),
             BankCode = "zalopayapp",
             CallbackUrl = $"{_configuration["API_URL"]}/api/payment/callback",

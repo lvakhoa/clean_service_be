@@ -1,4 +1,5 @@
 using System.Net.Http.Headers;
+
 using Newtonsoft.Json;
 
 namespace CleanService.Src.Utils.RequestClient;
@@ -19,9 +20,7 @@ public class RequestClient : IRequestClient
     {
         var request = new HttpRequestMessage
         {
-            Method = HttpMethod.Post,
-            RequestUri = new Uri(uri),
-            Content = content,
+            Method = HttpMethod.Post, RequestUri = new Uri(uri), Content = content,
         };
         if (contentType != null)
         {
@@ -41,19 +40,19 @@ public class RequestClient : IRequestClient
         {
             throw new HttpRequestException(response.ReasonPhrase);
         }
-        
+
         var responseString = await response.Content.ReadAsStringAsync();
         return JsonConvert.DeserializeObject<T>(responseString);
     }
 
-    public Task<Dictionary<string, object>> PostAsync(string uri, HttpContent content, string? contentType = "application/json",
-        Dictionary<string, object>? headers = null)
+    public Task<Dictionary<string, object>> PostAsync(string uri, HttpContent content,
+        string? contentType = "application/json", Dictionary<string, object>? headers = null)
     {
         return PostAsync<Dictionary<string, object>>(uri, content, contentType, headers);
     }
 
-    public Task<T> PostFormAsync<T>(string uri, Dictionary<string, string> data, string? contentType = "application/x-www-form-urlencoded",
-        Dictionary<string, object>? headers = null)
+    public Task<T> PostFormAsync<T>(string uri, Dictionary<string, string> data,
+        string? contentType = "application/x-www-form-urlencoded", Dictionary<string, object>? headers = null)
     {
         return PostAsync<T>(uri, new FormUrlEncodedContent(data), contentType, headers);
     }
@@ -66,11 +65,7 @@ public class RequestClient : IRequestClient
 
     public async Task<T> GetJson<T>(string uri, Dictionary<string, object>? headers = null)
     {
-        var request = new HttpRequestMessage
-        {
-            Method = HttpMethod.Get,
-            RequestUri = new Uri(uri),
-        };
+        var request = new HttpRequestMessage { Method = HttpMethod.Get, RequestUri = new Uri(uri), };
         if (headers != null)
         {
             foreach (var (key, value) in headers)

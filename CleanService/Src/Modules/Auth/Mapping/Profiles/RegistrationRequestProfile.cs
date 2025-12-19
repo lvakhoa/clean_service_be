@@ -17,5 +17,16 @@ public class RegistrationRequestProfile : Profile
                 FullName = dto.Fullname,
                 UserType = dto.UserType,
             });
+
+        CreateMap<SignUpMobileRequestDto, Users>()
+            .ConstructUsing(dto => new Users
+            {
+                Id = Guid.NewGuid().ToString(),
+                Email = dto.Email,
+                FullName = dto.FullName,
+                PhoneNumber = dto.PhoneNumber,
+                Password = dto.Password,
+                UserType = dto.UserType,
+            });
     }
 }

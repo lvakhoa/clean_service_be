@@ -8,10 +8,10 @@ using CleanService.Src.Modules.Scheduler;
 using CleanService.Src.Modules.ServiceCategory;
 using CleanService.Src.Modules.ServiceType;
 using CleanService.Src.Modules.Storage;
-using CleanService.Src.Utils;
 using CleanService.Src.Utils.RequestClient;
 
-using Microsoft.AspNetCore.Authentication;
+
+using HttpClientHandler = CleanService.Src.Utils.HttpClientHandler;
 
 namespace CleanService.Src.Modules;
 
@@ -25,6 +25,11 @@ public static class AppModule
 
         services
             .AddTransient<IRequestClient, RequestClient>();
+
+        services
+            .AddTransient<IHttpContextAccessor, HttpContextAccessor>();
+
+        services.AddTransient<HttpClientHandler>();
 
         // Inject Auth Module
         services
