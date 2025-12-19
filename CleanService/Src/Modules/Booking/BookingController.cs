@@ -26,12 +26,12 @@ public class BookingController : ApiController
     [HttpPost("create")]
     public async Task<ActionResult> CreateBooking([FromBody] CreateBookingRequestDto createBooking)
     {
-        var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
-        if (userId == null)
-        {
-            throw new UnauthorizedAccessException("Unauthorized");
-        }
-        createBooking.CustomerId = userId;
+        // var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+        // if (userId == null)
+        // {
+        //     throw new UnauthorizedAccessException("Unauthorized");
+        // }
+        // createBooking.CustomerId = userId;
         var paymentLink = await _bookingService.CreateBooking(createBooking);
         return CreatedAtAction("CreateBooking", new SuccessResponse()
         {

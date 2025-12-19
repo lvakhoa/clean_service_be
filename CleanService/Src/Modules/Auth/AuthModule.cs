@@ -1,8 +1,10 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Security.Claims;
+using System.Text;
 using System.Text.Json;
 
+using CleanService.Src.Common;
 using CleanService.Src.Constant;
 using CleanService.Src.Models;
 using CleanService.Src.Models.Enums;
@@ -13,7 +15,9 @@ using CleanService.Src.Utils;
 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OAuth;
+using Microsoft.IdentityModel.Tokens;
 
 namespace CleanService.Src.Modules.Auth;
 
@@ -23,9 +27,19 @@ public static class AuthModule
     {
         services.AddAuthentication(options =>
         {
-            options.DefaultAuthenticateScheme = CookieAuthenticationDefaults.AuthenticationScheme;
+            options.DefaultAuthenticateScheme = "MultiScheme";
             options.DefaultSignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
-            options.DefaultChallengeScheme = AuthProvider.Provider;
+            options.DefaultChallengeScheme = "MultiScheme";
+        })
+        .AddPolicyScheme("MultiScheme", "Authorization Bearer or Cookie", options =>
+        {
+            options.ForwardDefaultSelector = context =>
+            {
+                var authHeader = context.Request.Headers["Authorization"].FirstOrDefault();
+                if (authHeader?.StartsWith("Bearer ") == true)
+                    return JwtBearerDefaults.AuthenticationScheme;
+                return AuthProvider.Provider;
+            };
         }).AddCookie(options =>
         {
             options.Events.OnRedirectToAccessDenied = context =>
@@ -47,6 +61,19 @@ public static class AuthModule
                 options.Cookie.SameSite = SameSiteMode.Lax;
                 options.Cookie.Domain = builder.Configuration.GetValue<string>("WEB_DOMAIN");
             }
+        }).AddJwtBearer(options =>
+        {
+            options.RequireHttpsMetadata = false;
+            options.SaveToken = true;
+            options.TokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("SECRET_KEY"))),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ClockSkew = TimeSpan.Zero
+            };
+            options.EventsType = typeof(JwtBearerEventHandler);
         }).AddOAuth(AuthProvider.Provider, options =>
         {
             var providerDomain = builder.Configuration.GetValue<string>("OAuthProvider:Domain");
@@ -103,10 +130,7 @@ public static class AuthModule
                         {
                             await authService.RegisterUser(new RegistrationRequestDto
                             {
-                                Id = id,
-                                Email = email,
-                                Fullname = fullname,
-                                UserType = Enum.Parse<UserType>(role)
+                                Id = id, Email = email, Fullname = fullname, UserType = Enum.Parse<UserType>(role)
                             });
                         }
                     }
@@ -120,8 +144,11 @@ public static class AuthModule
 
     public static IServiceCollection AddAuthDependency(this IServiceCollection services)
     {
-        services
-            .AddScoped<IAuthService, AuthService>();
+        services.AddTransient<JwtService>();
+
+        services.AddScoped<IAuthService, AuthService>();
+
+        services.AddScoped<JwtBearerEventHandler>();
 
         return services;
     }

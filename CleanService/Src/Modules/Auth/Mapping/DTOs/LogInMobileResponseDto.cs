@@ -6,4 +6,6 @@ public class LogInMobileResponseDto
 {
     public string UserId { get; set; } = null!;
     public UserType UserType { get; set; }
+    public string AccessToken { get; set; }
+    public string RefreshToken { get; set; }
 }

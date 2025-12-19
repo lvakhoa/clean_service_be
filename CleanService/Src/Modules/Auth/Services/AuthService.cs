@@ -26,15 +26,17 @@ public class AuthService : IAuthService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IStorageService _storageService;
+    private readonly JwtService _jwtService;
 
     public AuthService(IRequestClient requestClient, IConfiguration configuration, IUnitOfWork unitOfWork,
-        IMapper mapper, IStorageService storageService)
+        IMapper mapper, IStorageService storageService, JwtService jwtService)
     {
         _requestClient = requestClient;
         _configuration = configuration;
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _storageService = storageService;
+        _jwtService = jwtService;
     }
 
     public async Task RegisterUser(RegistrationRequestDto registrationRequestDto)
@@ -103,8 +105,28 @@ public class AuthService : IAuthService
                 throw new BadRequestException("Invalid phone number or password.");
             }
 
-            return new LogInMobileResponseDto { UserId = user.Id, UserType = user.UserType};
+            var tokens = GenerateTokens(user);
+
+            return new LogInMobileResponseDto
+            {
+                UserId = user.Id,
+                UserType = user.UserType,
+                AccessToken = tokens.AccessToken,
+                RefreshToken = tokens.RefreshToken
+            };
         });
+    }
+
+    private JwtResponse GenerateTokens(Users user)
+    {
+        var tokens = _jwtService.GenerateTokens(new JwtUserInfo
+        {
+            Id = user.Id.ConvertToGuid() ?? Guid.Empty,
+            Email = user.Email,
+            UserType = user.UserType,
+            PhoneNumber = user.PhoneNumber
+        });
+        return tokens;
     }
 
 
