@@ -47,7 +47,7 @@ services:
             Redis__Port: ${REDIS_PORT}
             Redis__User: ${REDIS_USER}
             Redis__Password: ${REDIS_PASSWORD}
-            ORIGINS: "https://clean-service.kwork.live"
+            ORIGINS: "https://clean-service.kwork.live,https://admin.cleanservice.app"
         depends_on:
             - database
             - redis
