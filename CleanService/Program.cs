@@ -29,7 +29,7 @@ const string allowPolicy = "AllowCors";
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(allowPolicy,
-        policy => { policy.WithOrigins(origins).AllowCredentials().AllowAnyHeader().AllowAnyMethod(); });
+        policy => { policy.AllowAnyOrigin().AllowCredentials().AllowAnyHeader().AllowAnyMethod(); });
 });
 
 builder.Logging.ClearProviders();
