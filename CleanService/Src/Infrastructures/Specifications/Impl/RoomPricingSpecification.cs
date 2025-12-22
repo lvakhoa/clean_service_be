@@ -6,9 +6,11 @@ namespace CleanService.Src.Infrastructures.Specifications.Impl;
 
 public class RoomPricingSpecification
 {
-    public static BaseSpecification<RoomPricing> GetRoomPricingByTypeAndCountSpec(RoomType type, int count)
+    public static BaseSpecification<RoomPricing> GetRoomPricingByTypeAndCountAndServiceTypeSpec(RoomType type,
+        int count, Guid serviceTypeId)
     {
-        return new BaseSpecification<RoomPricing>(x => x.RoomType == type && x.RoomCount == count);
+        return new BaseSpecification<RoomPricing>(x =>
+            x.RoomType == type && x.RoomCount == count && x.ServiceTypeId == serviceTypeId);
     }
 
     public static BaseSpecification<RoomPricing> GetRoomPricingByRoomTypeOrServiceTypeSpec(RoomType? roomType,

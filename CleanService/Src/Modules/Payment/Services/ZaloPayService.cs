@@ -65,9 +65,9 @@ public class ZaloPayService : IPaymentService
             Description = booking.ServiceType.Name,
             EmbedData = JsonConvert.SerializeObject(new EmbedData()
             {
-                RedirectUrl = $"{_configuration["APP_URL"]}/payment-result",
+                RedirectUrl = $"{_configuration["APP_URL"]}/customer/booking/payment-result",
             }),
-            BankCode = "zalopayapp",
+            // BankCode = "zalopayapp",
             CallbackUrl = $"{_configuration["API_URL"]}/api/payment/callback",
         };
 

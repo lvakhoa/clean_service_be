@@ -61,26 +61,21 @@ public class BookingService : IBookingService
          - Duration Price
          */
         var basePrice = serviceType.BasePrice;
-        var bedroomPricing =
-            (await _unitOfWork.Repository<RoomPricing, PartialRoomPricing>().GetFirstAsync(
-                RoomPricingSpecification.GetRoomPricingByTypeAndCountSpec(RoomType.Bedroom,
-                    booking.BookingDetails.BedroomCount)))?.AdditionalPrice ?? 0;
-        var bathroomPricing =
-            (await _unitOfWork.Repository<RoomPricing, PartialRoomPricing>().GetFirstAsync(
-                RoomPricingSpecification.GetRoomPricingByTypeAndCountSpec(RoomType.Bathroom,
-                    booking.BookingDetails.BathroomCount)))?.AdditionalPrice ?? 0;
-        var kitchenPricing =
-            (await _unitOfWork.Repository<RoomPricing, PartialRoomPricing>().GetFirstAsync(
-                RoomPricingSpecification.GetRoomPricingByTypeAndCountSpec(RoomType.Kitchen,
-                    booking.BookingDetails.KitchenCount)))?.AdditionalPrice ?? 0;
-        var livingRoomPricing =
-            (await _unitOfWork.Repository<RoomPricing, PartialRoomPricing>().GetFirstAsync(
-                RoomPricingSpecification.GetRoomPricingByTypeAndCountSpec(RoomType.LivingRoom,
-                    booking.BookingDetails.LivingRoomCount)))?.AdditionalPrice ?? 0;
-        var durationPricing =
-            (await _unitOfWork.Repository<DurationPrice, PartialDurationPrice>().GetFirstAsync(
-                DurationPriceSpecification.GetDurationPriceByIdSpec(
-                    booking.BookingDetails.DurationPriceId ?? Guid.Empty)))?.PriceMultiplier ?? 0;
+        var bedroomPricing = (await _unitOfWork.Repository<RoomPricing, PartialRoomPricing>()
+            .GetFirstAsync(RoomPricingSpecification.GetRoomPricingByTypeAndCountAndServiceTypeSpec(RoomType.Bedroom,
+                booking.BookingDetails.BedroomCount, booking.ServiceTypeId)))?.AdditionalPrice ?? 0;
+        var bathroomPricing = (await _unitOfWork.Repository<RoomPricing, PartialRoomPricing>()
+            .GetFirstAsync(RoomPricingSpecification.GetRoomPricingByTypeAndCountAndServiceTypeSpec(RoomType.Bathroom,
+                booking.BookingDetails.BathroomCount, booking.ServiceTypeId)))?.AdditionalPrice ?? 0;
+        var kitchenPricing = (await _unitOfWork.Repository<RoomPricing, PartialRoomPricing>()
+            .GetFirstAsync(RoomPricingSpecification.GetRoomPricingByTypeAndCountAndServiceTypeSpec(RoomType.Kitchen,
+                booking.BookingDetails.KitchenCount, booking.ServiceTypeId)))?.AdditionalPrice ?? 0;
+        var livingRoomPricing = (await _unitOfWork.Repository<RoomPricing, PartialRoomPricing>()
+            .GetFirstAsync(RoomPricingSpecification.GetRoomPricingByTypeAndCountAndServiceTypeSpec(RoomType.LivingRoom,
+                booking.BookingDetails.LivingRoomCount, booking.ServiceTypeId)))?.AdditionalPrice ?? 0;
+        var durationPricing = (await _unitOfWork.Repository<DurationPrice, PartialDurationPrice>()
+            .GetFirstAsync(DurationPriceSpecification.GetDurationPriceByIdAndServiceTypeSpec(
+                booking.BookingDetails.DurationPriceId ?? Guid.Empty, booking.ServiceTypeId)))?.PriceMultiplier ?? 0;
 
         var totalPrice = basePrice + bedroomPricing + bathroomPricing + kitchenPricing + livingRoomPricing +
                          basePrice * durationPricing;

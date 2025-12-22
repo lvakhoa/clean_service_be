@@ -10,6 +10,11 @@ public class DurationPriceSpecification
         return new BaseSpecification<DurationPrice>(x => x.Id == id);
     }
 
+    public static BaseSpecification<DurationPrice> GetDurationPriceByIdAndServiceTypeSpec(Guid id, Guid serviceTypeId)
+    {
+        return new BaseSpecification<DurationPrice>(x => x.Id == id && x.ServiceTypeId == serviceTypeId);
+    }
+
     public static BaseSpecification<DurationPrice> GetDurationPriceOrderByDurationHoursSpec()
     {
         var spec = new BaseSpecification<DurationPrice>(null);
