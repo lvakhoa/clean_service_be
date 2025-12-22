@@ -89,7 +89,7 @@ public class AuthService : IAuthService
         return new SignUpMobileResponseDto { UserId = persistedEntity.Id };
     }
 
-    public Task<LogInMobileResponseDto> LoginUserMobile(LogInMobileRequestDto logInMobileRequestDto)
+    public async Task<LogInMobileResponseDto> LoginUserMobile(LogInMobileRequestDto logInMobileRequestDto)
     {
         var userSpec = UserSpecification.GetUserByPhoneNumberSpec(logInMobileRequestDto.PhoneNumber);
         if (userSpec == null)
@@ -97,24 +97,22 @@ public class AuthService : IAuthService
             throw new BadRequestException("Invalid phone number or password.");
         }
 
-        return _unitOfWork.Repository<Users, PartialUsers>().GetFirstAsync(userSpec).ContinueWith(u =>
+        var user = await _unitOfWork.Repository<Users, PartialUsers>().GetFirstAsync(userSpec);
+
+        if (user == null || string.IsNullOrEmpty(user.Password) || !user.Password.VerifyPassword(logInMobileRequestDto.Password))
         {
-            var user = u.Result;
-            if (user == null || !user.Password!.VerifyPassword(logInMobileRequestDto.Password))
-            {
-                throw new BadRequestException("Invalid phone number or password.");
-            }
+            throw new BadRequestException("Invalid phone number or password.");
+        }
 
-            var tokens = GenerateTokens(user);
+        var tokens = GenerateTokens(user);
 
-            return new LogInMobileResponseDto
-            {
-                UserId = user.Id,
-                UserType = user.UserType,
-                AccessToken = tokens.AccessToken,
-                RefreshToken = tokens.RefreshToken
-            };
-        });
+        return new LogInMobileResponseDto
+        {
+            UserId = user.Id,
+            UserType = user.UserType,
+            AccessToken = tokens.AccessToken,
+            RefreshToken = tokens.RefreshToken
+        };
     }
 
     private JwtResponse GenerateTokens(Users user)
@@ -150,8 +148,8 @@ public class AuthService : IAuthService
     public async Task<UserResponseDto?> GetUserById(string id)
     {
         var userSpec = UserSpecification.GetUserByIdSpec(id);
-        return await _unitOfWork.Repository<Users, PartialUsers>().GetFirstOrThrowAsync(userSpec)
-            .ContinueWith(u => _mapper.Map<UserResponseDto>(u.Result));
+        var user = await _unitOfWork.Repository<Users, PartialUsers>().GetFirstOrThrowAsync(userSpec);
+        return _mapper.Map<UserResponseDto>(user);
     }
 
     public async Task UpdateInfo(string id, UpdateUserRequestDto updateUserRequestDto)

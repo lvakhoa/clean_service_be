@@ -74,18 +74,20 @@ public class AuthController : ApiController
 
     [HttpPost("signup/mobile")]
     [AllowAnonymous]
-    public IActionResult SignUpMobile([FromBody] SignUpMobileRequestDto signUpMobileRequestDto)
+    public async Task<IActionResult> SignUpMobile([FromBody] SignUpMobileRequestDto signUpMobileRequestDto)
     {
+        var result = await _authService.RegisterUserMobile(signUpMobileRequestDto);
         return Ok(new ApiSuccessResult<SignUpMobileResponseDto>(StatusCodes.Status201Created,
-            "Sign up mobile successfully", _authService.RegisterUserMobile(signUpMobileRequestDto).Result));
+            "Sign up mobile successfully", result));
     }
 
     [HttpPost("login/mobile")]
     [AllowAnonymous]
-    public IActionResult LogInMobile([FromBody] LogInMobileRequestDto logInMobileRequestDto)
+    public async Task<IActionResult> LogInMobile([FromBody] LogInMobileRequestDto logInMobileRequestDto)
     {
+        var result = await _authService.LoginUserMobile(logInMobileRequestDto);
         return Ok(new ApiSuccessResult<LogInMobileResponseDto>(StatusCodes.Status200OK, "Log in mobile successfully",
-            _authService.LoginUserMobile(logInMobileRequestDto).Result));
+            result));
     }
 
     [HttpGet("login")]
