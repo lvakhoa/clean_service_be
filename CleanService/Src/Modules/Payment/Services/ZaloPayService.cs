@@ -1,7 +1,10 @@
 using CleanService.Src.Constant;
 using CleanService.Src.Exceptions;
+using CleanService.Src.Infrastructures.Repositories;
+using CleanService.Src.Infrastructures.Specifications.Impl;
 using CleanService.Src.Models;
 using CleanService.Src.Models.Domains;
+using CleanService.Src.Models.Enums;
 using CleanService.Src.Modules.Payment.Mapping.DTOs;
 using CleanService.Src.Modules.Payment.Mapping.DTOs.PayOs;
 using CleanService.Src.Modules.Payment.Mapping.DTOs.ZaloPay;
@@ -28,8 +31,10 @@ public class ZaloPayService : IPaymentService
     private readonly string _url;
     private readonly string _key1;
     private readonly string _clientUrl;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public ZaloPayService(IRequestClient requestClient, IConfiguration configuration, HttpClientHandler httpClientHandler)
+    public ZaloPayService(IRequestClient requestClient, IConfiguration configuration,
+        HttpClientHandler httpClientHandler, IUnitOfWork unitOfWork)
     {
         _requestClient = requestClient;
         _configuration = configuration;
@@ -38,6 +43,7 @@ public class ZaloPayService : IPaymentService
         _url = _configuration["ZaloPay:Url"]!;
         _key1 = _configuration["ZaloPay:Key1"]!;
         _clientUrl = httpClientHandler.getClientUrl();
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<string> CreatePaymentLink(Bookings booking)
@@ -105,9 +111,14 @@ public class ZaloPayService : IPaymentService
         throw new NotImplementedException();
     }
 
-    public Task ConfirmPayment(int orderCode)
+    public async Task ConfirmPayment(int orderCode)
     {
-        throw new NotImplementedException();
+        var booking = await _unitOfWork.Repository<Bookings, PartialBookings>()
+            .GetFirstAsync(BookingSpecification.GetBookingByOrderIdSpec(orderCode));
+        if (booking == null) return;
+
+        booking.PaymentStatus = PaymentStatus.Paid;
+        await _unitOfWork.SaveChangesAsync();
     }
 
     public Task CancelPayment(int orderCode)

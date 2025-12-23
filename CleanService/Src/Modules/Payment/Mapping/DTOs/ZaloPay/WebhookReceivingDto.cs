@@ -8,11 +8,11 @@ public class WebhookReceivingDto
 {
     [JsonPropertyName("data")]
     [JsonProperty("data")]
-    public WebhookData Data { get; set; } = new WebhookData();
+    public WebhookData Data { get; set; }
 
     [JsonPropertyName("mac")]
     [JsonProperty("mac")]
-    public string Mac { get; set; } = string.Empty;
+    public string Mac { get; set; }
 
     [JsonPropertyName("type")]
     [JsonProperty("type")]
@@ -27,11 +27,11 @@ public class WebhookData : BaseWebhookData
 
     [JsonPropertyName("app_user")]
     [JsonProperty("app_user")]
-    public string AppUser { get; set; } = string.Empty;
+    public string AppUser { get; set; }
 
     [JsonPropertyName("app_trans_id")]
     [JsonProperty("app_trans_id")]
-    public string AppTransId { get; set; } = string.Empty;
+    public string AppTransId { get; set; }
 
     [JsonPropertyName("app_time")]
     [JsonProperty("app_time")]
@@ -43,11 +43,11 @@ public class WebhookData : BaseWebhookData
 
     [JsonPropertyName("item")]
     [JsonProperty("item")]
-    public string Item { get; set; } = string.Empty;
+    public string Item { get; set; }
 
     [JsonPropertyName("embed_data")]
     [JsonProperty("embed_data")]
-    public string EmbedData { get; set; } = string.Empty;
+    public string EmbedData { get; set; }
 
     [JsonPropertyName("zp_trans_id")]
     [JsonProperty("zp_trans_id")]
@@ -63,7 +63,7 @@ public class WebhookData : BaseWebhookData
 
     [JsonPropertyName("merchant_user_id")]
     [JsonProperty("merchant_user_id")]
-    public string MerchantUserId { get; set; } = string.Empty;
+    public string MerchantUserId { get; set; }
 
     [JsonPropertyName("user_fee_amount")]
     [JsonProperty("user_fee_amount")]
