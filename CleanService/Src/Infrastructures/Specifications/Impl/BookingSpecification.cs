@@ -40,4 +40,11 @@ public class BookingSpecification
         }
         return spec;
     }
+
+    public static BaseSpecification<Bookings> GetPendingBookingsSpec()
+    {
+        return new BaseSpecification<Bookings>(x =>
+            x.Status == BookingStatus.Confirmed &&
+            x.PaymentStatus == PaymentStatus.Pending);
+    }
 }

@@ -121,8 +121,16 @@ public class ZaloPayService : IPaymentService
         await _unitOfWork.SaveChangesAsync();
     }
 
-    public Task CancelPayment(int orderCode)
+    public async Task CancelPayment(int orderCode)
     {
-        throw new NotImplementedException();
+        var booking = await _unitOfWork.Repository<Bookings, PartialBookings>()
+            .GetFirstAsync(BookingSpecification.GetBookingByOrderIdSpec(orderCode));
+        if (booking == null)
+            throw new NotFoundException("Booking not found with order code " + orderCode, ExceptionConvention.NotFound);
+
+        booking.Status = BookingStatus.Cancelled;
+        booking.CancellationReason = "Payment canceled";
+        booking.HelperId = null;
+        await _unitOfWork.SaveChangesAsync();
     }
 }

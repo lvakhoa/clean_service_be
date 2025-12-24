@@ -269,22 +269,42 @@ public class CleanServiceContext : DbContext
 
         // Notifications entity config
         modelBuilder.Entity<Notifications>()
-            .Property(n => n.CreatedAt)
-            .HasDefaultValue(DateTime.Now);
-        modelBuilder.Entity<Notifications>()
             .Property(n => n.IsRead)
             .HasDefaultValue(false);
     }
 
     public override int SaveChanges()
     {
-        var modifiedEntities = ChangeTracker.Entries()
-            .Where(e => e.State == EntityState.Modified);
+        var entries = ChangeTracker.Entries()
+            .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
 
-        foreach (var entity in modifiedEntities)
+        foreach (var entry in entries)
         {
-            if (entity.GetType().GetProperty("UpdatedAt") != null)
-                entity.Property("UpdatedAt").CurrentValue = DateTime.Now;
+            var entityType = entry.Entity.GetType();
+
+            // Set UpdatedAt for both Added and Modified entities
+            var updatedAtProperty = entityType.GetProperty("UpdatedAt");
+            if (updatedAtProperty != null)
+            {
+                entry.Property("UpdatedAt").CurrentValue = DateTime.UtcNow;
+            }
+
+            // Set CreatedAt only for new entities
+            if (entry.State == EntityState.Added)
+            {
+                var createdAtProperty = entityType.GetProperty("CreatedAt");
+                if (createdAtProperty != null)
+                {
+                    entry.Property("CreatedAt").CurrentValue = DateTime.UtcNow;
+                }
+
+                // Special handling for BlacklistedUsers.BlacklistedAt
+                var blacklistedAtProperty = entityType.GetProperty("BlacklistedAt");
+                if (blacklistedAtProperty != null)
+                {
+                    entry.Property("BlacklistedAt").CurrentValue = DateTime.UtcNow;
+                }
+            }
         }
 
         return base.SaveChanges();
@@ -293,13 +313,36 @@ public class CleanServiceContext : DbContext
     public override Task<int> SaveChangesAsync(
         CancellationToken cancellationToken = default(CancellationToken))
     {
-        var modifiedEntities = ChangeTracker.Entries()
-            .Where(e => e.State == EntityState.Modified);
+        var entries = ChangeTracker.Entries()
+            .Where(e => e.State == EntityState.Added || e.State == EntityState.Modified);
 
-        foreach (var entity in modifiedEntities)
+        foreach (var entry in entries)
         {
-            if (entity.GetType().GetProperty("UpdatedAt") != null)
-                entity.Property("UpdatedAt").CurrentValue = DateTime.Now;
+            var entityType = entry.Entity.GetType();
+
+            // Set UpdatedAt for both Added and Modified entities
+            var updatedAtProperty = entityType.GetProperty("UpdatedAt");
+            if (updatedAtProperty != null)
+            {
+                entry.Property("UpdatedAt").CurrentValue = DateTime.UtcNow;
+            }
+
+            // Set CreatedAt only for new entities
+            if (entry.State == EntityState.Added)
+            {
+                var createdAtProperty = entityType.GetProperty("CreatedAt");
+                if (createdAtProperty != null)
+                {
+                    entry.Property("CreatedAt").CurrentValue = DateTime.UtcNow;
+                }
+
+                // Special handling for BlacklistedUsers.BlacklistedAt
+                var blacklistedAtProperty = entityType.GetProperty("BlacklistedAt");
+                if (blacklistedAtProperty != null)
+                {
+                    entry.Property("BlacklistedAt").CurrentValue = DateTime.UtcNow;
+                }
+            }
         }
 
         return base.SaveChangesAsync(cancellationToken);

@@ -6,6 +6,7 @@ using CleanService.Src.Configs;
 using CleanService.Src.Constant;
 using CleanService.Src.Database;
 using CleanService.Src.Exceptions;
+using CleanService.Src.Jobs;
 using CleanService.Src.Middlewares;
 using CleanService.Src.Models;
 using CleanService.Src.Models.Enums;
@@ -74,6 +75,8 @@ builder.Services.AddAppDependency(builder);
 builder.Services.RegisterRateLimiter();
 
 builder.Services.AddCaching(builder.Configuration);
+
+builder.Services.AddHostedService<BookingCancellationJob>();
 
 Cloudinary cloudinary = new Cloudinary(builder.Configuration["CLOUDINARY_URL"]);
 
