@@ -35,8 +35,8 @@ public class ServiceTypeService : IServiceTypeService
 
     public async Task UpdateServiceType(Guid id, UpdateServiceTypeRequestDto updateServiceTypeDto)
     {
-        var serviceType = await _unitOfWork.Repository<ServiceTypes, PartialServiceTypes>().GetFirstOrThrowAsync(
-        );
+
+        var serviceType = await _unitOfWork.Repository<ServiceTypes, PartialServiceTypes>().GetFirstOrThrowAsync(ServiceTypeSpecification.GetServiceTypeByIdSpec(id));
 
         var serviceTypeEntity = _mapper.Map<PartialServiceTypes>(updateServiceTypeDto);
 
