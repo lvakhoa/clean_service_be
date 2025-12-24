@@ -16,6 +16,7 @@
 - [Features](#-features)
 - [Technology Stack](#%EF%B8%8F-technology-stack)
 - [Getting Started](#-getting-started)
+- [Development Guidelines](#-development-guidelines)
 - [Project Structure](#-project-structure)
 - [Database Configuration](#-database-configuration)
 - [Deployment](#-deployment)
@@ -118,29 +119,369 @@ docker-compose up --build
 #Or else run by the "Start" button from IDE you are using
 ```
 
+## 👨‍💻 Development Guidelines
+
+### Environment Setup
+
+#### 1. Configure Development Environment
+Create your development configuration file:
+```bash
+cp CleanService/appsettings.example.json CleanService/appsettings.Development.json
+```
+
+Update the following required settings in `appsettings.Development.json`:
+
+**Database Configuration:**
+```json
+"ConnectionStrings": {
+  "DefaultConnection": "Server=localhost;Database=clean_service_db;User=root;Password=your_password;"
+}
+```
+
+**Redis Configuration:**
+```json
+"Redis": {
+  "Host": "localhost",
+  "Port": "6379",
+  "Password": "",
+  "User": "default"
+}
+```
+
+**OAuth/Clerk Configuration:**
+```json
+"OAuthProvider": {
+  "Domain": "your-clerk-domain.clerk.accounts.dev",
+  "ClientId": "your-oauth-client-id",
+  "ClientSecret": "your-oauth-client-secret"
+}
+```
+
+**Firebase Configuration:**
+- Get your Firebase service account JSON from Firebase Console
+- Copy the values to the `FirebaseConfig` section
+
+**Payment Gateway Configuration:**
+- **PayOS**: For local payments
+- **VnPay**: Vietnamese payment gateway (use sandbox URL for development)
+- **ZaloPay**: ZaloPay integration (use sandbox URL for development)
+
+**Cloudinary Configuration:**
+```json
+"CLOUDINARY_URL": "cloudinary://api_key:api_secret@cloud_name"
+```
+
+**Email Configuration:**
+```json
+"Resend": {
+  "ApiKey": "re_your_resend_api_key"
+},
+"Mail": {
+  "From": "noreply@yourdomain.com"
+}
+```
+
+**Application URLs:**
+```json
+"WEB_URL": "http://localhost:3000",
+"APP_URL": "myapp://",
+"API_URL": "http://localhost:5011"
+```
+
+**Secret Key for JWT:**
+```json
+"SECRET_KEY": "your-secret-key-for-jwt-minimum-32-characters-long"
+```
+
+#### 2. Database Setup
+
+**Local MySQL Setup:**
+```bash
+# Start MySQL service
+sudo service mysql start  # Linux
+brew services start mysql  # macOS
+
+# Create database
+mysql -u root -p
+CREATE DATABASE clean_service_db;
+exit;
+
+# Run migrations
+dotnet ef database update
+```
+
+**Docker MySQL Setup:**
+```bash
+# MySQL is configured in docker-compose.yaml
+# Just run docker-compose
+docker-compose up mysql redis
+```
+
+#### 3. Redis Setup
+
+**Local Redis:**
+```bash
+# Install Redis
+sudo apt-get install redis-server  # Linux
+brew install redis                  # macOS
+
+# Start Redis
+redis-server
+```
+
+**Docker Redis:**
+```bash
+# Included in docker-compose.yaml
+docker-compose up redis
+```
+
+### Code Style and Standards
+
+#### Naming Conventions
+- **Classes**: PascalCase (e.g., `BookingService`, `UserController`)
+- **Methods**: PascalCase (e.g., `CreateBooking`, `GetUserById`)
+- **Variables**: camelCase (e.g., `userId`, `bookingDetails`)
+- **Private fields**: _camelCase (e.g., `_unitOfWork`, `_logger`)
+- **Constants**: UPPER_SNAKE_CASE (e.g., `MAX_RETRY_COUNT`)
+
+#### Entity Framework Guidelines
+- Always use specifications for queries
+- Use async/await for database operations
+- Never use `.Result` or `.Wait()` - always use `await`
+- Handle CreatedAt/UpdatedAt automatically in DbContext
+- Use transactions for complex operations
+
+**Example - Correct Way:**
+```csharp
+// ✅ CORRECT
+public async Task<Booking> GetBookingAsync(Guid id)
+{
+    var spec = BookingSpecification.GetBookingByIdSpec(id);
+    return await _unitOfWork.Repository<Bookings, PartialBookings>()
+        .GetFirstOrThrowAsync(spec);
+}
+
+// ❌ WRONG
+public Booking GetBooking(Guid id)
+{
+    return _context.Bookings.FirstOrDefault(b => b.Id == id); // Don't use DbContext directly
+}
+```
+
+#### Exception Handling
+- Use custom exceptions (`BadRequestException`, `NotFoundException`, etc.)
+- Let the global exception handler catch and format errors
+- Don't wrap exceptions unnecessarily
+
+**Example:**
+```csharp
+// ✅ CORRECT
+if (user == null)
+{
+    throw new NotFoundException("User not found");
+}
+
+// ❌ WRONG
+try
+{
+    // ... some code
+}
+catch (Exception ex)
+{
+    return new ErrorResponse(ex.Message); // Let exception handler do this
+}
+```
+
+#### Controller Best Practices
+- Keep controllers thin - business logic goes in services
+- Use async actions
+- Return proper status codes
+- Use ApiController attribute and ApiSuccessResult/ApiErrorResult
+
+**Example:**
+```csharp
+[HttpPost]
+public async Task<IActionResult> CreateBooking([FromBody] CreateBookingDto dto)
+{
+    var result = await _bookingService.CreateBookingAsync(dto);
+    return Ok(new ApiSuccessResult<BookingResponseDto>(
+        StatusCodes.Status201Created,
+        "Booking created successfully",
+        result
+    ));
+}
+```
+
+#### Background Jobs
+- Use BackgroundService for long-running tasks
+- Log important events and errors
+- Handle cancellation tokens properly
+- Use scoped services correctly
+
+### Git Workflow
+
+#### Branch Naming
+- Feature: `feat/issue-id-short-description`
+- Bug fix: `fix/issue-id-short-description`
+- Hotfix: `hotfix/issue-id-short-description`
+- Documentation: `docs/short-description`
+
+**Examples:**
+```bash
+feat/123-add-booking-cancellation
+fix/456-datetime-timezone-issue
+hotfix/789-payment-callback-error
+docs/update-api-documentation
+```
+
+#### Commit Messages
+Follow the format: `{type}: #{issue_id} {subject}`
+
+**Types:**
+- `feat`: New feature
+- `fix`: Bug fix
+- `docs`: Documentation changes
+- `style`: Code style changes (formatting, semicolons, etc.)
+- `refactor`: Code refactoring
+- `perf`: Performance improvements
+- `test`: Adding tests
+- `build`: Build system changes
+- `ci`: CI/CD changes
+- `chore`: Other changes
+
+**Examples:**
+```bash
+git commit -m "feat: #123 add booking cancellation job"
+git commit -m "fix: #456 correct CreatedAt timezone issue"
+git commit -m "docs: update development guidelines"
+```
+
+#### Pull Request Guidelines
+1. Create a branch from `main`
+2. Make your changes
+3. Run tests and ensure they pass
+4. Update documentation if needed
+5. Create PR with clear description
+6. Link related issues
+7. Request review from team members
+
+### Testing
+
+#### Unit Tests
+```bash
+# Run all tests
+dotnet test
+
+# Run specific test
+dotnet test --filter "FullyQualifiedName~BookingServiceTests"
+
+# Run with coverage
+dotnet test --collect:"XPlat Code Coverage"
+```
+
+#### Manual API Testing
+Use the Swagger UI available at: `http://localhost:5011/swagger`
+
+Or use tools like:
+- Postman
+- Insomnia
+- cURL
+
+### Debugging
+
+#### Visual Studio / Rider
+1. Set breakpoints in your code
+2. Press F5 to start debugging
+3. Use the Debug Console to inspect variables
+
+#### Logs
+Check application logs in:
+```bash
+# Console output
+dotnet run
+
+# Check background job logs
+# Look for BookingCancellationJob messages
+```
+
+### Common Issues and Solutions
+
+#### Issue: DateTime always shows same value
+**Solution:**
+- Don't use `HasDefaultValue(DateTime.Now)` in EF configuration
+- Handle CreatedAt/UpdatedAt in SaveChanges override
+- Use `DateTime.UtcNow` instead of `DateTime.Now`
+
+#### Issue: Exception not caught by exception handler
+**Solution:**
+- Never use `.Result` or `.Wait()` on async methods
+- Use `async/await` properly
+- Don't use `ContinueWith` - use `await` instead
+
+#### Issue: Database connection failed
+**Solution:**
+- Check MySQL service is running
+- Verify connection string in appsettings.Development.json
+- Ensure database exists: `CREATE DATABASE clean_service_db;`
+
+#### Issue: Redis connection failed
+**Solution:**
+- Check Redis service is running: `redis-cli ping`
+- Verify Redis configuration in appsettings.Development.json
+- For local development, password can be empty
+
+### Performance Best Practices
+
+1. **Use Redis caching** for frequently accessed data
+2. **Use pagination** for list endpoints
+3. **Add database indexes** for frequently queried columns
+4. **Use .AsNoTracking()** for read-only queries
+5. **Avoid N+1 queries** - use Include() or AutoInclude
+6. **Use background jobs** for long-running tasks
+
+### Security Best Practices
+
+1. **Never commit sensitive data** - use appsettings.Development.json (gitignored)
+2. **Use environment variables** for production secrets
+3. **Validate all user inputs** using FluentValidation
+4. **Use parameterized queries** (EF Core does this by default)
+5. **Implement proper authorization** using policies and roles
+6. **Use HTTPS** in production
+
+### Before Submitting PR
+
+- [ ] Code compiles without errors
+- [ ] All tests pass
+- [ ] Code follows naming conventions
+- [ ] Added/updated documentation
+- [ ] No sensitive data in commits
+- [ ] Commit messages follow guidelines
+- [ ] PR description is clear and complete
+
+
 ## 🏗️ Project Structure
 
 ```
-clean_service_be/          
-├── CleanService/                 
-│   ├── Properties/     
+clean_service_be/
+├── CleanService/
+│   ├── Properties/
 │   ├── Src/
-│   │   ├── Common/           
-│   │   ├── Configs/ 
-│   │   ├── Constant/ 
-│   │   ├── Database/ 
-│   │   ├── Exceptions/ 
-│   │   ├── Filters/ 
-│   │   ├── Infrastructures/ 
-│   │   ├── Middlewares/ 
-│   │   ├── Model/ 
-│   │   ├── Modules/ 
+│   │   ├── Common/
+│   │   ├── Configs/
+│   │   ├── Constant/
+│   │   ├── Database/
+│   │   ├── Exceptions/
+│   │   ├── Filters/
+│   │   ├── Infrastructures/
+│   │   ├── Middlewares/
+│   │   ├── Model/
+│   │   ├── Modules/
 │   │   ├── Utils/
-│   ├── CleanService.csproj            
-│   ├── CleanService.csproj.DotSettings   
-│   └── Program.cs      
-├── .config/            
-├── .husky/                       
+│   ├── CleanService.csproj
+│   ├── CleanService.csproj.DotSettings
+│   └── Program.cs
+├── .config/
+├── .husky/
 └── Dockerfile
 ```
 
