@@ -272,20 +272,43 @@ public class BookingService : IBookingService
         // {
         //     throw new ArgumentNullException(nameof(createFeedbackDto), "Feedback data cannot be null.");
         // }
-        var booking = await _unitOfWork.Repository<Bookings, PartialBookings>().GetFirstOrThrowAsync(
-            BookingSpecification.GetBookingByIdSpec(createFeedbackDto.BookingId));
+        // var booking = await _unitOfWork.Repository<Bookings, PartialBookings>().GetFirstOrThrowAsync(
+        //     BookingSpecification.GetBookingByIdSpec(createFeedbackDto.BookingId));
+        // if (booking.Status != BookingStatus.Completed)
+        //     throw new BadRequestException("Cannot create feedback if booking status is not completed.",
+        //         ExceptionConvention.BookingStatusNotCompleted);
+        //
+        // var feedback = _mapper.Map<Feedbacks>(createFeedbackDto);
+        // await _unitOfWork.Repository<Feedbacks, PartialFeedback>().AddAsync(feedback);
+        //
+        // //update booking rating
+        // await _unitOfWork.Repository<Bookings, PartialBookings>().Detach(booking);
+        //
+        // var updateBooking = new PartialBookings() { HelperRating = createFeedbackDto.Rating, };
+        // await _unitOfWork.Repository<Bookings, PartialBookings>().UpdateAsync(updateBooking, booking);
+        //
+        // await _unitOfWork.SaveChangesAsync();
+
+        var booking = await _unitOfWork
+            .Repository<Bookings, PartialBookings>()
+            .GetFirstOrThrowAsync(
+                BookingSpecification.GetBookingByIdSpec(createFeedbackDto.BookingId)
+            );
+
         if (booking.Status != BookingStatus.Completed)
-            throw new BadRequestException("Cannot create feedback if booking status is not completed.",
-                ExceptionConvention.BookingStatusNotCompleted);
+            throw new BadRequestException(
+                "Cannot create feedback if booking status is not completed.",
+                ExceptionConvention.BookingStatusNotCompleted
+            );
 
         var feedback = _mapper.Map<Feedbacks>(createFeedbackDto);
-        await _unitOfWork.Repository<Feedbacks, PartialFeedback>().AddAsync(feedback);
 
-        //update booking rating
-        await _unitOfWork.Repository<Bookings, PartialBookings>().Detach(booking);
+        await _unitOfWork
+            .Repository<Feedbacks, PartialFeedback>()
+            .AddAsync(feedback);
 
-        var updateBooking = new PartialBookings() { HelperRating = createFeedbackDto.Rating, };
-        await _unitOfWork.Repository<Bookings, PartialBookings>().UpdateAsync(updateBooking, booking);
+        booking.HelperRating = createFeedbackDto.Rating;
+        booking.UpdatedAt = DateTime.UtcNow;
 
         await _unitOfWork.SaveChangesAsync();
     }
