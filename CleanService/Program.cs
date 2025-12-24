@@ -72,7 +72,7 @@ builder.Services.AddAuthorization(options =>
 
 builder.Services.AddAppDependency(builder);
 
-builder.Services.RegisterRateLimiter();
+// builder.Services.RegisterRateLimiter();
 
 builder.Services.AddCaching(builder.Configuration);
 
@@ -102,7 +102,7 @@ app.UseCors(allowPolicy);
 
 app.UseStaticFiles();
 
-app.UseRateLimiter();
+// app.UseRateLimiter();
 
 app.Use(async (context, next) =>
 {
