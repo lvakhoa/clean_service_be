@@ -40,8 +40,8 @@ public class ServiceTypeService : IServiceTypeService
 
         var serviceTypeEntity = _mapper.Map<PartialServiceTypes>(updateServiceTypeDto);
 
-        await _unitOfWork.Repository<ServiceCategories, PartialServiceCategories>().GetFirstOrThrowAsync(ServiceCategorySpecification.GetServiceCategoryById(id)
-        );
+        // await _unitOfWork.Repository<ServiceCategories, PartialServiceCategories>().GetFirstOrThrowAsync(ServiceCategorySpecification.GetServiceCategoryById(id)
+        // );
 
         await _unitOfWork.Repository<ServiceTypes, PartialServiceTypes>().Detach(serviceType);
         await _unitOfWork.Repository<ServiceTypes, PartialServiceTypes>().UpdateAsync(serviceTypeEntity, serviceType);
