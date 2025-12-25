@@ -5,6 +5,7 @@ using CleanService.Src.Infrastructures.Specifications.Impl;
 using CleanService.Src.Models;
 using CleanService.Src.Models.Domains;
 using CleanService.Src.Models.Enums;
+using CleanService.Src.Modules.Mail.Services;
 using CleanService.Src.Modules.Payment.Mapping.DTOs;
 using CleanService.Src.Modules.Payment.Mapping.DTOs.PayOs;
 using CleanService.Src.Modules.Payment.Mapping.DTOs.ZaloPay;
@@ -32,9 +33,10 @@ public class ZaloPayService : IPaymentService
     private readonly string _key1;
     private readonly string _clientUrl;
     private readonly IUnitOfWork _unitOfWork;
+    private readonly IMailService _mailService;
 
     public ZaloPayService(IRequestClient requestClient, IConfiguration configuration,
-        HttpClientHandler httpClientHandler, IUnitOfWork unitOfWork)
+        HttpClientHandler httpClientHandler, IUnitOfWork unitOfWork, IMailService mailService)
     {
         _requestClient = requestClient;
         _configuration = configuration;
@@ -44,6 +46,7 @@ public class ZaloPayService : IPaymentService
         _key1 = _configuration["ZaloPay:Key1"]!;
         _clientUrl = httpClientHandler.getClientUrl();
         _unitOfWork = unitOfWork;
+        _mailService = mailService;
     }
 
     public async Task<string> CreatePaymentLink(Bookings booking)
@@ -119,6 +122,84 @@ public class ZaloPayService : IPaymentService
 
         booking.PaymentStatus = PaymentStatus.Paid;
         await _unitOfWork.SaveChangesAsync();
+
+        // Send email to customer
+        try
+        {
+            var customerEmailBody = $@"
+                <html>
+                <body>
+                    <h2>✅ Payment Successful</h2>
+                    <p>Dear {booking.Customer.FullName},</p>
+                    <p>Your payment has been successfully processed and your booking is now confirmed!</p>
+                    <h3>Booking Details:</h3>
+                    <ul>
+                        <li><strong>Order ID:</strong> {booking.OrderId}</li>
+                        <li><strong>Service:</strong> {booking.ServiceType.Name}</li>
+                        <li><strong>Scheduled Start:</strong> {booking.ScheduledStartTime:yyyy-MM-dd HH:mm}</li>
+                        <li><strong>Scheduled End:</strong> {booking.ScheduledEndTime:yyyy-MM-dd HH:mm}</li>
+                        <li><strong>Total Price:</strong> ${booking.TotalPrice:F2}</li>
+                        <li><strong>Payment Status:</strong> Paid ✓</li>
+                        <li><strong>Booking Status:</strong> {booking.Status}</li>
+                    </ul>
+                    <p>Our helper will arrive at your location at the scheduled time. You will receive their contact information shortly.</p>
+                    <p>Thank you for choosing our cleaning service!</p>
+                </body>
+                </html>
+            ";
+
+            await _mailService.SendMail(booking.Customer.Email, "Payment Successful - Order #" + booking.OrderId,
+                customerEmailBody);
+        }
+        catch (Exception ex)
+        {
+            // Log the error but don't fail the booking creation
+            Console.WriteLine($"Failed to send email to customer: {ex.Message}");
+        }
+
+        // Send email to helper
+        if (booking.HelperId != null)
+        {
+            try
+            {
+                var helperSpec = UserSpecification.GetUserByIdSpec(booking.HelperId);
+                var helper = await _unitOfWork.Repository<Users, PartialUsers>().GetFirstAsync(helperSpec);
+
+                if (helper != null)
+                {
+                    var helperEmailBody = $@"
+                        <html>
+                        <body>
+                            <h2>New Booking Assignment</h2>
+                            <p>Dear {helper.FullName},</p>
+                            <p>You have been assigned to a new booking!</p>
+                            <h3>Booking Details:</h3>
+                            <ul>
+                                <li><strong>Order ID:</strong> {booking.OrderId}</li>
+                                <li><strong>Service:</strong> {booking.ServiceType.Name}</li>
+                                <li><strong>Customer:</strong> {booking.Customer.FullName}</li>
+                                <li><strong>Customer Phone:</strong> {booking.Customer.PhoneNumber ?? "N/A"}</li>
+                                <li><strong>Address:</strong> {booking.Location}</li>
+                                <li><strong>Scheduled Start:</strong> {booking.ScheduledStartTime:yyyy-MM-dd HH:mm}</li>
+                                <li><strong>Scheduled End:</strong> {booking.ScheduledEndTime:yyyy-MM-dd HH:mm}</li>
+                                <li><strong>Status:</strong> {booking.Status}</li>
+                            </ul>
+                            <p>Please be ready for this assignment at the scheduled time.</p>
+                            <p>Thank you!</p>
+                        </body>
+                        </html>
+                    ";
+
+                    await _mailService.SendMail(helper.Email, "New Booking Assignment - Order #" + booking.OrderId,
+                        helperEmailBody);
+                }
+            }
+            catch (Exception ex)
+            {
+                // Log the error but don't fail the booking creation
+                Console.WriteLine($"Failed to send email to helper: {ex.Message}");
+            }
+        }
     }
 
     public async Task CancelPayment(int orderCode)
